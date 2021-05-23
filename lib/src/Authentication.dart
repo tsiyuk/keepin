@@ -1,8 +1,7 @@
-import 'dart:html';
-
 import 'package:flutter/material.dart';
+import 'package:keepin/src/AuthenticationForms.dart';
 
-import 'Widgets.dart';
+import 'CommonWidgets.dart';
 
 enum LoginState {
   loggedOut,
@@ -17,15 +16,21 @@ class Authentication extends StatelessWidget {
   Authentication({
     required this.loginState,
     this.email,
+    required this.startLoginWithEmail,
+    required this.startRegister,
+    required this.startLoginWithGoogle,
     required this.verifyEmail,
     required this.signInWithEmailAndPassword,
-    required this.cancelRegistration,
+    required this.cancel,
     required this.registerWithEmailAndPassword,
     required this.signOut,
   });
 
   final LoginState loginState;
-  String? email;
+  final String? email;
+  final void Function() startLoginWithEmail;
+  final void Function() startRegister;
+  final void Function() startLoginWithGoogle;
   final void Function(
     String email,
     void Function(Exception e) error,
@@ -36,7 +41,7 @@ class Authentication extends StatelessWidget {
     void Function(Exception e) error,
   ) signInWithEmailAndPassword;
   // TODO: signINWithGoogle
-  final void Function() cancelRegistration;
+  final void Function() cancel;
   final void Function(
     String email,
     String displayName,
@@ -46,7 +51,48 @@ class Authentication extends StatelessWidget {
   final void Function() signOut;
 
   @override
-  Widget build(BuildContext buildContext) {}
+  Widget build(BuildContext buildContext) {
+    switch (loginState) {
+      case LoginState.loggedOut:
+        return LogInMethods(
+            startLoginWithEmail: startLoginWithEmail,
+            startRegister: startRegister,
+            startLoginWithGoogle: startLoginWithGoogle);
+      case LoginState.logInWithEmail:
+        return EmailPasswordForm(
+          verifyEmail: (email) => verifyEmail(
+              email, (e) => _showErrorDialog(buildContext, 'Invalid email', e)),
+          verifyEmailandPassword: (email, password) =>
+              signInWithEmailAndPassword(
+                  email,
+                  password,
+                  (e) =>
+                      _showErrorDialog(buildContext, 'Failed to sign in', e)),
+          cancel: cancel,
+        );
+      case LoginState.register:
+        return RegisterForm(
+            email: email,
+            registerAccount: (email, username, password) =>
+                registerWithEmailAndPassword(
+                    email,
+                    username,
+                    password,
+                    (e) => _showErrorDialog(
+                        buildContext, 'Failed to create account', e)),
+            cancel: cancel);
+      // TODO
+      case LoginState.logInWithGoogle:
+      case LoginState.loggedIn:
+      case LoginState.forgetPassword:
+      default:
+        return Row(
+          children: [
+            Text("Emm, need more updates"),
+          ],
+        );
+    }
+  }
 
   void _showErrorDialog(BuildContext context, String title, Exception e) {
     showDialog<void>(
