@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "823382063646",
+    "project_id": "keepin-ffe2a",
+    "storage_bucket": "keepin-ffe2a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:823382063646:android:092cfe6f80ccb7af020c0f",
+        "android_client_info": {
+          "package_name": "com.example.keepin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "823382063646-s3pghprakq06ev89mmtvum57q1h0dlun.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.keepin",
+            "certificate_hash": "dde1a7996b5cc3c505aeefadc8f53b54f5cc10ab"
+          }
+        },
+        {
+          "client_id": "823382063646-oqbbl48c5irckf22rv3ssdb6bojh4ckp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHik-zsM0bwP2WWXskcTnQJDko0yVNJCY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "823382063646-oqbbl48c5irckf22rv3ssdb6bojh4ckp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
