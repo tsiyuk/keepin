@@ -1,4 +1,3 @@
-// @dart=2.9
 import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,6 +29,11 @@ class UserState extends ChangeNotifier {
 
   void startRegister() {
     _loginState = LoginState.register;
+    notifyListeners();
+  }
+
+  void startChangePassword() {
+    _loginState = LoginState.forgetPassword;
     notifyListeners();
   }
 
@@ -78,7 +82,7 @@ class UserState extends ChangeNotifier {
     try {
       UserCredential credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-      await credential.user.updateProfile(displayName: displayName);
+      await credential.user!.updateProfile(displayName: displayName);
       _loginState = LoginState.loggedIn;
       notifyListeners();
       //return credential;
@@ -113,7 +117,7 @@ class UserState extends ChangeNotifier {
 
   void signInWithGoogle() async {
     // Trigger the authentication flow
-    final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
+    final GoogleSignInAccount googleUser = (await GoogleSignIn().signIn())!;
 
     // Obtain the auth details from the request
     final GoogleSignInAuthentication googleAuth =

@@ -19,18 +19,24 @@ class Authentication extends StatelessWidget {
     UserState userState = Provider.of<UserState>(buildContext);
     switch (userState.loginState) {
       case LoginState.loggedOut:
-        return LogInMethods();
       case LoginState.logInWithEmail:
-        return EmailPasswordForm();
+        return LogInMethods();
       case LoginState.register:
         return RegisterForm();
       case LoginState.loggedIn:
       case LoginState.forgetPassword:
       default:
-        return Row(
-          children: [
-            Text("Emm, need more updates"),
-          ],
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Emm, need more updates"),
+              SecondaryButton(
+                onPressed: userState.startLoginWithEmail,
+                child: Text('Go to log in'),
+              ),
+            ],
+          ),
         );
     }
   }
