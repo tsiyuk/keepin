@@ -48,16 +48,28 @@ class IconAndDetail extends StatelessWidget {
       );
 }
 
-class StyledButton extends StatelessWidget {
-  const StyledButton({required this.child, required this.onPressed});
+class PrimaryButton extends StatelessWidget {
+  const PrimaryButton({required this.child, required this.onPressed});
   final Widget child;
   final void Function() onPressed;
 
   @override
-  Widget build(BuildContext context) => OutlinedButton(
-        style: OutlinedButton.styleFrom(
-            side: BorderSide(color: Colors.lightGreen)),
+  Widget build(BuildContext context) => ElevatedButton(
+        style: ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
         onPressed: onPressed,
         child: child,
       );
+}
+
+class SecondaryButton extends StatelessWidget {
+  const SecondaryButton({required this.child, required this.onPressed});
+  final Widget child;
+  final void Function() onPressed;
+
+  @override
+  Widget build(BuildContext context) => TextButton(
+    style: TextButton.styleFrom(primary: Theme.of(context).primaryColor),
+    onPressed: onPressed,
+    child: child,
+  );
 }

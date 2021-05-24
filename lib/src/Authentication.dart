@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:keepin/src/AuthenticationForms.dart';
-
+import 'package:provider/provider.dart';
 import 'CommonWidgets.dart';
 
 enum LoginState {
@@ -59,28 +59,9 @@ class Authentication extends StatelessWidget {
             startRegister: startRegister,
             startLoginWithGoogle: startLoginWithGoogle);
       case LoginState.logInWithEmail:
-        return EmailPasswordForm(
-          verifyEmail: (email) => verifyEmail(
-              email, (e) => _showErrorDialog(buildContext, 'Invalid email', e)),
-          verifyEmailandPassword: (email, password) =>
-              signInWithEmailAndPassword(
-                  email,
-                  password,
-                  (e) =>
-                      _showErrorDialog(buildContext, 'Failed to sign in', e)),
-          cancel: cancel,
-        );
+        return EmailPasswordForm();
       case LoginState.register:
-        return RegisterForm(
-            email: email,
-            registerAccount: (email, username, password) =>
-                registerWithEmailAndPassword(
-                    email,
-                    username,
-                    password,
-                    (e) => _showErrorDialog(
-                        buildContext, 'Failed to create account', e)),
-            cancel: cancel);
+        return RegisterForm();
       // TODO
       case LoginState.logInWithGoogle:
       case LoginState.loggedIn:
@@ -114,7 +95,7 @@ class Authentication extends StatelessWidget {
             ),
           ),
           actions: <Widget>[
-            StyledButton(
+            PrimaryButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },

@@ -1,17 +1,9 @@
 import 'package:flutter/material.dart';
-
+import 'package:keepin/src/UserState.dart';
+import 'package:provider/provider.dart';
 import 'CommonWidgets.dart';
 
 class EmailPasswordForm extends StatefulWidget {
-  EmailPasswordForm({
-    required this.verifyEmail,
-    required this.verifyEmailandPassword,
-    required this.cancel,
-  });
-  final void Function(String email) verifyEmail;
-  final void Function(String email, String password) verifyEmailandPassword;
-  final void Function() cancel;
-
   @override
   _EmailPasswordState createState() => _EmailPasswordState();
 }
@@ -23,19 +15,20 @@ class _EmailPasswordState extends State<EmailPasswordForm> {
 
   @override
   Widget build(BuildContext buildContext) {
+    UserState userState = Provider.of<UserState>(buildContext);
     return Center(
       child: Column(children: [
-        Header('Sign in with email'),
+        Image.asset("assets/images/TextLogoPrimary.png"),
         Padding(
           padding: EdgeInsets.all(8.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 24),
                 child: TextFormField(
                   controller: _emailController,
-                  decoration: InputDecoration(hintText: 'Enter your email'),
+                  decoration: InputDecoration(labelText: 'email'),
                   validator: (value) {
                     if (value!.isEmpty) {
                       return 'Enter your email address';
@@ -48,7 +41,7 @@ class _EmailPasswordState extends State<EmailPasswordForm> {
                 padding: EdgeInsets.symmetric(horizontal: 24),
                 child: TextFormField(
                   controller: _passwordController,
-                  decoration: InputDecoration(hintText: 'Enter your password'),
+                  decoration: InputDecoration(labelText: 'password'),
                   obscureText: true,
                   validator: (value) {
                     if (value!.isEmpty) {
@@ -59,26 +52,23 @@ class _EmailPasswordState extends State<EmailPasswordForm> {
                 ),
               ),
               Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  child:
-                      Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    TextButton(
-                      onPressed: widget.cancel,
-                      child: Text('CANCEL'),
-                    ),
-                    SizedBox(width: 16),
-                    StyledButton(
-                      onPressed: () {
-                        //if (_formKey.currentState!.validate()) {
-                        widget.verifyEmail(_emailController.text);
-                        widget.verifyEmailandPassword(
-                            _emailController.text, _passwordController.text);
-                        //}
-                      },
-                      child: Text('SIGN IN'),
-                    ),
-                    SizedBox(width: 30),
-                  ]))
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                  SecondaryButton(
+                    onPressed: userState.cancel,
+                    child: Text('CANCEL'),
+                  ),
+                  SizedBox(width: 16),
+                  PrimaryButton(
+                    onPressed: () {
+                      //if (_formKey.currentState!.validate()) {
+                      userState.verifyEmail(_emailController.text, (e) { });
+                      userState.signInWithEmailAndPassword(_emailController.text, _passwordController.text, (e) { });
+                    },
+                    child: Text('SIGN IN'),
+                  ),
+                  SizedBox(width: 30),
+                ]))
             ],
           ),
         )
@@ -88,15 +78,6 @@ class _EmailPasswordState extends State<EmailPasswordForm> {
 }
 
 class RegisterForm extends StatefulWidget {
-  RegisterForm({
-    required this.email,
-    required this.registerAccount,
-    required this.cancel,
-  });
-  final String? email;
-  final void Function(String email, String userName, String password)
-      registerAccount;
-  final void Function() cancel;
   @override
   _RegisterFormState createState() => _RegisterFormState();
 }
@@ -109,6 +90,7 @@ class _RegisterFormState extends State<RegisterForm> {
 
   @override
   Widget build(BuildContext buildContext) {
+    UserState userState = Provider.of<UserState>(buildContext);
     return Center(
       child: Column(children: [
         Header('Sign up with email'),
@@ -167,17 +149,19 @@ class _RegisterFormState extends State<RegisterForm> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: widget.cancel,
+                        onPressed: userState.cancel,
                         child: Text('CANCEL'),
                       ),
                       SizedBox(width: 16),
-                      StyledButton(
+                      PrimaryButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            widget.registerAccount(
+                            userState.registerAccount(
                                 _emailController.text,
                                 _userNameController.text,
-                                _passwordController.text);
+                                _passwordController.text,
+                                (e){}
+                            );
                           }
                         },
                         child: Text('SIGN UP'),
@@ -209,7 +193,7 @@ class LogInMethods extends StatelessWidget {
       String text, IconData icon, void Function() onpress) {
     return Padding(
         padding: EdgeInsets.all(10.0),
-        child: StyledButton(
+        child: PrimaryButton(
           onPressed: onpress,
           child: Row(
             children: [

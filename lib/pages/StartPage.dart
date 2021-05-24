@@ -11,9 +11,6 @@ class StartPage extends StatelessWidget {
   @override
   Widget build(BuildContext buildContext) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Sign in or Sign up"),
-      ),
       body: Consumer<UserState>(
         builder: (buildContext, userState, _) => Authentication(
             loginState: userState.loginState,
