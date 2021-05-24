@@ -4,11 +4,9 @@ import 'CommonWidgets.dart';
 
 class EmailPasswordForm extends StatefulWidget {
   EmailPasswordForm({
-    required this.verifyEmail,
     required this.verifyEmailandPassword,
     required this.cancel,
   });
-  final void Function(String email) verifyEmail;
   final void Function(String email, String password) verifyEmailandPassword;
   final void Function() cancel;
 
@@ -70,7 +68,7 @@ class _EmailPasswordState extends State<EmailPasswordForm> {
                     StyledButton(
                       onPressed: () {
                         //if (_formKey.currentState!.validate()) {
-                        widget.verifyEmail(_emailController.text);
+                        // widget.verifyEmail(_emailController.text);
                         widget.verifyEmailandPassword(
                             _emailController.text, _passwordController.text);
                         //}
@@ -89,11 +87,9 @@ class _EmailPasswordState extends State<EmailPasswordForm> {
 
 class RegisterForm extends StatefulWidget {
   RegisterForm({
-    required this.email,
     required this.registerAccount,
     required this.cancel,
   });
-  final String? email;
   final void Function(String email, String userName, String password)
       registerAccount;
   final void Function() cancel;
@@ -199,11 +195,11 @@ class LogInMethods extends StatelessWidget {
   LogInMethods({
     required this.startLoginWithEmail,
     required this.startRegister,
-    required this.startLoginWithGoogle,
+    required this.signInWithGoogle,
   });
   final void Function() startLoginWithEmail;
   final void Function() startRegister;
-  final void Function() startLoginWithGoogle;
+  final void Function() signInWithGoogle;
 
   Padding buildLogInMethod(
       String text, IconData icon, void Function() onpress) {
@@ -230,8 +226,11 @@ class LogInMethods extends StatelessWidget {
           buildLogInMethod(
               'Sign up with email', Icons.app_registration, startRegister),
           // TODO: google icon
-          buildLogInMethod('Sign in with google', Icons.android_outlined,
-              startLoginWithGoogle),
+          buildLogInMethod(
+            'Sign in with google',
+            Icons.android_outlined,
+            signInWithGoogle,
+          )
         ],
       ),
     );
