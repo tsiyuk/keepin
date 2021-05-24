@@ -180,21 +180,13 @@ class _RegisterFormState extends State<RegisterForm> {
 }
 
 class LogInMethods extends StatelessWidget {
-  LogInMethods({
-    required this.startLoginWithEmail,
-    required this.startRegister,
-    required this.startLoginWithGoogle,
-  });
-  final void Function() startLoginWithEmail;
-  final void Function() startRegister;
-  final void Function() startLoginWithGoogle;
 
   Padding buildLogInMethod(
-      String text, IconData icon, void Function() onpress) {
+      String text, IconData icon, void Function() onPress) {
     return Padding(
         padding: EdgeInsets.all(10.0),
         child: PrimaryButton(
-          onPressed: onpress,
+          onPressed: onPress,
           child: Row(
             children: [
               Icon(icon),
@@ -205,17 +197,21 @@ class LogInMethods extends StatelessWidget {
   }
 
   Widget build(BuildContext buildContext) {
+    UserState userState = Provider.of<UserState>(buildContext);
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           buildLogInMethod(
-              'Sign in with email', Icons.email_outlined, startLoginWithEmail),
+              'Sign in with email', Icons.email_outlined, userState.startLoginWithEmail),
           buildLogInMethod(
-              'Sign up with email', Icons.app_registration, startRegister),
+              'Sign up with email', Icons.app_registration, userState.startRegister),
           // TODO: google icon
-          buildLogInMethod('Sign in with google', Icons.android_outlined,
-              startLoginWithGoogle),
+          buildLogInMethod(
+            'Sign in with google',
+            Icons.android_outlined,
+            userState.signInWithGoogle,
+          )
         ],
       ),
     );
