@@ -8,10 +8,6 @@ class StartPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext buildContext) {
-    return Scaffold(
-        appBar: AppBar(
-          title: Text("Sign in or Sign up"),
-        ),
-        body: Authentication());
+    return Scaffold(body: Authentication());
   }
 }

@@ -19,39 +19,25 @@ class Authentication extends StatelessWidget {
     UserState userState = Provider.of<UserState>(buildContext);
     switch (userState.loginState) {
       case LoginState.loggedOut:
-        return LogInMethods(
-          startLoginWithEmail: userState.startLoginWithEmail,
-          startRegister: userState.startRegister,
-          signInWithGoogle: userState.signInWithGoogle,
-        );
       case LoginState.logInWithEmail:
-        return EmailPasswordForm(
-          verifyEmailandPassword: (email, password) =>
-              userState.signInWithEmailAndPassword(
-                  email,
-                  password,
-                  (e) =>
-                      _showErrorDialog(buildContext, 'Failed to sign in', e)),
-          cancel: userState.cancel,
-        );
+        return LogInMethods();
       case LoginState.register:
-        return RegisterForm(
-            registerAccount: (email, username, password) =>
-                userState.registerAccount(
-                    email,
-                    username,
-                    password,
-                    (e) => _showErrorDialog(
-                        buildContext, 'Failed to create account', e)),
-            cancel: userState.cancel);
-      // TODO
-      case LoginState.loggedIn:
+        return RegisterForm();
       case LoginState.forgetPassword:
+        return ForgetPasswordForm();
+      case LoginState.loggedIn:
       default:
-        return Row(
-          children: [
-            Text("Emm, need more updates"),
-          ],
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text("Emm, need more updates"),
+              SecondaryButton(
+                onPressed: userState.startLoginWithEmail,
+                child: Text('Go to log in'),
+              ),
+            ],
+          ),
         );
     }
   }
@@ -76,7 +62,7 @@ class Authentication extends StatelessWidget {
             ),
           ),
           actions: <Widget>[
-            StyledButton(
+            PrimaryButton(
               onPressed: () {
                 Navigator.of(context).pop();
               },

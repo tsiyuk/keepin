@@ -32,27 +32,28 @@ class UserState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // void verifyEmail(
-  //   String email,
-  //   void Function(FirebaseException e) errorCallback,
-  // ) async {
-  //   try {
-  //     var methods =
-  //         await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
-  //     if (!methods.contains('password')) {
-  //       _loginState = LoginState.register;
-  //     }
-  //     notifyListeners();
-  //   } on FirebaseAuthException catch (e) {
-  //     errorCallback(e);
-  //   }
-  // }
+  void startChangePassword() {
+    _loginState = LoginState.forgetPassword;
+    notifyListeners();
+  }
+
+  void verifyEmail(
+    String email,
+  ) async {
+    try {
+      User user = FirebaseAuth.instance.currentUser!;
+      if (!user.emailVerified) {
+        await user.sendEmailVerification();
+      }
+    } on FirebaseAuthException catch (e) {
+      throw e;
+    }
+  }
 
   //Future<UserCredential>? signInWithEmailAndPassword(
   void signInWithEmailAndPassword(
     String email,
     String password,
-    void Function(FirebaseAuthException e) errorCallback,
   ) async {
     try {
       UserCredential credential =
@@ -67,14 +68,18 @@ class UserState extends ChangeNotifier {
       if (e.code == 'user-not-found') {
         _loginState = LoginState.register;
       }
-      errorCallback(e);
+      throw e;
     }
   }
 
   //Future<UserCredential> registerAccount(
-  void registerAccount(String email, String displayName, String password,
-      void Function(FirebaseAuthException e) errorCallback) async {
+  void registerAccount(
+    String email,
+    String displayName,
+    String password,
+  ) async {
     try {
+      print(password);
       UserCredential credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
       await credential.user!.updateProfile(displayName: displayName);
@@ -82,7 +87,7 @@ class UserState extends ChangeNotifier {
       notifyListeners();
       //return credential;
     } on FirebaseAuthException catch (e) {
-      errorCallback(e);
+      throw e;
     }
   }
 
@@ -128,6 +133,11 @@ class UserState extends ChangeNotifier {
     await FirebaseAuth.instance.signInWithCredential(credential);
     _loginState = LoginState.loggedIn;
     notifyListeners();
+  }
+
+  void resetPassword(String email) async {
+    await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+    _loginState = LoginState.loggedOut;
   }
 
   void cancel() {
