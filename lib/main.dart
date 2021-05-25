@@ -18,7 +18,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'keepin sketch',
       theme: ThemeData(
-        primaryColor: Colors.lightGreen,
+        primaryColorDark: Color(0xff0B4229),
+        primaryColor: Color(0xff115c45),
+        primaryColorLight: Color(0xc0248F7D),
       ),
       home: StartPage(),
     );
