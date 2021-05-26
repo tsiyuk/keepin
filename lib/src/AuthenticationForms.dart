@@ -13,6 +13,7 @@ class _EmailPasswordState extends State<EmailPasswordForm> {
   final _formKey = GlobalKey<FormState>(debugLabel: '_EmailPasswordFormState');
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  String? _errorMessage;
 
   bool validate() {
     final form = _formKey.currentState!;
@@ -29,7 +30,7 @@ class _EmailPasswordState extends State<EmailPasswordForm> {
     if (validate()) {
       try {
         final userState = Provider.of<UserState>(context, listen: false);
-        userState.signInWithEmailAndPassword(
+        await userState.signInWithEmailAndPassword(
             _emailController.text, _passwordController.text);
         // String userId = await userState.signInWithEmailAndPassword(
         //   _emailController.text,
@@ -37,7 +38,10 @@ class _EmailPasswordState extends State<EmailPasswordForm> {
         // );
         // print('Signed in $userId');
       } on FirebaseAuthException catch (e) {
-        print(e);
+        setState(() {
+          _errorMessage = e.code;
+          print(_errorMessage);
+        });
       }
     }
   }
@@ -58,6 +62,7 @@ class _EmailPasswordState extends State<EmailPasswordForm> {
             children: [
               FormHelpers.buildTextFields(_emailController,
                   passwordController: _passwordController),
+              _errorMessage != null ? ErrorMessage(_errorMessage!) : SizedBox(),
               _buildSecondaryButtons(userState),
               PrimaryButton(
                 onPressed: submit,
@@ -100,6 +105,7 @@ class _RegisterFormState extends State<RegisterForm> {
   final _emailController = TextEditingController();
   final _userNameController = TextEditingController();
   final _passwordController = TextEditingController();
+  String? _errorMessage;
 
   bool validate() {
     final form = _formKey.currentState!;
@@ -118,11 +124,13 @@ class _RegisterFormState extends State<RegisterForm> {
         // print("sign up start");
         final userState = Provider.of<UserState>(context, listen: false);
         userState.verifyEmail(_emailController.text);
-        userState.registerAccount(_emailController.text,
+        await userState.registerAccount(_emailController.text,
             _userNameController.text, _passwordController.text);
         // print("sign up success");
       } on FirebaseAuthException catch (e) {
-        print(e);
+        setState(() {
+          _errorMessage = e.code;
+        });
       }
     }
   }
@@ -147,6 +155,9 @@ class _RegisterFormState extends State<RegisterForm> {
                 FormHelpers.buildTextFields(_emailController,
                     passwordController: _passwordController,
                     nameController: _userNameController),
+                _errorMessage != null
+                    ? ErrorMessage(_errorMessage!)
+                    : SizedBox(),
                 _buildSecondaryButtons(userState),
                 PrimaryButton(
                   onPressed: submit,
@@ -173,6 +184,103 @@ class _RegisterFormState extends State<RegisterForm> {
           SecondaryButton(
             onPressed: userState.startChangePassword,
             child: Text('Forgot Password'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ForgetPasswordForm extends StatefulWidget {
+  @override
+  _ForgetPasswordFormState createState() => _ForgetPasswordFormState();
+}
+
+class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
+  final _formKey = GlobalKey<FormState>(debugLabel: '_ForgetPasswordFormState');
+  final _emailController = TextEditingController();
+  bool _isSubmit = false;
+  String? _errorMessage;
+
+  bool validate() {
+    final form = _formKey.currentState!;
+    form.save();
+    if (form.validate()) {
+      form.save();
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  void submit() async {
+    if (validate()) {
+      try {
+        final userState = Provider.of<UserState>(context, listen: false);
+        userState.resetPassword(_emailController.text);
+        setState(() {
+          _isSubmit = true;
+        });
+      } on FirebaseAuthException catch (e) {
+        setState(() {
+          _errorMessage = e.code;
+          // print(_errorMessage);
+        });
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext buildContext) {
+    UserState userState = Provider.of<UserState>(buildContext);
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12.0),
+            child: Image.asset("assets/images/TextLogoPrimary.png"),
+          ),
+          Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                FormHelpers.buildTextFields(_emailController),
+                PrimaryButton(
+                  onPressed: submit,
+                  child: Text('Reset password'),
+                ),
+                _errorMessage != null
+                    ? ErrorMessage(_errorMessage!)
+                    : SizedBox(),
+                _isSubmit
+                    ? Text(
+                        'A reset password email has been sent',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: Theme.of(buildContext).primaryColor),
+                      )
+                    : SizedBox(),
+                _buildSecondaryButtons(userState),
+              ],
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Padding _buildSecondaryButtons(UserState userState) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          SecondaryButton(
+            onPressed: userState.startLoginWithEmail,
+            child: Text('Go to log in'),
           ),
         ],
       ),
@@ -251,80 +359,13 @@ class FormHelpers {
   }
 }
 
-class ForgetPasswordForm extends StatefulWidget {
-  @override
-  _ForgetPasswordFormState createState() => _ForgetPasswordFormState();
-}
+class ErrorMessage extends StatelessWidget {
+  ErrorMessage(this._error);
+  final String _error;
 
-class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
-  final _formKey = GlobalKey<FormState>(debugLabel: '_ForgetPasswordFormState');
-  final _emailController = TextEditingController();
-
-  bool validate() {
-    final form = _formKey.currentState!;
-    form.save();
-    if (form.validate()) {
-      form.save();
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  void submit() async {
-    if (validate()) {
-      try {
-        final userState = Provider.of<UserState>(context, listen: false);
-        userState.resetPassword(_emailController.text);
-      } on FirebaseAuthException catch (e) {
-        print(e);
-      }
-    }
-  }
-
-  @override
   Widget build(BuildContext buildContext) {
-    UserState userState = Provider.of<UserState>(buildContext);
     return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 12.0),
-            child: Image.asset("assets/images/TextLogoPrimary.png"),
-          ),
-          Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                FormHelpers.buildTextFields(_emailController),
-                PrimaryButton(
-                  onPressed: submit,
-                  child: Text('Reset password'),
-                ),
-                _buildSecondaryButtons(userState),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Padding _buildSecondaryButtons(UserState userState) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          SecondaryButton(
-            onPressed: userState.startLoginWithEmail,
-            child: Text('Go to log in'),
-          ),
-        ],
-      ),
-    );
+        padding: EdgeInsets.symmetric(horizontal: 30),
+        child: Text(_error, style: TextStyle(color: Colors.red)));
   }
 }

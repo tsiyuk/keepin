@@ -40,18 +40,14 @@ class UserState extends ChangeNotifier {
   void verifyEmail(
     String email,
   ) async {
-    try {
-      User user = FirebaseAuth.instance.currentUser!;
-      if (!user.emailVerified) {
-        await user.sendEmailVerification();
-      }
-    } on FirebaseAuthException catch (e) {
-      throw e;
+    User user = FirebaseAuth.instance.currentUser!;
+    if (!user.emailVerified) {
+      await user.sendEmailVerification();
     }
   }
 
-  //Future<UserCredential>? signInWithEmailAndPassword(
-  void signInWithEmailAndPassword(
+  Future<UserCredential?> signInWithEmailAndPassword(
+    //void signInWithEmailAndPassword(
     String email,
     String password,
   ) async {
@@ -63,29 +59,25 @@ class UserState extends ChangeNotifier {
       );
       _loginState = LoginState.loggedIn;
       notifyListeners();
-      //return credential;
+      return credential;
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'user-not-found') {
-        _loginState = LoginState.register;
-      }
       throw e;
     }
   }
 
-  //Future<UserCredential> registerAccount(
-  void registerAccount(
+  Future<UserCredential> registerAccount(
+    //void registerAccount(
     String email,
     String displayName,
     String password,
   ) async {
     try {
-      print(password);
       UserCredential credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
       await credential.user!.updateProfile(displayName: displayName);
       _loginState = LoginState.loggedIn;
       notifyListeners();
-      //return credential;
+      return credential;
     } on FirebaseAuthException catch (e) {
       throw e;
     }
