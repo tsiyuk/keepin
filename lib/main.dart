@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primaryColorDark: Color(0xff0B4229),
         primaryColor: Color(0xff115c45),
-        primaryColorLight: Color(0xc0248F7D),
+        primaryColorLight: Color(0xff248F7D),
       ),
       home: StartPage(),
     );
