@@ -6,7 +6,7 @@ import 'package:keepin/src/Authentication.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 /*
-  The UserState class will handle all the program related to Firebase
+  The UserState class handles the backend log in and register workflow with firebase
 */
 class UserState extends ChangeNotifier {
   UserState() {
@@ -47,7 +47,6 @@ class UserState extends ChangeNotifier {
   }
 
   Future<UserCredential?> signInWithEmailAndPassword(
-    //void signInWithEmailAndPassword(
     String email,
     String password,
   ) async {
@@ -66,7 +65,6 @@ class UserState extends ChangeNotifier {
   }
 
   Future<UserCredential> registerAccount(
-    //void registerAccount(
     String email,
     String displayName,
     String password,
@@ -83,45 +81,14 @@ class UserState extends ChangeNotifier {
     }
   }
 
-  //Future<UserCredential> signInWithGoogle
-  // void signInWithGoogle(
-  //     void Function(FirebaseAuthException e) errorCallback) async {
-  //   // Trigger the authentication flow
-  //   final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
-
-  //   // Obtain the auth details from the request
-  //   final GoogleSignInAuthentication googleAuth =
-  //       await googleUser.authentication;
-
-  //   // Create a new credential
-  //   final credential = GoogleAuthProvider.credential(
-  //     accessToken: googleAuth.accessToken,
-  //     idToken: googleAuth.idToken,
-  //   );
-
-  //   // Once signed in, return the UserCredential
-  //   try {
-  //     await FirebaseAuth.instance.signInWithCredential(credential);
-  //   } on FirebaseAuthException catch (e) {
-  //     errorCallback(e);
-  //   }
-  // }
-
   void signInWithGoogle() async {
-    // Trigger the authentication flow
     final GoogleSignInAccount googleUser = (await GoogleSignIn().signIn())!;
-
-    // Obtain the auth details from the request
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
-
-    // Create a new credential
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
-
-    // Once signed in, return the UserCredential
     await FirebaseAuth.instance.signInWithCredential(credential);
     _loginState = LoginState.loggedIn;
     notifyListeners();

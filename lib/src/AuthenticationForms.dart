@@ -4,6 +4,11 @@ import 'package:keepin/src/UserState.dart';
 import 'package:provider/provider.dart';
 import 'CommonWidgets.dart';
 
+/*
+  The authentication forms contains the layout of log in page.
+  
+*/
+
 class EmailPasswordForm extends StatefulWidget {
   @override
   _EmailPasswordState createState() => _EmailPasswordState();
@@ -32,11 +37,6 @@ class _EmailPasswordState extends State<EmailPasswordForm> {
         final userState = Provider.of<UserState>(context, listen: false);
         await userState.signInWithEmailAndPassword(
             _emailController.text, _passwordController.text);
-        // String userId = await userState.signInWithEmailAndPassword(
-        //   _emailController.text,
-        //   _passwordController.text,
-        // );
-        // print('Signed in $userId');
       } on FirebaseAuthException catch (e) {
         setState(() {
           _errorMessage = e.code;
