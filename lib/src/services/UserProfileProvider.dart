@@ -1,0 +1,93 @@
+import 'dart:io';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:keepin/src/models/UserProfile.dart';
+
+class UserProfileProvider with ChangeNotifier {
+  final firestoreService = FirestoreService();
+  String? _userId;
+  String? _userName;
+  String? _avatarURL;
+
+  // Getters
+  String? get userId => _userId;
+  String? get userName => _userName;
+  String? get avatarURL => _avatarURL;
+
+  // Setters
+  set changeUserName(String userName) {
+    _userName = userName;
+    notifyListeners();
+  }
+
+  void load(UserProfile userProfile) {
+    _userId = userProfile.userId;
+    _userName = userProfile.userName;
+    _avatarURL = userProfile.avatarURL;
+  }
+
+  void saveChanges() {
+    if (userId != null && userName != null) {
+      UserProfile userProfile =
+          UserProfile(userId!, userName!, avatarURL: avatarURL);
+      firestoreService.setUserProfile(userProfile);
+    }
+  }
+
+  Future uploadPic(BuildContext context) async {
+    ImagePicker imagePicker = ImagePicker();
+    final pickedFile = await imagePicker.getImage(source: ImageSource.gallery);
+    if (pickedFile != null && userId != null) {
+      File image = File(pickedFile.path);
+      String fileName = image.path;
+      Reference firebaseStorageRef = FirebaseStorage.instance
+          .ref()
+          .child('userAvatars')
+          .child(userId!)
+          .child(fileName);
+      TaskSnapshot task = await firebaseStorageRef.putFile(image);
+      _avatarURL = await firebaseStorageRef.getDownloadURL();
+      notifyListeners();
+    }
+  }
+
+  Future<UserProfile> userProfile(String userId) async {
+    return await firestoreService.getUserProfile(userId);
+  }
+}
+
+class FirestoreService {
+  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+  //Get user profiles
+  Stream<List<UserProfile>> getUserProfiles() {
+    return _firestore.collection('userProfiles').snapshots().map((snapshot) =>
+        snapshot.docs.map((doc) => UserProfile.fromJson(doc.data())).toList());
+  }
+
+  Future<UserProfile> getUserProfile(String userId) async {
+    return await _firestore
+        .collection('userProfiles')
+        .doc(userId)
+        .get()
+        .then((value) => UserProfile.fromJson(value.data()!));
+  }
+
+  // Update or Insert
+  Future<void> setUserProfile(UserProfile userProfile) {
+    var options = SetOptions(merge: true);
+
+    return _firestore
+        .collection('userProfiles')
+        .doc(userProfile.userId)
+        .set(userProfile.toMap(), options);
+  }
+
+  // Delete
+  Future<void> removeUserProfile(String userId) {
+    return _firestore.collection('userProfiles').doc(userId).delete();
+  }
+}
