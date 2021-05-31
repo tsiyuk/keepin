@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-class CirclePages extends StatefulWidget {
+class CirclePage extends StatefulWidget {
   @override
-  _CirclePagesState createState() => _CirclePagesState();
+  _CirclePageState createState() => _CirclePageState();
 }
 
-class _CirclePagesState extends State<CirclePages>
+class _CirclePageState extends State<CirclePage>
     with TickerProviderStateMixin {
-  TabController? _tabController = null;
+  late TabController _tabController;
   @override
   void initState() {
     super.initState();
@@ -22,10 +22,10 @@ class _CirclePagesState extends State<CirclePages>
           ClipRRect(
             borderRadius: BorderRadius.circular(15.0),
             child: Image.asset('assets/images/nus.png',
-                width: 150, height: 150, fit: BoxFit.cover),
+                width: 70, height: 70, fit: BoxFit.cover),
           ),
           Container(
-            padding: const EdgeInsets.all(32),
+            padding: const EdgeInsets.all(10),
             child: Text(
               'NUS Night Runners',
               style: TextStyle(fontSize: 17.0),
@@ -36,9 +36,11 @@ class _CirclePagesState extends State<CirclePages>
     );
 
     BottomNavigationBar bottomBar =
-        BottomNavigationBar(items: <BottomNavigationBarItem>[
+    BottomNavigationBar(items: <BottomNavigationBarItem>[
       BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
       BottomNavigationBarItem(icon: Icon(Icons.lock_clock), label: 'Clock in'),
+      // TODO
+      // the clock in may use a floating action button with CircularNotchedRectangle() for better visual effect
       BottomNavigationBarItem(
           icon: Icon(Icons.fireplace_outlined), label: 'Recommend'),
     ]);
@@ -54,10 +56,10 @@ class _CirclePagesState extends State<CirclePages>
     return Scaffold(
       appBar: AppBar(
         title: SizedBox(
-          height: 200,
+          height: 160,
           child: _profileSection,
         ),
-        toolbarHeight: 200,
+        toolbarHeight: 160,
         bottom: TabBar(
           controller: _tabController,
           tabs: _postBarItems,
