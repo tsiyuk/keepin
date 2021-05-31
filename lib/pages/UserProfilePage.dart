@@ -14,15 +14,18 @@ class UserProfilePage extends StatefulWidget {
 class _UserProfilePageState extends State<UserProfilePage> {
   //File? avatar;
   final userNameController = TextEditingController();
-  @override
-  void initState() async {
+  void initState() {
+    initUser();
+    super.initState();
+  }
+
+  void initUser() async {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context, listen: false);
     final UserProfile userProfile =
         await userProfileProvider.userProfile(widget.user.uid);
     userProfileProvider.load(userProfile);
     userNameController.text = userProfile.userName;
-    super.initState();
   }
 
   @override
@@ -33,9 +36,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
       children: [
         Row(
           children: [
-            userProfileProvider.avatarURL != null
-                ? Image.network(userProfileProvider.avatarURL!)
-                : Image.asset('asset/images/nus.png'),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(15.0),
+              child: userProfileProvider.avatarURL != null
+                  ? Image.network(userProfileProvider.avatarURL!,
+                      width: 150, height: 150, fit: BoxFit.cover)
+                  : Image.asset('assets/images/nus.png',
+                      width: 150, height: 150, fit: BoxFit.cover),
+            ),
             TextButton(
                 onPressed: () async {
                   await userProfileProvider.uploadPic(context);
@@ -45,7 +53,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         ),
         TextFormField(
           controller: userNameController,
-          decoration: InputDecoration(labelText: 'email'),
+          decoration: InputDecoration(labelText: 'userName'),
         ),
         TextButton(
             onPressed: userProfileProvider.saveChanges, child: Text('Save')),

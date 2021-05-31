@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/StartPage.dart';
-import 'package:keepin/src/UserState.dart';
+import 'package:keepin/src/services/UserProfileProvider.dart';
+import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => UserState(),
-      builder: (context, _) => MyApp(),
-    ),
-  );
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (context) => UserState(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => UserProfileProvider(),
+      ),
+    ],
+    builder: (context, child) => MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {

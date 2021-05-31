@@ -66,9 +66,9 @@ class UserState extends ChangeNotifier {
         email: email,
         password: password,
       );
+      _user = credential.user;
       _loginState = LoginState.loggedIn;
       notifyListeners();
-      _user = credential.user;
       return credential;
     } on FirebaseAuthException catch (e) {
       throw e;
@@ -85,8 +85,8 @@ class UserState extends ChangeNotifier {
           .createUserWithEmailAndPassword(email: email, password: password);
       await credential.user!.updateProfile(displayName: displayName);
       _loginState = LoginState.loggedIn;
-      notifyListeners();
       _user = credential.user;
+      notifyListeners();
       return credential;
     } on FirebaseAuthException catch (e) {
       throw e;
@@ -102,8 +102,8 @@ class UserState extends ChangeNotifier {
       idToken: googleAuth.idToken,
     );
     var temp = await FirebaseAuth.instance.signInWithCredential(credential);
-    _loginState = LoginState.loggedIn;
     _user = temp.user;
+    _loginState = LoginState.loggedIn;
     notifyListeners();
   }
 
