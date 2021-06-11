@@ -13,15 +13,10 @@ class UserProfilePage extends StatefulWidget {
 
 class _UserProfilePageState extends State<UserProfilePage> {
   //File? avatar;
+  //late UserProfileProvider userProfileProvider;
   final userNameController = TextEditingController();
-  void initState() {
-    initUser();
-    super.initState();
-  }
 
-  void initUser() async {
-    UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context, listen: false);
+  void initUser(UserProfileProvider userProfileProvider) async {
     final UserProfile userProfile =
         await userProfileProvider.userProfile(widget.user.uid);
     userProfileProvider.load(userProfile);
@@ -32,6 +27,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget build(BuildContext context) {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context);
+    initUser(userProfileProvider);
     return Column(
       children: [
         Row(
@@ -56,7 +52,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
           decoration: InputDecoration(labelText: 'userName'),
         ),
         TextButton(
-            onPressed: userProfileProvider.saveChanges, child: Text('Save')),
+            onPressed: () {
+              userProfileProvider.changeUserName(userNameController.text);
+              userProfileProvider.saveChanges();
+            },
+            child: Text('Save')),
       ],
     );
   }

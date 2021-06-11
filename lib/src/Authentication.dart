@@ -35,7 +35,7 @@ class Authentication extends StatelessWidget {
         );
     }
   }
-
+/*
   void _showErrorDialog(BuildContext context, String title, Exception e) {
     showDialog<void>(
       context: context,
@@ -69,5 +69,5 @@ class Authentication extends StatelessWidget {
         );
       },
     );
-  }
+  }*/
 }

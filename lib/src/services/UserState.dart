@@ -3,6 +3,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:keepin/src/models/UserProfile.dart';
+import 'package:keepin/src/services/UserProfileProvider.dart';
 
 enum LoginState {
   loggedOut,
@@ -47,16 +49,31 @@ class UserState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void verifyEmail(
-    String email,
-  ) async {
-    User user = FirebaseAuth.instance.currentUser!;
-    if (!user.emailVerified) {
+  // TODO: implement email verification
+  Future<bool> verifyEmail() async {
+    User? user = FirebaseAuth.instance.currentUser;
+    bool flag = false;
+    if (user != null && !user.emailVerified) {
       await user.sendEmailVerification();
+      // Timer timer = Timer.periodic(Duration(seconds: 100), (timer) async {
+      //   await user.reload();
+      //   if (user.emailVerified) {
+      //     timer.cancel();
+      //     flag = true;
+      //   }
+      // });
+      // return timer.isActive ? false : true;
+      // while (!user.emailVerified) {
+      //   await user.reload();
+      //   flag = user.emailVerified;
+      // }
+      return true;
+    } else {
+      return true;
     }
   }
 
-  Future<UserCredential?> signInWithEmailAndPassword(
+  Future<UserCredential> signInWithEmailAndPassword(
     String email,
     String password,
   ) async {
@@ -83,10 +100,19 @@ class UserState extends ChangeNotifier {
     try {
       UserCredential credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-      await credential.user!.updateProfile(displayName: displayName);
-      _loginState = LoginState.loggedIn;
-      _user = credential.user;
-      notifyListeners();
+      //bool flag = await verifyEmail();
+      if (true) {
+        await credential.user!.updateProfile(displayName: displayName);
+        _loginState = LoginState.loggedIn;
+        _user = credential.user!;
+        FirestoreService firestoreService = FirestoreService();
+        await firestoreService
+            .setUserProfile(UserProfile(_user!.uid, displayName));
+        notifyListeners();
+      } else {
+        //credential.user!.delete();
+        print('verification fail');
+      }
       return credential;
     } on FirebaseAuthException catch (e) {
       throw e;

@@ -1,52 +1,59 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 
+/*
+  This class provide the methods related to CURD of UserProfile
+*/
 class UserProfileProvider with ChangeNotifier {
   final firestoreService = FirestoreService();
-  String? _userId;
-  String? _userName;
+  late String _userId;
+  late String _userName;
   String? _avatarURL;
+  User user = FirebaseAuth.instance.currentUser!;
 
   // Getters
-  String? get userId => _userId;
-  String? get userName => _userName;
+  String get userId => _userId;
+  String get userName => _userName;
   String? get avatarURL => _avatarURL;
 
   // Setters
-  set changeUserName(String userName) {
+  void changeUserName(String userName) {
     _userName = userName;
     notifyListeners();
   }
 
+  // load all the information from the userProfile instance
   void load(UserProfile userProfile) {
     _userId = userProfile.userId;
     _userName = userProfile.userName;
     _avatarURL = userProfile.avatarURL;
   }
 
+  // save all the changes
   void saveChanges() {
-    if (userId != null && userName != null) {
-      UserProfile userProfile =
-          UserProfile(userId!, userName!, avatarURL: avatarURL);
-      firestoreService.setUserProfile(userProfile);
-    }
+    UserProfile userProfile =
+        UserProfile(userId, userName, avatarURL: avatarURL);
+    user.updateProfile(displayName: userName, photoURL: avatarURL);
+    firestoreService.setUserProfile(userProfile);
   }
 
+  // upload avatar from the user's local gallery
   Future uploadPic(BuildContext context) async {
     ImagePicker imagePicker = ImagePicker();
     final pickedFile = await imagePicker.getImage(source: ImageSource.gallery);
-    if (pickedFile != null && userId != null) {
+    if (pickedFile != null) {
       File image = File(pickedFile.path);
       String fileName = image.path;
       Reference firebaseStorageRef = FirebaseStorage.instance
           .ref()
           .child('userAvatars')
-          .child(userId!)
+          .child(userId)
           .child(fileName);
       TaskSnapshot task = await firebaseStorageRef.putFile(image);
       _avatarURL = await firebaseStorageRef.getDownloadURL();
@@ -54,6 +61,7 @@ class UserProfileProvider with ChangeNotifier {
     }
   }
 
+  // get the userProfile instance specified by the userId
   Future<UserProfile> userProfile(String userId) async {
     return await firestoreService.getUserProfile(userId);
   }

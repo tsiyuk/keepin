@@ -123,7 +123,7 @@ class _RegisterFormState extends State<RegisterForm> {
       try {
         // print("sign up start");
         final userState = Provider.of<UserState>(context, listen: false);
-        userState.verifyEmail(_emailController.text);
+        //userState.verifyEmail(_emailController.text);
         await userState.registerAccount(_emailController.text,
             _userNameController.text, _passwordController.text);
         // print("sign up success");
