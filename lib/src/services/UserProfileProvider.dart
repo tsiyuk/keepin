@@ -44,6 +44,7 @@ class UserProfileProvider with ChangeNotifier {
   }
 
   // upload avatar from the user's local gallery
+  // maybe need to restrict the size of the uploaded image
   Future uploadPic(BuildContext context) async {
     ImagePicker imagePicker = ImagePicker();
     final pickedFile = await imagePicker.getImage(source: ImageSource.gallery);

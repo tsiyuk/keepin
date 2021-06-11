@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
+import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
 
 class UserProfilePage extends StatefulWidget {
@@ -27,6 +29,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget build(BuildContext context) {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context);
+    UserState userState = Provider.of<UserState>(context);
     initUser(userProfileProvider);
     return Column(
       children: [
@@ -57,6 +60,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               userProfileProvider.saveChanges();
             },
             child: Text('Save')),
+        PrimaryButton(onPressed: userState.signOut, child: Text("Sign out")),
       ],
     );
   }
