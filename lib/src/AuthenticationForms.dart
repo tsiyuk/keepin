@@ -75,7 +75,7 @@ class _EmailPasswordState extends State<EmailPasswordForm> {
     );
   }
 
-  Padding _buildSecondaryButtons(UserState userState) {
+  Widget _buildSecondaryButtons(UserState userState) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 0),
       child: Row(
@@ -171,7 +171,7 @@ class _RegisterFormState extends State<RegisterForm> {
     );
   }
 
-  Padding _buildSecondaryButtons(UserState userState) {
+  Widget _buildSecondaryButtons(UserState userState) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 0),
       child: Row(
@@ -272,7 +272,7 @@ class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
     );
   }
 
-  Padding _buildSecondaryButtons(UserState userState) {
+  Widget _buildSecondaryButtons(UserState userState) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 0),
       child: Row(

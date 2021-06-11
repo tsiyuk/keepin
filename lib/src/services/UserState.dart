@@ -145,5 +145,7 @@ class UserState extends ChangeNotifier {
 
   void signOut() {
     FirebaseAuth.instance.signOut();
+    _loginState = LoginState.loggedOut;
+    notifyListeners();
   }
 }

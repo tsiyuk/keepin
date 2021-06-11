@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:keepin/pages/UserProfilePage.dart';
+import 'package:keepin/pages/CirclePage.dart';
+import 'package:keepin/pages/MainPage/MainPage.dart';
 import 'package:keepin/src/AuthenticationForms.dart';
 import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
@@ -19,7 +20,7 @@ class Authentication extends StatelessWidget {
       case LoginState.forgetPassword:
         return ForgetPasswordForm();
       case LoginState.loggedIn:
-        return UserProfilePage(userState.user!);
+        return MainPage();
       default:
         return Center(
           child: Column(
