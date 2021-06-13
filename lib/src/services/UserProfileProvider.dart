@@ -21,6 +21,8 @@ class UserProfileProvider with ChangeNotifier {
   String get userId => _userId;
   String get userName => _userName;
   String? get avatarURL => _avatarURL;
+  Stream<List<UserProfile>> get userProfiles =>
+      firestoreService.getUserProfiles();
 
   // Setters
   void changeUserName(String userName) {
@@ -82,7 +84,15 @@ class FirestoreService {
         .collection('userProfiles')
         .doc(userId)
         .get()
-        .then((value) => UserProfile.fromJson(value.data()!));
+        .then((value) {
+      if (value.data() != null) {
+        return UserProfile.fromJson(value.data()!);
+      } else {
+        User user = FirebaseAuth.instance.currentUser!;
+        return UserProfile(user.uid, user.displayName!,
+            avatarURL: user.photoURL);
+      }
+    });
   }
 
   // Update or Insert

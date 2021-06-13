@@ -43,9 +43,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   : Image.asset('assets/images/nus.png',
                       width: 150, height: 150, fit: BoxFit.cover),
             ),
-            TextButton(
+            PrimaryButton(
                 onPressed: () async {
                   await userProfileProvider.uploadPic(context);
+                  userProfileProvider.saveChanges();
                 },
                 child: Text('Upload Avatar'))
           ],
@@ -54,7 +55,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
           controller: userNameController,
           decoration: InputDecoration(labelText: 'userName'),
         ),
-        TextButton(
+        PrimaryButton(
             onPressed: () {
               userProfileProvider.changeUserName(userNameController.text);
               userProfileProvider.saveChanges();
