@@ -160,7 +160,14 @@ class _RegisterFormState extends State<RegisterForm> {
                     : SizedBox(),
                 _buildSecondaryButtons(userState),
                 PrimaryButton(
-                  onPressed: submit,
+                  onPressed: () {
+                    submit();
+                    final snackBar = SnackBar(
+                      content: Text(
+                          'A verification email has been sent to ${_emailController.text}'),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  },
                   child: Text('SIGN UP'),
                 ),
               ],

@@ -47,30 +47,6 @@ class UserState extends ChangeNotifier {
     notifyListeners();
   }
 
-  // TODO: implement email verification
-  // Future<bool> verifyEmail() async {
-  //   User? user = FirebaseAuth.instance.currentUser;
-  //   bool flag = false;
-  //   if (user != null && !user.emailVerified) {
-  //     await user.sendEmailVerification();
-  //     // Timer timer = Timer.periodic(Duration(seconds: 100), (timer) async {
-  //     //   await user.reload();
-  //     //   if (user.emailVerified) {
-  //     //     timer.cancel();
-  //     //     flag = true;
-  //     //   }
-  //     // });
-  //     // return timer.isActive ? false : true;
-  //     // while (!user.emailVerified) {
-  //     //   await user.reload();
-  //     //   flag = user.emailVerified;
-  //     // }
-  //     return true;
-  //   } else {
-  //     return true;
-  //   }
-  // }
-
   Future<UserCredential> signInWithEmailAndPassword(
     String email,
     String password,
@@ -99,21 +75,18 @@ class UserState extends ChangeNotifier {
       UserCredential credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
       User user = credential.user!;
-      // await user.sendEmailVerification();
-      // Timer.periodic(Duration(seconds: 5), (timer) async {
-      //   await user.reload();
-      //   if (user.emailVerified) {
-      //     timer.cancel();
-      //     await user.updateProfile(displayName: displayName);
-      //     _loginState = LoginState.loggedIn;
-      //     _user = user;
-      //     notifyListeners();
-      //   }
-      // });
-      await user.updateProfile(displayName: displayName);
-      _loginState = LoginState.loggedIn;
-      _user = user;
-      notifyListeners();
+      await user.sendEmailVerification();
+      Timer.periodic(Duration(seconds: 3), (timer) async {
+        user = FirebaseAuth.instance.currentUser!;
+        await user.reload();
+        if (user.emailVerified) {
+          timer.cancel();
+          await user.updateProfile(displayName: displayName);
+          _loginState = LoginState.loggedIn;
+          _user = user;
+          notifyListeners();
+        }
+      });
       return credential;
     } on FirebaseAuthException catch (e) {
       throw e;
