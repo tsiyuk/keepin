@@ -19,7 +19,7 @@ class UserProfile {
         avatarURL: json['avatarURL']);
   }
 
-  // transform the UserProfile instance into the firestore form
+  // transform the UserProfile instance into the json form
   Map<String, dynamic> toMap() {
     return {
       'userId': userId,

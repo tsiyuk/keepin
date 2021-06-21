@@ -1,8 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:keepin/pages/Circle/CreateCirclePage.dart';
+import 'package:keepin/src/services/CircleProvider.dart';
+import 'package:provider/provider.dart';
 
-import '../CirclePage.dart';
+import '../Circle/CirclePage.dart';
 
 class HomePage extends StatelessWidget {
   // to prevent creating multiple HomePage at different time to save memory
@@ -13,58 +16,81 @@ class HomePage extends StatelessWidget {
   // https://flutter.dev/docs/cookbook/navigation/navigation-basics
   // refer to this link for navigating to circle page and back
   Widget _buildCircleList(BuildContext context) {
+    CircleProvider circleProvider = Provider.of<CircleProvider>(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
           MaterialButton(
-            onPressed: (){},
+            onPressed: () {
+              Navigator.of(context).push(
+                  MaterialPageRoute(builder: (context) => CreateCirclePage()));
+            },
             color: Colors.white,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Icon(Icons.add_box, size: 50, color: Colors.teal,),
+              child: Icon(
+                Icons.add_box,
+                size: 50,
+                color: Colors.teal,
+              ),
             ),
             padding: EdgeInsets.all(6),
-            shape: ContinuousRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: ContinuousRectangleBorder(
+                borderRadius: BorderRadius.circular(16)),
             minWidth: 50,
           ),
           MaterialButton(
-            onPressed: (){
+            onPressed: () {
               Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => CirclePage()),
-            );},
+                context,
+                MaterialPageRoute(builder: (context) => CirclePage()),
+              );
+            },
             color: Colors.white,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Image.asset('assets/images/nus.png',
-                width: 50, height: 50, fit: BoxFit.cover),
+                  width: 50, height: 50, fit: BoxFit.cover),
             ),
             padding: EdgeInsets.all(6),
-            shape: ContinuousRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: ContinuousRectangleBorder(
+                borderRadius: BorderRadius.circular(16)),
             minWidth: 50,
           ),
           MaterialButton(
-            onPressed: (){},
+            onPressed: () {},
             color: Colors.white,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Container(color: Colors.blueAccent, height: 50, width: 50,),
+              child: Container(
+                color: Colors.blueAccent,
+                height: 50,
+                width: 50,
+              ),
             ),
             padding: EdgeInsets.all(6),
-            shape: ContinuousRectangleBorder(borderRadius: BorderRadius.circular(16),),
+            shape: ContinuousRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             minWidth: 50,
           ),
           MaterialButton(
-            onPressed: (){},
+            onPressed: () {},
             color: Colors.white,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
-              child: Container(color: Colors.greenAccent, height: 50, width: 50,),
+              child: Container(
+                color: Colors.greenAccent,
+                height: 50,
+                width: 50,
+              ),
             ),
             padding: EdgeInsets.all(6),
-            shape: ContinuousRectangleBorder(borderRadius: BorderRadius.circular(16),),
+            shape: ContinuousRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             minWidth: 50,
           ),
           // create circle button,
@@ -75,15 +101,11 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        _buildCircleList(context),
-        Divider(),
-        Expanded(child: Feed())
-      ],
+      children: [_buildCircleList(context), Divider(), Expanded(child: Feed())],
     );
   }
 }
@@ -112,19 +134,13 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
           indicatorColor: Theme.of(context).primaryColor,
           labelPadding: EdgeInsets.all(8),
           controller: _tabController,
-          tabs: <Widget>[
-            Text("Follow"),
-            Text("Recommendation")
-          ],
+          tabs: <Widget>[Text("Follow"), Text("Recommendation")],
         ),
         Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildFollowFeed(),
-                _buildRecommendation()
-              ],
-            ),
+          child: TabBarView(
+            controller: _tabController,
+            children: [_buildFollowFeed(), _buildRecommendation()],
+          ),
         )
       ],
     );
@@ -137,5 +153,4 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
   Widget _buildRecommendation() {
     return Center(child: Text("Recommendation feed"));
   }
-
 }

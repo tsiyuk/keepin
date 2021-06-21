@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 
 /*
@@ -23,6 +24,8 @@ class UserProfileProvider with ChangeNotifier {
   String? get avatarURL => _avatarURL;
   Stream<List<UserProfile>> get userProfiles =>
       firestoreService.getUserProfiles();
+  Stream<List<CircleInfo>> get circlesJoined =>
+      firestoreService.getCirclesJoined(userId);
 
   // Setters
   void changeUserName(String userName) {
@@ -93,6 +96,17 @@ class FirestoreService {
             avatarURL: user.photoURL);
       }
     });
+  }
+
+  Stream<List<CircleInfo>> getCirclesJoined(String userId) {
+    return _firestore
+        .collection('userProfiles')
+        .doc(userId)
+        .collection('circlesJoined')
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+            .map((doc) => CircleInfo.fromJson(doc.data()))
+            .toList());
   }
 
   // Update or Insert

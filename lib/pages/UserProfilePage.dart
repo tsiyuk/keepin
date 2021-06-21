@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:keepin/src/CommonWidgets.dart';
+import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:keepin/src/services/UserState.dart';
@@ -14,8 +15,6 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
-  //File? avatar;
-  //late UserProfileProvider userProfileProvider;
   final userNameController = TextEditingController();
 
   void initUser(UserProfileProvider userProfileProvider) async {
@@ -29,7 +28,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget build(BuildContext context) {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context);
-    UserState userState = Provider.of<UserState>(context);
+    UserState userState = Provider.of<UserState>(context, listen: false);
     initUser(userProfileProvider);
     return Column(
       children: [
@@ -61,6 +60,38 @@ class _UserProfilePageState extends State<UserProfilePage> {
               userProfileProvider.saveChanges();
             },
             child: Text('Save')),
+        StreamBuilder<List<CircleInfo>>(
+            stream: userProfileProvider.circlesJoined,
+            //stream: postProvider.posts,
+            builder: (context, snapshot) {
+              if (snapshot.data != null) {
+                return SizedBox(
+                  height: 300,
+                  child: ListView.builder(
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        return ListTile(
+                          leading:
+                              Image.network(snapshot.data![index].avatarURL),
+                          // title: Column(
+                          //   children: [
+                          //     Text(snapshot.data![index].posterName),
+                          //     Text(snapshot.data![index].text),
+                          //     snapshot.data![index].imageLinks[0] != null
+                          //         ? Image.network(
+                          //             snapshot.data![index].imageLinks[0])
+                          //         : SizedBox(),
+                          //   ],
+                          // ),
+                          title: Text(snapshot.data![index].circleName),
+                          shape: Border.all(),
+                        );
+                      }),
+                );
+              } else {
+                return Text('No circles joined');
+              }
+            }),
         PrimaryButton(onPressed: userState.signOut, child: Text("Sign out")),
       ],
     );

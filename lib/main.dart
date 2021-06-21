@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/StartPage.dart';
+import 'package:keepin/src/services/CircleProvider.dart';
+import 'package:keepin/src/services/PostProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +15,10 @@ void main() {
       ChangeNotifierProvider(
         create: (context) => UserProfileProvider(),
       ),
+      ChangeNotifierProvider(
+        create: (context) => PostProvider(),
+      ),
+      ChangeNotifierProvider(create: (context) => CircleProvider()),
     ],
     builder: (context, child) => MyApp(),
   ));
