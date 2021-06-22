@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/services/CircleProvider.dart';
@@ -31,7 +30,9 @@ class _CreateCirclePageState extends State<CreateCirclePage> {
             controller: _tagsController,
             decoration: InputDecoration(labelText: 'tag'),
             onEditingComplete: () {
-              tags.add(_tagsController.text);
+              setState(() {
+                tags.add(_tagsController.text);
+              });
             },
           ),
         ),

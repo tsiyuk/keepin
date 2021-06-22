@@ -43,14 +43,20 @@ class Circle {
 class CircleInfo {
   String circleName;
   String avatarURL;
+  num clockinCount;
 
-  CircleInfo(this.circleName, this.avatarURL);
+  CircleInfo(this.circleName, this.avatarURL, this.clockinCount);
 
   factory CircleInfo.fromJson(Map<String, dynamic> json) {
-    return CircleInfo(json['circleName'], json['avatarURL']);
+    return CircleInfo(
+        json['circleName'], json['avatarURL'], json['clockinCount']);
   }
 
   Map<String, dynamic> toMap() {
-    return {'circleName': circleName, 'avatarURL': avatarURL};
+    return {
+      'circleName': circleName,
+      'avatarURL': avatarURL,
+      'clockinCount': clockinCount
+    };
   }
 }

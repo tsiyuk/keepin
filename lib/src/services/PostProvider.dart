@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:keepin/src/models/Comment.dart';
 import 'package:keepin/src/models/Post.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
@@ -30,6 +31,10 @@ class PostProvider with ChangeNotifier {
   num get numOfLikes => _numOfLikes;
   Stream<List<Post>> get posts => _firestoreService.getPosts();
 
+  Stream<List<Comment>> getComments(String postId) {
+    return _firestoreService.getComments(postId);
+  }
+
   // Setters
   set changeAvatarURL(String avatarURL) {
     _posterAvatarLink = avatarURL;
@@ -55,6 +60,7 @@ class PostProvider with ChangeNotifier {
     _numOfLikes = post.numOfLikes;
   }
 
+  /// Must call it before create the post and upload the images
   void initPostInfo(User user, String circleName) {
     _posterId = user.uid;
     _posterName = user.displayName!;
@@ -91,7 +97,7 @@ class PostProvider with ChangeNotifier {
     _firestoreService.updateLikes(postId, numOfLikes);
   }
 
-  ///S upload images
+  /// upload images
   Future uploadAssets(BuildContext context) async {
     final List<AssetEntity>? assets = await AssetPicker.pickAssets(context);
     if (assets != null) {
@@ -113,6 +119,19 @@ class PostProvider with ChangeNotifier {
       }
       notifyListeners();
     }
+  }
+
+  void addComments(String postId, User commenter, String text, String? replyTo,
+      String replyToId) {
+    _firestoreService.addComment(Comment(
+      postId: postId,
+      commenterName: commenter.displayName!,
+      commenterId: commenter.uid,
+      text: text,
+      timestamp: DateTime.now().millisecondsSinceEpoch,
+      replyTo: replyTo,
+      replyToId: replyToId,
+    ));
   }
 }
 
@@ -144,6 +163,18 @@ class FirestoreService {
             snapshot.docs.map((doc) => Post.fromJson(doc.data())).toList());
   }
 
+  /// Read comments from the post specified by the postId
+  Stream<List<Comment>> getComments(String postId) {
+    return _firestore
+        .collection('posts')
+        .doc(postId)
+        .collection('comments')
+        .orderBy('timestamp')
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => Comment.fromJson(doc.data())).toList());
+  }
+
   Future<void> addPost(Post post) {
     var docRef = _firestore.collection('posts').doc();
     post.postId = docRef.id;
@@ -162,6 +193,14 @@ class FirestoreService {
         .collection('posts')
         .doc(postId)
         .update({'imageLinks': imageLinks});
+  }
+
+  Future<void> addComment(Comment comment) {
+    return _firestore
+        .collection('posts')
+        .doc(comment.postId)
+        .collection('comments')
+        .add(comment.toMap());
   }
 
   Future<void> removePost(String postId) {

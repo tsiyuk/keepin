@@ -18,6 +18,9 @@ class CircleProvider with ChangeNotifier {
   late String _adminUserId;
   late num _numOfMembers;
   late bool _isPublic;
+
+  /// clockinCount is for the specifiled user
+  late num _clockinCount;
   File? _avatar;
 
   FirestoreService _firestoreService = FirestoreService();
@@ -29,6 +32,7 @@ class CircleProvider with ChangeNotifier {
   List<String> get tags => _tags;
   num get numOfMembers => _numOfMembers;
   bool get isPublic => _isPublic;
+  num get clockinCount => _clockinCount;
 
   Stream<List<Circle>> get allCircles => _firestoreService.getCircles();
 
@@ -42,7 +46,7 @@ class CircleProvider with ChangeNotifier {
   }
 
   /// Use circle name to query the circle
-  Future<Circle> readCircleFromname(String name) async {
+  Future<Circle> readCircleFromName(String name) async {
     if (await _firestoreService.isCircleExist(name)) {
       return _firestoreService.getCircleFromName(name);
     } else {
@@ -60,13 +64,14 @@ class CircleProvider with ChangeNotifier {
   }
 
   // Setters
-  void loadAll(Circle circle) {
+  void loadAll(Circle circle, CircleInfo circleInfo) {
     _circleName = circle.circleName;
     _circleAvatarURL = circle.avatarURL;
     _adminUserId = circle.adminUserId;
     _tags = circle.tags;
     _numOfMembers = circle.numOfMembers;
     _isPublic = circle.isPublic;
+    _clockinCount = circleInfo.clockinCount;
   }
 
   /// call upload avatar before create a circle
@@ -92,6 +97,7 @@ class CircleProvider with ChangeNotifier {
       _tags = tags;
       _adminUserId = user.uid;
       _numOfMembers = 1;
+      notifyListeners();
 
       // upload the avatar to the firebase
       String fileName = _avatar!.path;
@@ -122,6 +128,19 @@ class CircleProvider with ChangeNotifier {
     }
   }
 
+  void updateAvatar() async {
+    String fileName = _avatar!.path;
+    Reference firebaseStorageRef = FirebaseStorage.instance
+        .ref()
+        .child('circleAssets')
+        .child(circleName)
+        .child(fileName);
+    await firebaseStorageRef.putFile(_avatar!);
+    _circleAvatarURL = await firebaseStorageRef.getDownloadURL();
+    notifyListeners();
+    await _firestoreService.updateAvatarURL(circleName, _circleAvatarURL);
+  }
+
   /// Enable the current user to join the circle
   void joinCircle() async {
     ++_numOfMembers;
@@ -135,6 +154,13 @@ class CircleProvider with ChangeNotifier {
     // update number of user in the circle doc
     futures.add(_firestoreService.updateNumOfMember(circleName, numOfMembers));
     await Future.wait(futures);
+  }
+
+  void clockin() async {
+    ++_clockinCount;
+    notifyListeners();
+    await _firestoreService.updateClockinCount(
+        circleName, user.uid, clockinCount);
   }
 }
 
@@ -212,6 +238,13 @@ class FirestoreService {
         .set(circle.toMap(), setOption);
   }
 
+  Future<void> updateAvatarURL(String circleName, String avatarURL) {
+    return _firebaseFirestore
+        .collection('circles')
+        .doc(circleName)
+        .update({'avatarURL': avatarURL});
+  }
+
   Future<void> updateUserProfile(
       String circleName, String circleAvatar, String userId) {
     return _firebaseFirestore
@@ -219,7 +252,16 @@ class FirestoreService {
         .doc(userId)
         .collection('circlesJoined')
         .doc(circleName)
-        .set(CircleInfo(circleName, circleAvatar).toMap());
+        .set(CircleInfo(circleName, circleAvatar, 0).toMap());
+  }
+
+  Future<void> updateClockinCount(String circleName, String userId, num count) {
+    return _firebaseFirestore
+        .collection('userProfiles')
+        .doc(userId)
+        .collection('circlesJoined')
+        .doc(circleName)
+        .update({'clockinCount': count});
   }
 
   // Add an admin

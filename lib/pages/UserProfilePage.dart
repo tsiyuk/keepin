@@ -73,17 +73,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         return ListTile(
                           leading:
                               Image.network(snapshot.data![index].avatarURL),
-                          // title: Column(
-                          //   children: [
-                          //     Text(snapshot.data![index].posterName),
-                          //     Text(snapshot.data![index].text),
-                          //     snapshot.data![index].imageLinks[0] != null
-                          //         ? Image.network(
-                          //             snapshot.data![index].imageLinks[0])
-                          //         : SizedBox(),
-                          //   ],
-                          // ),
                           title: Text(snapshot.data![index].circleName),
+                          subtitle: Text(
+                              'clockin days: ${snapshot.data![index].clockinCount}'),
                           shape: Border.all(),
                         );
                       }),

@@ -13,10 +13,10 @@ import 'package:keepin/src/models/UserProfile.dart';
 */
 class UserProfileProvider with ChangeNotifier {
   final firestoreService = FirestoreService();
-  late String _userId;
-  late String _userName;
   String? _avatarURL;
   User user = FirebaseAuth.instance.currentUser!;
+  String _userId = FirebaseAuth.instance.currentUser!.uid;
+  String _userName = FirebaseAuth.instance.currentUser!.displayName!;
 
   // Getters
   String get userId => _userId;
