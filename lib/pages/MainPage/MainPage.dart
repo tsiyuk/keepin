@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/MainPage/HomePage.dart';
-import 'file:///D:/_NUS/Orbital/keepin/lib/pages/MainPage/UserProfilePage.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
+
+import 'UserProfilePage.dart';
 
 class MainPage extends StatefulWidget {
   @override
