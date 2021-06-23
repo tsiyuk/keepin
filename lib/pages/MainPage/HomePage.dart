@@ -82,7 +82,7 @@ class HomePage extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Container(
-                color: Colors.green .shade700,
+                color: Colors.green.shade700,
                 height: 50,
                 width: 50,
               ),

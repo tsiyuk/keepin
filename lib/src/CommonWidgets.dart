@@ -55,7 +55,8 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ElevatedButton(
-        style: ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
+        style:
+            ElevatedButton.styleFrom(primary: Theme.of(context).primaryColor),
         onPressed: onPressed,
         child: child,
       );
@@ -68,8 +69,8 @@ class SecondaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => TextButton(
-    style: TextButton.styleFrom(primary: Theme.of(context).primaryColor),
-    onPressed: onPressed,
-    child: child,
-  );
+        style: TextButton.styleFrom(primary: Theme.of(context).primaryColor),
+        onPressed: onPressed,
+        child: child,
+      );
 }
