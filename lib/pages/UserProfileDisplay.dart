@@ -24,7 +24,7 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
 
   void initUser(UserProfileProvider userProfileProvider) async {
     final UserProfile userProfile =
-    await userProfileProvider.userProfile(widget.user.uid);
+        await userProfileProvider.userProfile(widget.user.uid);
     userProfileProvider.load(userProfile);
     setState(() {
       userName = userProfile.userName;
@@ -36,53 +36,53 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
 
   @override
   Widget build(BuildContext context) {
-    UserProfileProvider userProfileProvider = Provider.of<UserProfileProvider>(context);
+    UserProfileProvider userProfileProvider =
+        Provider.of<UserProfileProvider>(context);
     initUser(userProfileProvider);
 
-    return loading ? Loading(100.0) : Padding(
-      padding: const EdgeInsets.all(30.0),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            children: [
-              ClipOval(
-                child: avatar,
-              ),
-              Column(
-                children: [
-                  Text(userName)
-                ],
-              )
-            ],
-          ),
-
-          StreamBuilder<List<CircleInfo>>(
-              stream: userProfileProvider.circlesJoined,
-              //stream: postProvider.posts,
-              builder: (context, snapshot) {
-                if (snapshot.data != null && snapshot.data!.isNotEmpty) {
-                  return SizedBox(
-                    height: 300,
-                    child: ListView.builder(
-                        itemCount: snapshot.data!.length,
-                        itemBuilder: (context, index) {
-                          return ListTile(
-                            leading:
-                            Image.network(snapshot.data![index].avatarURL),
-                            title: Text(snapshot.data![index].circleName),
-                            subtitle: Text(
-                                'clockin days: ${snapshot.data![index].clockinCount}'),
-                            shape: Border.all(),
-                          );
-                        }),
-                  );
-                } else {
-                  return Text('No circles joined');
-                }
-              }),
-        ],
-      ),
-    );
+    return loading
+        ? Loading(100.0)
+        : Padding(
+            padding: const EdgeInsets.all(30.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    ClipOval(
+                      child: avatar,
+                    ),
+                    Column(
+                      children: [Text(userName)],
+                    )
+                  ],
+                ),
+                StreamBuilder<List<CircleInfo>>(
+                    stream: userProfileProvider.circlesJoined,
+                    //stream: postProvider.posts,
+                    builder: (context, snapshot) {
+                      if (snapshot.data != null && snapshot.data!.isNotEmpty) {
+                        return SizedBox(
+                          height: 300,
+                          child: ListView.builder(
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (context, index) {
+                                return ListTile(
+                                  leading: Image.network(
+                                      snapshot.data![index].avatarURL),
+                                  title: Text(snapshot.data![index].circleName),
+                                  subtitle: Text(
+                                      'clockin days: ${snapshot.data![index].clockinCount}'),
+                                  shape: Border.all(),
+                                );
+                              }),
+                        );
+                      } else {
+                        return Text('No circles joined');
+                      }
+                    }),
+              ],
+            ),
+          );
   }
 }
