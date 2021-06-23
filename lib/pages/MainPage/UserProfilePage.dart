@@ -16,7 +16,8 @@ class UserProfilePage extends StatefulWidget {
 
 class _UserProfilePageState extends State<UserProfilePage> {
   // final userNameController = TextEditingController();
-  late String userName;
+  String initialUserName = "";
+  String userName = "";
   late Image avatar;
   bool loading = true;
 
@@ -26,11 +27,27 @@ class _UserProfilePageState extends State<UserProfilePage> {
     userProfileProvider.load(userProfile);
     // userNameController.text = userProfile.userName;
     setState(() {
-      userName = userProfile.userName;
+      initialUserName = userProfile.userName;
       avatar = Image.network(userProfileProvider.avatarURL!,
-          width: 90, height: 90, fit: BoxFit.cover);
+        width: 90, height: 90, fit: BoxFit.cover, loadingBuilder:(BuildContext context, Widget child,ImageChunkEvent? loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null ?
+              loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
+                  : null,
+            ),
+          );
+        },);
       loading = false;
     });
+  }
+
+  void handleOnChange(String value) {setState((){this.userName = value;}); print(this.userName);}
+  void handleSave (UserProfileProvider userProfileProvider) {
+    print(this.userName);
+    userProfileProvider.changeUserName(this.userName);
+    userProfileProvider.saveChanges();
   }
 
   @override
@@ -68,22 +85,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
               SizedBox(width: 20),
               Expanded(
                 child: TextFormField(
-                  initialValue: userName,
-                  onChanged: (String s) {userName = s;},
+                  initialValue: initialUserName,
+                  onChanged: handleOnChange,
+                  // controller: userNameController,
                   decoration: InputDecoration(labelText: 'userName', suffix: IconButton(
-                    onPressed: () {
-                      userProfileProvider.changeUserName(userName);
-                      userProfileProvider.saveChanges();
-                    },
+                    onPressed: () {handleSave(userProfileProvider);},
                     visualDensity: VisualDensity(vertical: -4.0),
-                    icon: Icon(Icons.save, color: Theme.of(context).primaryColor,), iconSize: 20,),),
+                    icon: Icon(Icons.save)),),
                 ),
               ),
             ],
           ),
           Divider(),
-
-
           StreamBuilder<List<CircleInfo>>(
               stream: userProfileProvider.circlesJoined,
               //stream: postProvider.posts,
