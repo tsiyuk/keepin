@@ -14,6 +14,7 @@ import 'package:keepin/src/models/UserProfile.dart';
 class UserProfileProvider with ChangeNotifier {
   final firestoreService = FirestoreService();
   String? _avatarURL;
+  String? _bio;
   User user = FirebaseAuth.instance.currentUser!;
   String _userId = FirebaseAuth.instance.currentUser!.uid;
   String _userName = FirebaseAuth.instance.currentUser!.displayName!;
@@ -22,6 +23,7 @@ class UserProfileProvider with ChangeNotifier {
   String get userId => _userId;
   String get userName => _userName;
   String? get avatarURL => _avatarURL;
+  String? get bio => _bio;
   Stream<List<UserProfile>> get userProfiles =>
       firestoreService.getUserProfiles();
   Stream<List<CircleInfo>> get circlesJoined =>
@@ -33,17 +35,23 @@ class UserProfileProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void changeBio(String newBio) {
+    _bio = newBio;
+    notifyListeners();
+  }
+
   // load all the information from the userProfile instance
   void load(UserProfile userProfile) {
     _userId = userProfile.userId;
     _userName = userProfile.userName;
     _avatarURL = userProfile.avatarURL;
+    _bio = userProfile.bio;
   }
 
   // save all the changes
   void saveChanges() {
     UserProfile userProfile =
-        UserProfile(userId, userName, avatarURL: avatarURL);
+        UserProfile(userId, userName, avatarURL: avatarURL, bio: bio);
     user.updateProfile(displayName: userName, photoURL: avatarURL);
     firestoreService.setUserProfile(userProfile);
   }
