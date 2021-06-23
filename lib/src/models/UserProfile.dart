@@ -9,14 +9,14 @@ class UserProfile {
   final String userId;
   final String userName;
   String? avatarURL;
-  //posts
+  String? bio;
 
-  UserProfile(this.userId, this.userName, {this.avatarURL});
+  UserProfile(this.userId, this.userName, {this.avatarURL, this.bio});
 
   // factory method to retrive data from firestore
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(json['userId'], json['userName'],
-        avatarURL: json['avatarURL']);
+        avatarURL: json['avatarURL'], bio: json['bio']);
   }
 
   // transform the UserProfile instance into the json form
@@ -25,6 +25,7 @@ class UserProfile {
       'userId': userId,
       'userName': userName,
       'avatarURL': avatarURL,
+      'bio': bio,
     };
   }
 }

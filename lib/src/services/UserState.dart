@@ -58,8 +58,13 @@ class UserState extends ChangeNotifier {
         password: password,
       );
       _user = credential.user;
-      _loginState = LoginState.loggedIn;
-      notifyListeners();
+      if (_user!.emailVerified) {
+        _loginState = LoginState.loggedIn;
+        notifyListeners();
+      } else {
+        _user!.delete();
+        throw FirebaseAuthException(code: 'The user has not been verified!');
+      }
       return credential;
     } on FirebaseAuthException catch (e) {
       throw e;

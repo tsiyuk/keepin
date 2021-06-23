@@ -66,6 +66,7 @@ class PostProvider with ChangeNotifier {
     _posterName = user.displayName!;
     _posterAvatarLink = user.photoURL;
     _circleName = circleName;
+    _imageLinks = [];
     notifyListeners();
   }
 
@@ -114,10 +115,10 @@ class PostProvider with ChangeNotifier {
             await firebaseStorageRef.putFile(file);
             String imageLink = await firebaseStorageRef.getDownloadURL();
             _imageLinks.add(imageLink);
+            notifyListeners();
           }
         }
       }
-      notifyListeners();
     }
   }
 
