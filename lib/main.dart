@@ -31,8 +31,9 @@ class MyApp extends StatelessWidget {
       title: 'keepin sketch',
       theme: ThemeData(
         primaryColorDark: Color(0xff0B4229),
-        primaryColor: Color(0xff115c45),
-        primaryColorLight: Color(0xff248F7D),
+        primaryColor: Color(0xff206a45),
+        // primaryColorLight: Color(0xffE4EFE7),
+        primaryColorLight: Color(0xff279080),
       ),
       home: StartPage(),
     );

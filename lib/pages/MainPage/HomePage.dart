@@ -33,7 +33,7 @@ class HomePage extends StatelessWidget {
               child: Icon(
                 Icons.add_box,
                 size: 50,
-                color: Colors.teal,
+                color: Colors.teal.shade700,
               ),
             ),
             padding: EdgeInsets.all(6),
@@ -65,7 +65,7 @@ class HomePage extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Container(
-                color: Colors.blueAccent,
+                color: Colors.blue.shade700,
                 height: 50,
                 width: 50,
               ),
@@ -82,7 +82,7 @@ class HomePage extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: Container(
-                color: Colors.greenAccent,
+                color: Colors.green .shade700,
                 height: 50,
                 width: 50,
               ),

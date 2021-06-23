@@ -15,13 +15,22 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
-  final userNameController = TextEditingController();
+  // final userNameController = TextEditingController();
+  late String userName;
+  late Image avatar;
+  bool loading = true;
 
   void initUser(UserProfileProvider userProfileProvider) async {
     final UserProfile userProfile =
         await userProfileProvider.userProfile(widget.user.uid);
     userProfileProvider.load(userProfile);
-    userNameController.text = userProfile.userName;
+    // userNameController.text = userProfile.userName;
+    setState(() {
+      userName = userProfile.userName;
+      avatar = Image.network(userProfileProvider.avatarURL!,
+          width: 90, height: 90, fit: BoxFit.cover);
+      loading = false;
+    });
   }
 
   @override
@@ -30,62 +39,78 @@ class _UserProfilePageState extends State<UserProfilePage> {
         Provider.of<UserProfileProvider>(context);
     UserState userState = Provider.of<UserState>(context, listen: false);
     initUser(userProfileProvider);
-    return Column(
-      children: [
-        Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(15.0),
-              child: userProfileProvider.avatarURL != null
-                  ? Image.network(userProfileProvider.avatarURL!,
-                      width: 150, height: 150, fit: BoxFit.cover)
-                  : Image.asset('assets/images/nus.png',
-                      width: 150, height: 150, fit: BoxFit.cover),
-            ),
-            PrimaryButton(
-                onPressed: () async {
-                  await userProfileProvider.uploadPic(context);
-                  userProfileProvider.saveChanges();
-                },
-                child: Text('Upload Avatar'))
-          ],
-        ),
-        TextFormField(
-          controller: userNameController,
-          decoration: InputDecoration(labelText: 'userName'),
-        ),
-        PrimaryButton(
-            onPressed: () {
-              userProfileProvider.changeUserName(userNameController.text);
-              userProfileProvider.saveChanges();
-            },
-            child: Text('Save')),
-        StreamBuilder<List<CircleInfo>>(
-            stream: userProfileProvider.circlesJoined,
-            //stream: postProvider.posts,
-            builder: (context, snapshot) {
-              if (snapshot.data != null && !snapshot.data!.isEmpty) {
-                return SizedBox(
-                  height: 300,
-                  child: ListView.builder(
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          leading:
-                              Image.network(snapshot.data![index].avatarURL),
-                          title: Text(snapshot.data![index].circleName),
-                          subtitle: Text(
-                              'clockin days: ${snapshot.data![index].clockinCount}'),
-                          shape: Border.all(),
-                        );
-                      }),
-                );
-              } else {
-                return Text('No circles joined');
-              }
-            }),
-        PrimaryButton(onPressed: userState.signOut, child: Text("Sign out")),
-      ],
+
+    return loading ? Container() : Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisSize: MainAxisSize.max,
+        children: [
+          Row(
+            children: [
+              Stack(
+                children: [
+                  ClipOval(child: avatar),
+                  Positioned(
+                    right: -24,
+                    bottom: -4,
+                    child: MaterialButton(
+                      onPressed: () async {
+                        await userProfileProvider.uploadPic(context);
+                        userProfileProvider.saveChanges();
+                      },
+                      color: Color(0xc0ffffff),
+                      shape: CircleBorder(),
+                      child: Icon(Icons.upload_rounded, size: 26, color: Colors.black45,),),
+                  ),
+                ],
+              ),
+              SizedBox(width: 20),
+              Expanded(
+                child: TextFormField(
+                  initialValue: userName,
+                  onChanged: (String s) {userName = s;},
+                  decoration: InputDecoration(labelText: 'userName', suffix: IconButton(
+                    onPressed: () {
+                      userProfileProvider.changeUserName(userName);
+                      userProfileProvider.saveChanges();
+                    },
+                    visualDensity: VisualDensity(vertical: -4.0),
+                    icon: Icon(Icons.save, color: Theme.of(context).primaryColor,), iconSize: 20,),),
+                ),
+              ),
+            ],
+          ),
+          Divider(),
+
+
+          StreamBuilder<List<CircleInfo>>(
+              stream: userProfileProvider.circlesJoined,
+              //stream: postProvider.posts,
+              builder: (context, snapshot) {
+                if (snapshot.data != null && snapshot.data!.isNotEmpty) {
+                  return SizedBox(
+                    height: 300,
+                    child: ListView.builder(
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          return ListTile(
+                            leading:
+                                Image.network(snapshot.data![index].avatarURL),
+                            title: Text(snapshot.data![index].circleName),
+                            subtitle: Text(
+                                'clockin days: ${snapshot.data![index].clockinCount}'),
+                            shape: Border.all(),
+                          );
+                        }),
+                  );
+                } else {
+                  return Text('No circles joined');
+                }
+              }),
+          SecondaryButton(onPressed: userState.signOut, child: Text("Sign out")),
+        ],
+      ),
     );
   }
 }
