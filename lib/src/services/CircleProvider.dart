@@ -75,6 +75,7 @@ class CircleProvider with ChangeNotifier {
   }
 
   /// call upload avatar before create a circle
+  /// Throw an exxception when no image is selected
   void uploadAvatar(BuildContext context) async {
     final List<AssetEntity>? assets =
         await AssetPicker.pickAssets(context, maxAssets: 1);
@@ -86,6 +87,9 @@ class CircleProvider with ChangeNotifier {
     }
   }
 
+  /// create a new circle
+  /// Throw an exception when the circle with [circleName] has already existed
+  /// Throw an exception when the circle avatar has not been uploaded
   void createCircle(String circleName, List<String> tags, bool isPublic) async {
     if (await _firestoreService.isCircleExist(circleName)) {
       throw Exception('The circle $circleName has already existed');
@@ -128,6 +132,7 @@ class CircleProvider with ChangeNotifier {
     }
   }
 
+  /// Need to ask the user to upload a new avatar
   void updateAvatar() async {
     String fileName = _avatar!.path;
     Reference firebaseStorageRef = FirebaseStorage.instance
@@ -183,7 +188,7 @@ class FirestoreService {
             snapshot.docs.map((doc) => Circle.fromJson(doc.data())).toList());
   }
 
-  // To display circle avatar and circle name at the circles feed
+  /// To display circle avatar and circle name at the circles feed
   Stream<List<CircleInfo?>> getCircleInfosFromUser(String userId) {
     return _firebaseFirestore
         .collection('userProfiles')
