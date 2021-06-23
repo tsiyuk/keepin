@@ -64,7 +64,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             stream: userProfileProvider.circlesJoined,
             //stream: postProvider.posts,
             builder: (context, snapshot) {
-              if (snapshot.data != null && !snapshot.data!.isEmpty) {
+              if (snapshot.data != null && snapshot.data!.isNotEmpty) {
                 return SizedBox(
                   height: 300,
                   child: ListView.builder(

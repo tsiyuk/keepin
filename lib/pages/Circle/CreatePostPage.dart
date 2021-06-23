@@ -43,7 +43,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
         PrimaryButton(
             child: Text('Post'),
             onPressed: () {
-              postProvider.initPostInfo(widget.user, widget.circleName);
+              //postProvider.initPostInfo(widget.user, widget.circleName);
               postProvider.changeText(_textController.text);
               postProvider.createPost();
               Navigator.of(context).pop();
