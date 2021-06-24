@@ -1,7 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:keepin/pages/UserProfileDisplay.dart';
 import 'package:keepin/src/CommonWidgets.dart';
+import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
@@ -44,7 +46,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               width: avatarSize,
               height: avatarSize,
               fit: BoxFit.cover,
-              loadingBuilder: _loadingBuilder,
+              loadingBuilder: Loading.loadingBuilder,
             );
       loading = false;
     });
@@ -64,7 +66,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Container(
-                padding: const EdgeInsets.all(20.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
                 decoration: BoxDecoration(
                   color: Colors.teal.shade100,
                   // image: DecorationImage(
@@ -77,10 +80,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   children: [
                     Stack(
                       children: [
-                        ClipOval(child: avatar),
+                        Padding(
+                          padding: const EdgeInsets.all(12.0),
+                          child: ClipOval(child: avatar),
+                        ),
                         Positioned(
-                          right: -26,
-                          bottom: -6,
+                          right: -24,
+                          bottom: -4,
                           child: MaterialButton(
                             onPressed: () async {
                               await userProfileProvider.uploadPic(context);
@@ -97,12 +103,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         ),
                       ],
                     ),
-                    SizedBox(width: 18),
+                    SizedBox(width: 14),
                     Expanded(
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(0.0),
-                        title: TextH2(str: initialUserName),
-                        subtitle: TextH3(str: initialBio),
+                        title: TextH2(initialUserName),
+                        subtitle: TextH3(initialBio),
                         trailing: IconButton(
                           visualDensity:
                               VisualDensity(horizontal: -4.0, vertical: -4.0),
@@ -124,7 +130,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextH3(str: "Circles Joined: "),
+                    TextH3("Circles Joined: "),
                     StreamBuilder<List<CircleInfo>>(
                       stream: userProfileProvider.circlesJoined,
                       //stream: postProvider.posts,
@@ -138,8 +144,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               itemCount: snapshot.data!.length,
                               itemBuilder: (context, index) {
                                 CircleInfo data = snapshot.data![index];
-                                return _buildCircleInfo(data.avatarURL,
-                                    data.circleName, data.clockinCount);
+                                return CircleInfoBuilder.buildCircleInfo(
+                                    data.avatarURL,
+                                    data.circleName,
+                                    data.clockinCount);
                               },
                               separatorBuilder: (c, i) => VerticalDivider(
                                 indent: 10,
@@ -162,58 +170,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
               ),
             ],
           );
-  }
-
-  Widget _buildCircleInfo(String url, String name, num count) {
-    return Container(
-      width: 130,
-      height: 50,
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Image.network(
-              url,
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
-            ),
-          ),
-          SizedBox(width: 4),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 80,
-                child: Text(
-                  name,
-                  style: TextStyle(fontSize: 18),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              Text(
-                'keepin for: $count',
-                style: TextStyle(fontSize: 12),
-              ),
-            ],
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _loadingBuilder(
-      BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-    if (loadingProgress == null) return child;
-    return Center(
-      child: CircularProgressIndicator(
-        value: loadingProgress.expectedTotalBytes != null
-            ? loadingProgress.cumulativeBytesLoaded /
-                loadingProgress.expectedTotalBytes!
-            : null,
-      ),
-    );
   }
 
   Future<void> _showEditForm(BuildContext context, userProfileProvider,

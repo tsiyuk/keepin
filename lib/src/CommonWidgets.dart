@@ -76,7 +76,7 @@ class SecondaryButton extends StatelessWidget {
 }
 
 class TextH1 extends StatelessWidget {
-  const TextH1({required this.str});
+  const TextH1(this.str);
   final String str;
   @override
   Widget build(BuildContext context) => Text(
@@ -90,7 +90,7 @@ class TextH1 extends StatelessWidget {
 }
 
 class TextH2 extends StatelessWidget {
-  const TextH2({required this.str});
+  const TextH2(this.str);
   final String str;
   @override
   Widget build(BuildContext context) => Padding(
@@ -100,7 +100,7 @@ class TextH2 extends StatelessWidget {
           style: TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.w500,
-            color: Colors.black87,
+            color: Colors.black,
           ),
           softWrap: true,
         ),
@@ -108,15 +108,62 @@ class TextH2 extends StatelessWidget {
 }
 
 class TextH3 extends StatelessWidget {
-  const TextH3({required this.str});
+  const TextH3(this.str, {this.size = 18.0});
+  final String str;
+  final double size;
+  @override
+  Widget build(BuildContext context) => Text(
+        str,
+        style: TextStyle(
+            fontSize: size,
+            fontWeight: FontWeight.w400,
+            color: Colors.blueGrey.shade700),
+      );
+}
+
+class TextH4 extends StatelessWidget {
+  const TextH4(this.str);
   final String str;
   @override
   Widget build(BuildContext context) => Text(
         str,
         style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w400,
+          fontSize: 15,
+          fontWeight: FontWeight.w300,
           color: Colors.black54,
         ),
       );
+}
+
+Image defaultAvatar(double size) {
+  return Image.asset(
+    'assets/images/placeholder.png',
+    width: size,
+    height: size,
+    fit: BoxFit.cover,
+  );
+}
+
+void showError(BuildContext context, String str) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    duration: Duration(seconds: 2),
+    backgroundColor: Colors.red.shade400,
+    content: Text(str),
+  ));
+}
+
+void showSuccess(BuildContext context, String str) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    duration: Duration(seconds: 2),
+    backgroundColor: Colors.green.shade400,
+    content: Text(str),
+  ));
+}
+
+void showWarning(BuildContext context, String str) {
+  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+    duration: Duration(seconds: 2),
+    backgroundColor: Colors.orange.shade300,
+    content: Text(str),
+  ));
 }
