@@ -74,3 +74,49 @@ class SecondaryButton extends StatelessWidget {
         child: child,
       );
 }
+
+class TextH1 extends StatelessWidget {
+  const TextH1({required this.str});
+  final String str;
+  @override
+  Widget build(BuildContext context) => Text(
+        str,
+        style: TextStyle(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
+        ),
+      );
+}
+
+class TextH2 extends StatelessWidget {
+  const TextH2({required this.str});
+  final String str;
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 4.0),
+        child: Text(
+          str,
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.w500,
+            color: Colors.black87,
+          ),
+          softWrap: true,
+        ),
+      );
+}
+
+class TextH3 extends StatelessWidget {
+  const TextH3({required this.str});
+  final String str;
+  @override
+  Widget build(BuildContext context) => Text(
+        str,
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w400,
+          color: Colors.black54,
+        ),
+      );
+}
