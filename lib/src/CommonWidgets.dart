@@ -145,22 +145,25 @@ Image defaultAvatar(double size) {
 }
 
 void showError(BuildContext context, String str) {
+  ScaffoldMessenger.of(context).hideCurrentSnackBar();
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     duration: Duration(seconds: 2),
-    backgroundColor: Colors.red.shade400,
+    backgroundColor: Colors.red.shade300,
     content: Text(str),
   ));
 }
 
 void showSuccess(BuildContext context, String str) {
+  ScaffoldMessenger.of(context).hideCurrentSnackBar();
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     duration: Duration(seconds: 2),
-    backgroundColor: Colors.green.shade400,
+    backgroundColor: Colors.green.shade300,
     content: Text(str),
   ));
 }
 
 void showWarning(BuildContext context, String str) {
+  ScaffoldMessenger.of(context).hideCurrentSnackBar();
   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
     duration: Duration(seconds: 2),
     backgroundColor: Colors.orange.shade300,
