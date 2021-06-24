@@ -75,12 +75,7 @@ class CircleProvider with ChangeNotifier {
   }
 
   /// call upload avatar before create a circle
-<<<<<<< HEAD
-  /// Throw an exxception when no image is selected
-  void uploadAvatar(BuildContext context) async {
-=======
   Future<File> uploadAvatar(BuildContext context) async {
->>>>>>> refs/remotes/origin/cx/circle&post
     final List<AssetEntity>? assets =
         await AssetPicker.pickAssets(context, maxAssets: 1);
     if (assets != null) {
@@ -92,15 +87,8 @@ class CircleProvider with ChangeNotifier {
     }
   }
 
-<<<<<<< HEAD
-  /// create a new circle
-  /// Throw an exception when the circle with [circleName] has already existed
-  /// Throw an exception when the circle avatar has not been uploaded
-  void createCircle(String circleName, List<String> tags, bool isPublic) async {
-=======
   Future<void> createCircle(
       String circleName, List<String> tags, bool isPublic) async {
->>>>>>> refs/remotes/origin/cx/circle&post
     if (await _firestoreService.isCircleExist(circleName)) {
       throw Exception('The circle $circleName has already existed');
     }
