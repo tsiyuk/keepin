@@ -75,6 +75,91 @@ class SecondaryButton extends StatelessWidget {
       );
 }
 
+class ImageButton extends StatelessWidget {
+  const ImageButton(
+      {required this.image,
+      this.oval = true,
+      this.onPressed,
+      required this.size});
+
+  final Widget image;
+  final void Function()? onPressed;
+  final bool oval;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) => MaterialButton(
+      onPressed: onPressed == null ? _showImage(context, image) : onPressed,
+      child: Container(
+        width: size,
+        height: size,
+        child: oval ? ClipOval(child: image) : image,
+      ),
+      padding: const EdgeInsets.all(0.0),
+      shape: CircleBorder());
+
+  static Null Function() _showImage(BuildContext context, Widget image) {
+    return () {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            insetPadding: const EdgeInsets.all(0),
+            contentPadding: const EdgeInsets.all(0),
+            content: ImageButton(
+              image: image,
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              oval: false,
+              size: MediaQuery.of(context).size.width,
+            ),
+          );
+        },
+      );
+    };
+  }
+}
+
+class UploadImageButton extends StatelessWidget {
+  const UploadImageButton({
+    required this.image,
+    required this.size,
+    required this.onPressed,
+  });
+
+  final Widget image;
+  final void Function() onPressed;
+  final double size;
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ImageButton(image: image, size: size),
+        ),
+        Positioned(
+          right: -24,
+          bottom: 1,
+          child: MaterialButton(
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            onPressed: onPressed,
+            color: Color(0xbbffffff),
+            shape: CircleBorder(),
+            child: Icon(
+              Icons.upload_rounded,
+              size: 22,
+              color: Colors.black45,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class TextH1 extends StatelessWidget {
   const TextH1(this.str);
   final String str;
@@ -90,17 +175,19 @@ class TextH1 extends StatelessWidget {
 }
 
 class TextH2 extends StatelessWidget {
-  const TextH2(this.str);
+  const TextH2(this.str, {this.size = 22.0});
   final String str;
+  final double size;
+
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 4.0),
         child: Text(
           str,
           style: TextStyle(
-            fontSize: 24,
+            fontSize: size,
             fontWeight: FontWeight.w500,
-            color: Colors.black,
+            color: Colors.black87,
           ),
           softWrap: true,
         ),
@@ -128,7 +215,7 @@ class TextH4 extends StatelessWidget {
   Widget build(BuildContext context) => Text(
         str,
         style: TextStyle(
-          fontSize: 15,
+          fontSize: 16.0,
           fontWeight: FontWeight.w300,
           color: Colors.black54,
         ),

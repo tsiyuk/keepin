@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -18,10 +19,11 @@ class UserProfilePage extends StatefulWidget {
 }
 
 class _UserProfilePageState extends State<UserProfilePage> {
-  final double avatarSize = 90;
+  final double avatarSize = 80;
   String initialUserName = "";
   String initialBio = "";
-  late Image avatar;
+  late Widget avatar;
+  late Widget largeAvatar;
   bool loading = true;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -35,18 +37,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
           ? "Please tell us more about you!"
           : userProfile.bio!;
       avatar = userProfileProvider.avatarURL == null
-          ? Image.asset(
-              'assets/images/placeholder.png',
-              width: avatarSize,
-              height: avatarSize,
+          ? defaultAvatar(avatarSize)
+          : CachedNetworkImage(
               fit: BoxFit.cover,
-            )
-          : Image.network(
-              userProfileProvider.avatarURL!,
-              width: avatarSize,
-              height: avatarSize,
-              fit: BoxFit.cover,
-              loadingBuilder: Loading.loadingBuilder,
+              imageUrl: userProfileProvider.avatarURL!,
+              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  CircularProgressIndicator(value: downloadProgress.progress),
+              errorWidget: (context, url, error) => Icon(Icons.error),
             );
       loading = false;
     });
@@ -69,7 +66,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
                 decoration: BoxDecoration(
-                  color: Colors.teal.shade100,
+                  color: Colors.teal.withAlpha(0x20),
                   // image: DecorationImage(
                   //   image: AssetImage('assets/images/blurry.jpg'),
                   //   fit: BoxFit.cover,
@@ -78,37 +75,20 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Stack(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(12.0),
-                          child: ClipOval(child: avatar),
-                        ),
-                        Positioned(
-                          right: -24,
-                          bottom: -4,
-                          child: MaterialButton(
-                            onPressed: () async {
-                              await userProfileProvider.uploadPic(context);
-                              userProfileProvider.saveChanges();
-                            },
-                            color: Color(0xc0ffffff),
-                            shape: CircleBorder(),
-                            child: Icon(
-                              Icons.upload_rounded,
-                              size: 25,
-                              color: Colors.black45,
-                            ),
-                          ),
-                        ),
-                      ],
+                    UploadImageButton(
+                      image: avatar,
+                      size: avatarSize,
+                      onPressed: () async {
+                        await userProfileProvider.uploadPic(context);
+                        userProfileProvider.saveChanges();
+                      },
                     ),
                     SizedBox(width: 14),
                     Expanded(
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(0.0),
                         title: TextH2(initialUserName),
-                        subtitle: TextH3(initialBio),
+                        subtitle: TextH4(initialBio),
                         trailing: IconButton(
                           visualDensity:
                               VisualDensity(horizontal: -4.0, vertical: -4.0),
@@ -182,7 +162,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
         userNameController.text = initialUserName;
         bioController.text = initialBio;
         return AlertDialog(
-          insetPadding: const EdgeInsets.all(20.0),
+          contentPadding: const EdgeInsets.all(20.0),
           actionsPadding:
               const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
           content: Form(

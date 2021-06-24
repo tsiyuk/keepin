@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:keepin/pages/Circle/CreateCirclePage.dart';
+import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:provider/provider.dart';
 
@@ -105,7 +106,11 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [_buildCircleList(context), Divider(), Expanded(child: Feed())],
+      children: [
+        _buildCircleList(context),
+        Divider(),
+        Expanded(child: Feed()),
+      ],
     );
   }
 }
@@ -132,7 +137,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
         TabBar(
           labelColor: Theme.of(context).primaryColorDark,
           indicatorColor: Theme.of(context).primaryColor,
-          labelPadding: EdgeInsets.all(8),
+          labelPadding: EdgeInsets.all(12.0),
           controller: _tabController,
           tabs: <Widget>[Text("Follow"), Text("Recommendation")],
         ),
