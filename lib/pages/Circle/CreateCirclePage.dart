@@ -14,7 +14,7 @@ class _CreateCirclePageState extends State<CreateCirclePage> {
   final _textController = TextEditingController();
   final _tagsController = TextEditingController();
   final tags = <String>[];
-  final double _avatarSize = 90;
+  final double _avatarSize = 120;
   bool isPublic = true;
   Image? _avatar;
 
@@ -45,6 +45,7 @@ class _CreateCirclePageState extends State<CreateCirclePage> {
                 }
               },
             ),
+            SizedBox(height: 12),
             TextFormField(
               controller: _textController,
               decoration: InputDecoration(labelText: 'circleName'),
@@ -59,7 +60,7 @@ class _CreateCirclePageState extends State<CreateCirclePage> {
               },
             ),
             Padding(
-              padding: const EdgeInsets.symmetric(vertical: 18.0),
+              padding: const EdgeInsets.symmetric(vertical: 20.0),
               child: SwitchListTile(
                 title: TextH3(
                   "public",
