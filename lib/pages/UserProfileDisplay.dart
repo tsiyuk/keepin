@@ -6,7 +6,6 @@ import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
-import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
 
 // This widget is used to display other user's profile
@@ -18,7 +17,9 @@ class UserProfileDisplay extends StatefulWidget {
 }
 
 class _UserProfileDisplayState extends State<UserProfileDisplay> {
-  late String userName;
+  final double avatarSize = 90;
+  String userName = "";
+  String bio = "";
   late Image avatar;
   bool loading = true;
 
@@ -28,8 +29,23 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
     userProfileProvider.load(userProfile);
     setState(() {
       userName = userProfile.userName;
-      avatar = Image.network(userProfileProvider.avatarURL!,
-          width: 100, height: 100, fit: BoxFit.cover);
+      bio = userProfile.bio == null
+          ? "Please tell us more about you!"
+          : userProfile.bio!;
+      avatar = userProfileProvider.avatarURL == null
+          ? Image.asset(
+              'assets/images/placeholder.png',
+              width: avatarSize,
+              height: avatarSize,
+              fit: BoxFit.cover,
+            )
+          : Image.network(
+              userProfileProvider.avatarURL!,
+              width: avatarSize,
+              height: avatarSize,
+              fit: BoxFit.cover,
+              loadingBuilder: Loading.loadingBuilder,
+            );
       loading = false;
     });
   }
@@ -49,40 +65,98 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
               children: [
                 Row(
                   children: [
-                    ClipOval(
-                      child: avatar,
-                    ),
-                    Column(
-                      children: [Text(userName)],
+                    ClipOval(child: avatar),
+                    SizedBox(width: 10),
+                    ListTile(
+                      contentPadding: const EdgeInsets.all(0.0),
+                      title: TextH2(userName),
+                      subtitle: TextH3(bio),
                     )
                   ],
                 ),
-                StreamBuilder<List<CircleInfo>>(
-                    stream: userProfileProvider.circlesJoined,
-                    //stream: postProvider.posts,
-                    builder: (context, snapshot) {
-                      if (snapshot.data != null && snapshot.data!.isNotEmpty) {
-                        return SizedBox(
-                          height: 300,
-                          child: ListView.builder(
-                              itemCount: snapshot.data!.length,
-                              itemBuilder: (context, index) {
-                                return ListTile(
-                                  leading: Image.network(
-                                      snapshot.data![index].avatarURL),
-                                  title: Text(snapshot.data![index].circleName),
-                                  subtitle: Text(
-                                      'clockin days: ${snapshot.data![index].clockinCount}'),
-                                  shape: Border.all(),
-                                );
-                              }),
-                        );
-                      } else {
-                        return Text('No circles joined');
-                      }
-                    }),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextH3("Circles Joined: "),
+                      StreamBuilder<List<CircleInfo>>(
+                        stream: userProfileProvider.circlesJoined,
+                        //stream: postProvider.posts,
+                        builder: (context, snapshot) {
+                          if (snapshot.data != null &&
+                              snapshot.data!.isNotEmpty) {
+                            return Container(
+                              height: 60,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  CircleInfo data = snapshot.data![index];
+                                  return CircleInfoBuilder.buildCircleInfo(
+                                      data.avatarURL,
+                                      data.circleName,
+                                      data.clockinCount);
+                                },
+                                separatorBuilder: (c, i) => VerticalDivider(
+                                  indent: 10,
+                                  endIndent: 10,
+                                  thickness: 1,
+                                ),
+                              ),
+                            );
+                          } else {
+                            return Text('No circles joined');
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           );
+  }
+}
+
+class CircleInfoBuilder {
+  static Widget buildCircleInfo(String url, String name, num count) {
+    return Container(
+      width: 130,
+      height: 50,
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Image.network(
+              url,
+              width: 40,
+              height: 40,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(width: 4),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 80,
+                child: Text(
+                  name,
+                  style: TextStyle(fontSize: 18),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                'keepin for: $count',
+                style: TextStyle(fontSize: 12),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
   }
 }
