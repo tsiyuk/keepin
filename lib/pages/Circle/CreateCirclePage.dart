@@ -14,6 +14,7 @@ class _CreateCirclePageState extends State<CreateCirclePage> {
   final _textController = TextEditingController();
   final _tagsController = TextEditingController();
   final tags = <String>[];
+  final double _avatarSize = 90;
   bool isPublic = true;
   Image? _avatar;
 
@@ -27,42 +28,22 @@ class _CreateCirclePageState extends State<CreateCirclePage> {
           mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Stack(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ClipOval(
-                      child: _avatar == null ? defaultAvatar(90) : _avatar!),
-                ),
-                Positioned(
-                  right: -24,
-                  bottom: -4,
-                  child: MaterialButton(
-                    onPressed: () async {
-                      try {
-                        Image avatar = Image.file(
-                          await circleProvider.uploadAvatar(context),
-                          width: 90,
-                          height: 90,
-                          fit: BoxFit.cover,
-                        );
-                        setState(() {
-                          this._avatar = avatar;
-                        });
-                      } catch (e) {
-                        showWarning(context, "Failed to add image!");
-                      }
-                    },
-                    color: Color(0xc0ffffff),
-                    shape: CircleBorder(),
-                    child: Icon(
-                      Icons.upload_rounded,
-                      size: 25,
-                      color: Colors.black45,
-                    ),
-                  ),
-                ),
-              ],
+            UploadImageButton(
+              image: _avatar == null ? defaultAvatar(_avatarSize) : _avatar!,
+              size: _avatarSize,
+              onPressed: () async {
+                try {
+                  Image avatar = Image.file(
+                    await circleProvider.uploadAvatar(context),
+                    fit: BoxFit.cover,
+                  );
+                  setState(() {
+                    this._avatar = avatar;
+                  });
+                } catch (e) {
+                  showWarning(context, "Failed to add image!");
+                }
+              },
             ),
             TextFormField(
               controller: _textController,
@@ -89,7 +70,7 @@ class _CreateCirclePageState extends State<CreateCirclePage> {
                     : TextH4("only invited members can view the post"),
                 contentPadding: const EdgeInsets.all(10.0),
                 tileColor: Colors.blueGrey.shade50,
-                activeColor: Colors.teal.shade300,
+                activeColor: Colors.teal.shade400,
                 value: isPublic,
                 onChanged: (value) {
                   setState(() {
@@ -105,10 +86,6 @@ class _CreateCirclePageState extends State<CreateCirclePage> {
                 SecondaryButton(
                   child: Text("Cancel"),
                   onPressed: Navigator.of(context).pop,
-                ),
-                SecondaryButton(
-                  child: Text("Canceljj"),
-                  onPressed: () {showSuccess(context, "success");},
                 ),
                 PrimaryButton(
                   child: Text('Create Circle'),
