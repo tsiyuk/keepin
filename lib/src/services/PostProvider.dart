@@ -115,11 +115,11 @@ class PostProvider with ChangeNotifier {
             await firebaseStorageRef.putFile(file);
             String imageLink = await firebaseStorageRef.getDownloadURL();
             _imageLinks.add(imageLink);
-            notifyListeners();
           }
         }
       }
     }
+    notifyListeners();
   }
 
   void addComments(String postId, User commenter, String text, String? replyTo,

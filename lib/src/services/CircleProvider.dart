@@ -21,6 +21,8 @@ class CircleProvider with ChangeNotifier {
 
   /// clockinCount is for the specifiled user
   late num _clockinCount;
+  String? _description;
+  List<String>? _descriptionImageURLs = [];
   File? _avatar;
 
   FirestoreService _firestoreService = FirestoreService();
@@ -33,6 +35,8 @@ class CircleProvider with ChangeNotifier {
   num get numOfMembers => _numOfMembers;
   bool get isPublic => _isPublic;
   num get clockinCount => _clockinCount;
+  String? get description => _description;
+  List<String>? get descriptionImageURLs => _descriptionImageURLs;
 
   Stream<List<Circle>> get allCircles => _firestoreService.getCircles();
 
@@ -165,6 +169,37 @@ class CircleProvider with ChangeNotifier {
     await _firestoreService.updateClockinCount(
         circleName, user.uid, clockinCount);
   }
+
+  /// Upload Descirption Images
+  Future uploadDescirptionImages(BuildContext context) async {
+    final List<AssetEntity>? assets = await AssetPicker.pickAssets(context);
+    if (assets != null) {
+      for (AssetEntity asset in assets) {
+        if (await asset.exists) {
+          File? file = await asset.file;
+          if (file != null) {
+            String fileName = file.path;
+            Reference firebaseStorageRef = FirebaseStorage.instance
+                .ref()
+                .child('circleAssets')
+                .child(circleName)
+                .child(fileName);
+            await firebaseStorageRef.putFile(file);
+            String imageLink = await firebaseStorageRef.getDownloadURL();
+            _descriptionImageURLs!.add(imageLink);
+          }
+        }
+      }
+    }
+    notifyListeners();
+  }
+
+  void addDescritpion(String text) {
+    _description = text;
+    _firestoreService.updateDescription(
+        circleName, _description, _descriptionImageURLs);
+    notifyListeners();
+  }
 }
 
 class FirestoreService {
@@ -267,8 +302,8 @@ class FirestoreService {
         .update({'clockinCount': count});
   }
 
-  // Add an admin
-  // should be call after creating a new circle
+  /// Add an admin
+  /// should be call after creating a new circle
   Future<void> addAdmin(Circle circle) {
     return _firebaseFirestore
         .collection('circles')
@@ -281,7 +316,7 @@ class FirestoreService {
     });
   }
 
-  // Add a new user
+  /// Add a new user
   Future<void> addUser(String circleName, String userId) {
     return _firebaseFirestore
         .collection('circles')
@@ -299,6 +334,15 @@ class FirestoreService {
         .collection('circles')
         .doc(circleName)
         .update({'numOfMembers': count});
+  }
+
+  /// Add or update description
+  Future<void> updateDescription(
+      String circleName, String? description, List<String>? urls) {
+    return _firebaseFirestore
+        .collection('circles')
+        .doc(circleName)
+        .update({'description': description, 'descritpionImageURLs': urls});
   }
 
   // remove a user from the circle

@@ -17,7 +17,7 @@ class SearchService {
 
   static Stream<List<UserProfile>> searchUserProfile(String inputName) {
     return _firebaseFirestore
-        .collection('users')
+        .collection('userProfiles')
         .where('userName', isGreaterThanOrEqualTo: inputName)
         .snapshots()
         .map((snapshot) => snapshot.docs

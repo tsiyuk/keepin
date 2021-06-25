@@ -40,7 +40,7 @@ class _MainPageState extends State<MainPage> {
         actions: [
           IconButton(
               onPressed: () async {
-                await showSearch(context: context, delegate: CircleSearch());
+                await showSearch(context: context, delegate: SearchData());
               },
               icon: Icon(Icons.search)),
         ],
