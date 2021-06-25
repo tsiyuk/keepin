@@ -62,10 +62,7 @@ class _CreateCirclePageState extends State<CreateCirclePage> {
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20.0),
               child: SwitchListTile(
-                title: TextH3(
-                  "public",
-                  size: 22,
-                ),
+                title: TextH3("public", size: 22),
                 subtitle: isPublic
                     ? TextH4("everyone can view the post")
                     : TextH4("only invited members can view the post"),

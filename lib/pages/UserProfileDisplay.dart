@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,7 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
   final double avatarSize = 90;
   String userName = "";
   String bio = "";
-  late Image avatar;
+  late Widget avatar;
   bool loading = true;
 
   void initUser(UserProfileProvider userProfileProvider) async {
@@ -33,18 +34,13 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
           ? "Please tell us more about you!"
           : userProfile.bio!;
       avatar = userProfileProvider.avatarURL == null
-          ? Image.asset(
-              'assets/images/placeholder.png',
-              width: avatarSize,
-              height: avatarSize,
+          ? defaultAvatar(avatarSize)
+          : CachedNetworkImage(
               fit: BoxFit.cover,
-            )
-          : Image.network(
-              userProfileProvider.avatarURL!,
-              width: avatarSize,
-              height: avatarSize,
-              fit: BoxFit.cover,
-              loadingBuilder: Loading.loadingBuilder,
+              imageUrl: userProfileProvider.avatarURL!,
+              progressIndicatorBuilder: (context, url, downloadProgress) =>
+                  CircularProgressIndicator(value: downloadProgress.progress),
+              errorWidget: (context, url, error) => Icon(Icons.error),
             );
       loading = false;
     });
