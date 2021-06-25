@@ -86,7 +86,7 @@ class UserState extends ChangeNotifier {
         await user.reload();
         if (user.emailVerified) {
           timer.cancel();
-          await user.updateProfile(displayName: displayName);
+          await user.updateDisplayName(displayName);
           _loginState = LoginState.loggedIn;
           _user = user;
           notifyListeners();

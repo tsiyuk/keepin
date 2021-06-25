@@ -52,7 +52,8 @@ class UserProfileProvider with ChangeNotifier {
   void saveChanges() {
     UserProfile userProfile =
         UserProfile(userId, userName, avatarURL: avatarURL, bio: bio);
-    user.updateProfile(displayName: userName, photoURL: avatarURL);
+    user.updateDisplayName(userName);
+    user.updatePhotoURL(avatarURL);
     firestoreService.setUserProfile(userProfile);
   }
 

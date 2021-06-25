@@ -10,8 +10,8 @@ import 'package:provider/provider.dart';
 
 // This widget is used to display other user's profile
 class UserProfileDisplay extends StatefulWidget {
-  final User user;
-  UserProfileDisplay(this.user);
+  final String userId;
+  UserProfileDisplay(this.userId);
   @override
   _UserProfileDisplayState createState() => _UserProfileDisplayState();
 }
@@ -25,7 +25,7 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
 
   void initUser(UserProfileProvider userProfileProvider) async {
     final UserProfile userProfile =
-        await userProfileProvider.userProfile(widget.user.uid);
+        await userProfileProvider.userProfile(widget.userId);
     userProfileProvider.load(userProfile);
     setState(() {
       userName = userProfile.userName;

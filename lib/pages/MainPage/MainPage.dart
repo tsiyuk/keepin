@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/MainPage/HomePage.dart';
+import 'package:keepin/pages/SearchDelegate.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
@@ -36,6 +37,13 @@ class _MainPageState extends State<MainPage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Search Bar'),
+        actions: [
+          IconButton(
+              onPressed: () async {
+                await showSearch(context: context, delegate: CircleSearch());
+              },
+              icon: Icon(Icons.search)),
+        ],
       ),
       body: Center(
         child: _subPages.elementAt(_selectedIndex),
