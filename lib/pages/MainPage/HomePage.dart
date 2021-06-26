@@ -46,52 +46,57 @@ class HomePage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16)),
             minWidth: 50,
           ),
-          StreamBuilder<List<CircleInfo>>(
-            stream: userProfileProvider.circlesJoined,
-            //stream: postProvider.posts,
-            builder: (context, snapshot) {
-              if (snapshot.data != null && snapshot.data!.isNotEmpty) {
-                return Container(
-                  height: 75,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      CircleInfo data = snapshot.data![index];
-                      // Circle circle = await circleProvider.readCircleFromName(data.circleName);
-                      return MaterialButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => CirclePage(
-                                      circleInfo: data,
-                                    )),
-                          );
-                        },
-                        color: Colors.white,
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.network(data.avatarURL,
-                              width: 50, height: 50, fit: BoxFit.cover),
-                        ),
-                        padding: EdgeInsets.all(6),
-                        shape: ContinuousRectangleBorder(
-                            borderRadius: BorderRadius.circular(16)),
-                        minWidth: 50,
-                      );
-                    },
-                    separatorBuilder: (c, i) => VerticalDivider(
-                      indent: 10,
-                      endIndent: 10,
-                      thickness: 1,
+          SizedBox(
+            height: 65,
+            width: 300,
+            child: StreamBuilder<List<CircleInfo>>(
+              stream: userProfileProvider.circlesJoined,
+              //stream: postProvider.posts,
+              builder: (context, snapshot) {
+                if (snapshot.data != null && snapshot.data!.isNotEmpty) {
+                  return Container(
+                    // height: 50,
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        CircleInfo data = snapshot.data![index];
+                        // Circle circle = await circleProvider.readCircleFromName(data.circleName);
+                        return MaterialButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => CirclePage(
+                                        circleInfo: data,
+                                      )),
+                            );
+                          },
+                          color: Colors.white,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(data.avatarURL,
+                                width: 50, height: 50, fit: BoxFit.cover),
+                          ),
+                          padding: EdgeInsets.all(6),
+                          shape: ContinuousRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
+                          minWidth: 50,
+                        );
+                      },
+                      separatorBuilder: (c, i) => VerticalDivider(
+                        indent: 10,
+                        endIndent: 10,
+                        thickness: 1,
+                      ),
                     ),
-                  ),
-                );
-              } else {
-                return Text('No circles joined');
-              }
-            },
+                  );
+                } else {
+                  return Text('No circles joined');
+                }
+              },
+            ),
           ),
           // MaterialButton(
           //   onPressed: () {
@@ -111,44 +116,6 @@ class HomePage extends StatelessWidget {
           //       borderRadius: BorderRadius.circular(16)),
           //   minWidth: 50,
           // ),
-          // MaterialButton(
-          //   onPressed: () {},
-          //   color: Colors.white,
-          //   child: ClipRRect(
-          //     borderRadius: BorderRadius.circular(8),
-          //     child: Container(
-          //       color: Colors.blue.shade700,
-          //       height: 50,
-          //       width: 50,
-          //     ),
-          //   ),
-          //   padding: EdgeInsets.all(6),
-          //   shape: ContinuousRectangleBorder(
-          //     borderRadius: BorderRadius.circular(16),
-          //   ),
-          //   minWidth: 50,
-          // ),
-          // MaterialButton(
-          //   onPressed: () {},
-          //   color: Colors.white,
-          //   child: ClipRRect(
-          //     borderRadius: BorderRadius.circular(8),
-          //     child: Container(
-          //       color: Colors.green.shade700,
-          //       height: 50,
-          //       width: 50,
-          //     ),
-          //   ),
-          //   padding: EdgeInsets.all(6),
-          //   shape: ContinuousRectangleBorder(
-          //     borderRadius: BorderRadius.circular(16),
-          //   ),
-          //   minWidth: 50,
-          // ),
-          // create circle button,
-          // Container(color: Colors.blueGrey, height: 100, width: 100,),
-          // Container(color: Colors.green, height: 100, width: 100,),
-          // my circles StreamBuilder
         ],
       ),
     );

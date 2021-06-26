@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:keepin/pages/Circle/CirclePage.dart';
 import 'package:keepin/pages/UserProfileDisplay.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/Loading.dart';
@@ -124,10 +125,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               itemCount: snapshot.data!.length,
                               itemBuilder: (context, index) {
                                 CircleInfo data = snapshot.data![index];
-                                return CircleInfoBuilder.buildCircleInfo(
-                                    data.avatarURL,
-                                    data.circleName,
-                                    data.clockinCount);
+                                return GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                        (MaterialPageRoute(
+                                            builder: (context) =>
+                                                CirclePage(circleInfo: data))));
+                                  },
+                                  child: CircleInfoBuilder.buildCircleInfo(
+                                      data.avatarURL,
+                                      data.circleName,
+                                      data.clockinCount),
+                                );
                               },
                               separatorBuilder: (c, i) => VerticalDivider(
                                 indent: 10,

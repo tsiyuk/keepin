@@ -18,7 +18,7 @@ class CirclePage extends StatefulWidget {
 
 class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
   User user = FirebaseAuth.instance.currentUser!;
-  late Circle circle;
+  //late Circle circle;
   late TabController _tabController;
   @override
   void initState() {
@@ -27,7 +27,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
   }
 
   void initCircle(CircleProvider cp) async {
-    circle = await cp.readCircleFromName(widget.circleInfo.circleName);
+    //circle = await cp.readCircleFromName(widget.circleInfo.circleName);
   }
 
   @override
@@ -36,7 +36,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
     CircleProvider circleProvider =
         Provider.of<CircleProvider>(context, listen: false);
     initCircle(circleProvider);
-    circleProvider.loadAll(circle, widget.circleInfo);
+    //circleProvider.loadAll(circle, widget.circleInfo);
     Widget _profileSection = Container(
       padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
       child: Row(
