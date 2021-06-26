@@ -107,7 +107,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ],
                 ),
               ),
-              // Divider(thickness: 1),
               Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(

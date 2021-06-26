@@ -49,7 +49,7 @@ class HomePage extends StatelessWidget {
             minWidth: 50,
           ),
           SizedBox(
-            height: 65,
+            height: 63,
             width: 300,
             child: StreamBuilder<List<CircleInfo>>(
               stream: userProfileProvider.circlesJoined,

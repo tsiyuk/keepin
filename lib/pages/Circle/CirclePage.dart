@@ -28,16 +28,24 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
     _tabController = TabController(length: 3, vsync: this);
   }
 
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
+  }
+
   void initCircleInfo(CircleProvider cp) async {
     cp.loadAll(widget.circle, widget.circleInfo);
-    setState(() async {
-      isMember = await cp.isMember(user.uid);
-      loading = false;
-    });
-    if (isMember && widget.circleInfo == null) {
+    bool temp = await cp.isMember(user.uid);
+    if (temp && widget.circleInfo == null) {
       CircleInfo circleInfo = await cp.readCircleInfoFromUser();
       cp.loadAll(widget.circle, circleInfo);
     }
+    setState(() {
+      isMember = temp;
+      loading = false;
+    });
   }
 
   @override
@@ -88,7 +96,6 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
         // BottomBarItem(icon: Icon(Icons.menu), label: 'Menu'),
         // BottomNavigationBarItem(
         //     icon: Icon(Icons.lock_clock), label: 'Clock in'),
-        // // TODO
         // // the clock in may use a floating action button with CircularNotchedRectangle() for better visual effect
         // BottomNavigationBarItem(
         //     icon: Icon(Icons.fireplace_outlined), label: 'Recommend'),
