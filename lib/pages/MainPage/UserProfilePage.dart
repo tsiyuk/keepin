@@ -8,6 +8,7 @@ import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/UserProfile.dart';
+import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
@@ -55,6 +56,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context);
     UserState userState = Provider.of<UserState>(context, listen: false);
+    CircleProvider circleProvider =
+        Provider.of<CircleProvider>(context, listen: false);
     initUser(userProfileProvider);
 
     return loading
@@ -126,11 +129,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                               itemBuilder: (context, index) {
                                 CircleInfo data = snapshot.data![index];
                                 return GestureDetector(
-                                  onTap: () {
+                                  onTap: () async {
+                                    Circle circle = await circleProvider
+                                        .readCircleFromName(data.circleName);
                                     Navigator.of(context).push(
                                         (MaterialPageRoute(
-                                            builder: (context) =>
-                                                CirclePage(circleInfo: data))));
+                                            builder: (context) => CirclePage(
+                                                circle: circle,
+                                                circleInfo: data))));
                                   },
                                   child: CircleInfoBuilder.buildCircleInfo(
                                       data.avatarURL,

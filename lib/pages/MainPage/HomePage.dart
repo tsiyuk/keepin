@@ -22,6 +22,8 @@ class HomePage extends StatelessWidget {
   Widget _buildCircleList(BuildContext context) {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context);
+    CircleProvider circleProvider =
+        Provider.of<CircleProvider>(context, listen: false);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
       child: Row(
@@ -62,13 +64,15 @@ class HomePage extends StatelessWidget {
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
                         CircleInfo data = snapshot.data![index];
-                        // Circle circle = await circleProvider.readCircleFromName(data.circleName);
                         return MaterialButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            Circle circle = await circleProvider
+                                .readCircleFromName(data.circleName);
                             Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) => CirclePage(
+                                        circle: circle,
                                         circleInfo: data,
                                       )),
                             );
