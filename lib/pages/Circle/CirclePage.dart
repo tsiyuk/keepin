@@ -2,17 +2,23 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/Circle/CreatePostPage.dart';
 import 'package:keepin/src/CommonWidgets.dart';
+import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/Post.dart';
+import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:keepin/src/services/PostProvider.dart';
 import 'package:provider/provider.dart';
 
 class CirclePage extends StatefulWidget {
+  // final Circle circle;
+  final CircleInfo circleInfo;
+  CirclePage({required this.circleInfo});
   @override
   _CirclePageState createState() => _CirclePageState();
 }
 
 class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
   User user = FirebaseAuth.instance.currentUser!;
+  late Circle circle;
   late TabController _tabController;
   @override
   void initState() {
@@ -20,9 +26,17 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
     _tabController = TabController(length: 3, vsync: this);
   }
 
+  void initCircle(CircleProvider cp) async {
+    circle = await cp.readCircleFromName(widget.circleInfo.circleName);
+  }
+
   @override
   Widget build(BuildContext context) {
     PostProvider postProvider = Provider.of<PostProvider>(context);
+    CircleProvider circleProvider =
+        Provider.of<CircleProvider>(context, listen: false);
+    initCircle(circleProvider);
+    circleProvider.loadAll(circle, widget.circleInfo);
     Widget _profileSection = Container(
       padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
       child: Row(
@@ -33,7 +47,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
           ),
           Expanded(
             child: ListTile(
-              title: TextH2('NUS Night Runners'),
+              title: TextH2(widget.circleInfo.circleName),
             ),
           ),
         ],
@@ -95,8 +109,8 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
               children: [
                 Text('1'),
                 StreamBuilder<List<Post>>(
-                    stream:
-                        postProvider.readPostsFromCircle('NUS Night Runners'),
+                    stream: postProvider
+                        .readPostsFromCircle(widget.circleInfo.circleName),
                     //stream: postProvider.posts,
                     builder: (context, snapshot) {
                       if (snapshot.data != null) {
@@ -130,7 +144,8 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                     onPressed: () {
                       Navigator.of(context).push(MaterialPageRoute(
                           builder: (context) => CreatePostPage(
-                              user: user, circleName: 'NUS Night Runners')));
+                              user: user,
+                              circleName: widget.circleInfo.circleName)));
                     }),
               ],
             ),
@@ -140,7 +155,11 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
       bottomNavigationBar: bottomBar,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) => CreatePostPage(
+                  user: user, circleName: widget.circleInfo.circleName)));
+        },
         backgroundColor: Theme.of(context).primaryColor,
         child: Icon(
           Icons.add,

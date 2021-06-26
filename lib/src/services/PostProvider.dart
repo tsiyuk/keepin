@@ -123,7 +123,7 @@ class PostProvider with ChangeNotifier {
   }
 
   void addComments(String postId, User commenter, String text, String? replyTo,
-      String replyToId) {
+      String? replyToId) {
     _firestoreService.addComment(Comment(
       postId: postId,
       commenterName: commenter.displayName!,

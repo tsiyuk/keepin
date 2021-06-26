@@ -91,7 +91,7 @@ class CircleBuilder {
 }
 
 class Feed extends StatefulWidget {
-  String query;
+  final String query;
   Feed({Key? key, required this.query}) : super(key: key);
 
   @override

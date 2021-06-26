@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:keepin/pages/Circle/CreateCirclePage.dart';
 import 'package:keepin/src/CommonWidgets.dart';
+import 'package:keepin/src/models/Circle.dart';
+import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/CircleProvider.dart';
+import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:provider/provider.dart';
 
 import '../Circle/CirclePage.dart';
@@ -17,7 +20,8 @@ class HomePage extends StatelessWidget {
   // https://flutter.dev/docs/cookbook/navigation/navigation-basics
   // refer to this link for navigating to circle page and back
   Widget _buildCircleList(BuildContext context) {
-    CircleProvider circleProvider = Provider.of<CircleProvider>(context);
+    UserProfileProvider userProfileProvider =
+        Provider.of<UserProfileProvider>(context);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
       child: Row(
@@ -42,58 +46,105 @@ class HomePage extends StatelessWidget {
                 borderRadius: BorderRadius.circular(16)),
             minWidth: 50,
           ),
-          MaterialButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CirclePage()),
-              );
+          StreamBuilder<List<CircleInfo>>(
+            stream: userProfileProvider.circlesJoined,
+            //stream: postProvider.posts,
+            builder: (context, snapshot) {
+              if (snapshot.data != null && snapshot.data!.isNotEmpty) {
+                return Container(
+                  height: 75,
+                  child: ListView.separated(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      CircleInfo data = snapshot.data![index];
+                      // Circle circle = await circleProvider.readCircleFromName(data.circleName);
+                      return MaterialButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => CirclePage(
+                                      circleInfo: data,
+                                    )),
+                          );
+                        },
+                        color: Colors.white,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.network(data.avatarURL,
+                              width: 50, height: 50, fit: BoxFit.cover),
+                        ),
+                        padding: EdgeInsets.all(6),
+                        shape: ContinuousRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                        minWidth: 50,
+                      );
+                    },
+                    separatorBuilder: (c, i) => VerticalDivider(
+                      indent: 10,
+                      endIndent: 10,
+                      thickness: 1,
+                    ),
+                  ),
+                );
+              } else {
+                return Text('No circles joined');
+              }
             },
-            color: Colors.white,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset('assets/images/nus.png',
-                  width: 50, height: 50, fit: BoxFit.cover),
-            ),
-            padding: EdgeInsets.all(6),
-            shape: ContinuousRectangleBorder(
-                borderRadius: BorderRadius.circular(16)),
-            minWidth: 50,
           ),
-          MaterialButton(
-            onPressed: () {},
-            color: Colors.white,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                color: Colors.blue.shade700,
-                height: 50,
-                width: 50,
-              ),
-            ),
-            padding: EdgeInsets.all(6),
-            shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            minWidth: 50,
-          ),
-          MaterialButton(
-            onPressed: () {},
-            color: Colors.white,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                color: Colors.green.shade700,
-                height: 50,
-                width: 50,
-              ),
-            ),
-            padding: EdgeInsets.all(6),
-            shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            minWidth: 50,
-          ),
+          // MaterialButton(
+          //   onPressed: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (context) => CirclePage()),
+          //     );
+          //   },
+          //   color: Colors.white,
+          //   child: ClipRRect(
+          //     borderRadius: BorderRadius.circular(8),
+          //     child: Image.asset('assets/images/nus.png',
+          //         width: 50, height: 50, fit: BoxFit.cover),
+          //   ),
+          //   padding: EdgeInsets.all(6),
+          //   shape: ContinuousRectangleBorder(
+          //       borderRadius: BorderRadius.circular(16)),
+          //   minWidth: 50,
+          // ),
+          // MaterialButton(
+          //   onPressed: () {},
+          //   color: Colors.white,
+          //   child: ClipRRect(
+          //     borderRadius: BorderRadius.circular(8),
+          //     child: Container(
+          //       color: Colors.blue.shade700,
+          //       height: 50,
+          //       width: 50,
+          //     ),
+          //   ),
+          //   padding: EdgeInsets.all(6),
+          //   shape: ContinuousRectangleBorder(
+          //     borderRadius: BorderRadius.circular(16),
+          //   ),
+          //   minWidth: 50,
+          // ),
+          // MaterialButton(
+          //   onPressed: () {},
+          //   color: Colors.white,
+          //   child: ClipRRect(
+          //     borderRadius: BorderRadius.circular(8),
+          //     child: Container(
+          //       color: Colors.green.shade700,
+          //       height: 50,
+          //       width: 50,
+          //     ),
+          //   ),
+          //   padding: EdgeInsets.all(6),
+          //   shape: ContinuousRectangleBorder(
+          //     borderRadius: BorderRadius.circular(16),
+          //   ),
+          //   minWidth: 50,
+          // ),
           // create circle button,
           // Container(color: Colors.blueGrey, height: 100, width: 100,),
           // Container(color: Colors.green, height: 100, width: 100,),
