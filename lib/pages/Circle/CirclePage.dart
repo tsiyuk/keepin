@@ -66,7 +66,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
     final _postBarItems = <Widget>[
       Tab(text: 'Description'),
       Tab(text: 'Post'),
-      Tab(text: 'Theme'),
+      Tab(text: 'LeaderBoard'),
     ];
 
     return Scaffold(
@@ -125,13 +125,9 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                         return Text('null');
                       }
                     }),
-                PrimaryButton(
-                    child: Text('Create Post'),
-                    onPressed: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => CreatePostPage(
-                              user: user, circleName: 'NUS Night Runners')));
-                    }),
+                Center(
+                  child: Text("Leader Board"),
+                ),
               ],
             ),
           ),
@@ -140,7 +136,11 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
       bottomNavigationBar: bottomBar,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          Navigator.of(context).push(MaterialPageRoute(
+              builder: (context) =>
+                  CreatePostPage(user: user, circleName: 'NUS Night Runners')));
+        },
         backgroundColor: Theme.of(context).primaryColor,
         child: Icon(
           Icons.add,

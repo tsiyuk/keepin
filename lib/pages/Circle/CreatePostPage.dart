@@ -20,35 +20,41 @@ class _CreatePostPageState extends State<CreatePostPage> {
   Widget build(BuildContext context) {
     PostProvider postProvider =
         Provider.of<PostProvider>(context, listen: false);
-    return Column(
-      children: [
-        Material(
-          child: TextFormField(
-            controller: _textController,
-            decoration: InputDecoration(labelText: 'Text'),
-            onTap: () {
-              postProvider.initPostInfo(widget.user, widget.circleName);
-            },
-            onEditingComplete: () {
-              postProvider.changeText(_textController.text);
-            },
+    return Scaffold(
+      body: Column(
+        mainAxisSize: MainAxisSize.max,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Material(
+            child: TextFormField(
+              maxLines: 8,
+              controller: _textController,
+              decoration: InputDecoration(labelText: 'Text'),
+              onTap: () {
+                postProvider.initPostInfo(widget.user, widget.circleName);
+              },
+              onEditingComplete: () {
+                postProvider.changeText(_textController.text);
+              },
+            ),
           ),
-        ),
-        PrimaryButton(
-            child: Text('upload pictures'),
-            onPressed: () async {
-              postProvider.initPostInfo(widget.user, widget.circleName);
-              await postProvider.uploadAssets(context);
-            }),
-        PrimaryButton(
-            child: Text('Post'),
-            onPressed: () {
-              //postProvider.initPostInfo(widget.user, widget.circleName);
-              postProvider.changeText(_textController.text);
-              postProvider.createPost();
-              Navigator.of(context).pop();
-            }),
-      ],
+          IconButton(
+              icon: Icon(Icons.camera_alt_outlined, size: 50,),
+              onPressed: () async {
+                postProvider.initPostInfo(widget.user, widget.circleName);
+                await postProvider.uploadAssets(context);
+              },
+          ),
+          PrimaryButton(
+              child: Text('Post'),
+              onPressed: () {
+                //postProvider.initPostInfo(widget.user, widget.circleName);
+                postProvider.changeText(_textController.text);
+                postProvider.createPost();
+                Navigator.of(context).pop();
+              }),
+        ],
+      ),
     );
   }
 }

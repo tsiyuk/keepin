@@ -23,83 +23,57 @@ class HomePage extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          MaterialButton(
+          _buildCircleButton(
             onPressed: () {
               Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => CreateCirclePage()));
             },
-            color: Colors.white,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Icon(
-                Icons.add_box,
-                size: 50,
-                color: Colors.teal.shade700,
-              ),
-            ),
-            padding: EdgeInsets.all(6),
-            shape: ContinuousRectangleBorder(
-                borderRadius: BorderRadius.circular(16)),
-            minWidth: 50,
+            child: Icon(Icons.add_box, size: 50, color: Colors.teal),
           ),
-          MaterialButton(
+          _buildCircleButton(
             onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => CirclePage()),
-              );
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) => CirclePage()));
             },
-            color: Colors.white,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset('assets/images/nus.png',
-                  width: 50, height: 50, fit: BoxFit.cover),
-            ),
-            padding: EdgeInsets.all(6),
-            shape: ContinuousRectangleBorder(
-                borderRadius: BorderRadius.circular(16)),
-            minWidth: 50,
+            child: defaultAvatar(50),
           ),
-          MaterialButton(
+          _buildCircleButton(
             onPressed: () {},
-            color: Colors.white,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                color: Colors.blue.shade700,
-                height: 50,
-                width: 50,
-              ),
+            child: Container(
+              color: Colors.blue.shade700,
             ),
-            padding: EdgeInsets.all(6),
-            shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            minWidth: 50,
           ),
-          MaterialButton(
+          _buildCircleButton(
             onPressed: () {},
-            color: Colors.white,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Container(
-                color: Colors.green.shade700,
-                height: 50,
-                width: 50,
-              ),
+            child: Container(
+              color: Colors.green.shade700,
             ),
-            padding: EdgeInsets.all(6),
-            shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            minWidth: 50,
-          ),
+          )
           // create circle button,
-          // Container(color: Colors.blueGrey, height: 100, width: 100,),
-          // Container(color: Colors.green, height: 100, width: 100,),
           // my circles StreamBuilder
         ],
       ),
+    );
+  }
+
+  Widget _buildCircleButton(
+      {required Function() onPressed, required Widget child}) {
+    return MaterialButton(
+      onPressed: onPressed,
+      color: Colors.white,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(8),
+        child: Container(
+          child: child,
+          width: 50,
+          height: 50,
+        ),
+      ),
+      padding: EdgeInsets.all(6),
+      shape: ContinuousRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      minWidth: 50,
     );
   }
 

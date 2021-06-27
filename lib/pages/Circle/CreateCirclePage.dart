@@ -18,6 +18,40 @@ class _CreateCirclePageState extends State<CreateCirclePage> {
   bool isPublic = true;
   Image? _avatar;
 
+  void handleCreateCircle(CircleProvider circleProvider) async {
+    try {
+      String name = _textController.text;
+      if (_avatar == null) {
+        showWarning(context, "Please upload an image for circle profile.");
+        return;
+      } else if (name.isEmpty || name.trim().length == 0) {
+        showWarning(context, "Please enter a valid circle name");
+        return;
+      }
+      await circleProvider.createCircle(name, tags, isPublic);
+      showSuccess(context, "Circle $name is successfully created!");
+      Navigator.of(context).pop();
+      // should go in to the circle
+    } catch (e) {
+      String str = "Fail to create circle:\n";
+      showError(context, str + e.toString());
+    }
+  }
+
+  void handleUpload(CircleProvider circleProvider) async {
+    try {
+      Image avatar = Image.file(
+        await circleProvider.uploadAvatar(context),
+        fit: BoxFit.cover,
+      );
+      setState(() {
+        this._avatar = avatar;
+      });
+    } catch (e) {
+      showWarning(context, "Failed to add image!");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     CircleProvider circleProvider = Provider.of<CircleProvider>(context);
@@ -31,18 +65,8 @@ class _CreateCirclePageState extends State<CreateCirclePage> {
             UploadImageButton(
               image: _avatar == null ? defaultAvatar(_avatarSize) : _avatar!,
               size: _avatarSize,
-              onPressed: () async {
-                try {
-                  Image avatar = Image.file(
-                    await circleProvider.uploadAvatar(context),
-                    fit: BoxFit.cover,
-                  );
-                  setState(() {
-                    this._avatar = avatar;
-                  });
-                } catch (e) {
-                  showWarning(context, "Failed to add image!");
-                }
+              onPressed: () {
+                handleUpload(circleProvider);
               },
             ),
             SizedBox(height: 12),
@@ -80,34 +104,14 @@ class _CreateCirclePageState extends State<CreateCirclePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                // SizedBox(width: 1),
                 SecondaryButton(
                   child: Text("Cancel"),
                   onPressed: Navigator.of(context).pop,
                 ),
                 PrimaryButton(
                   child: Text('Create Circle'),
-                  onPressed: () async {
-                    try {
-                      String name = _textController.text;
-                      if (_avatar == null) {
-                        showWarning(context,
-                            "Please upload an image for circle profile.");
-                        return;
-                      } else if (name.isEmpty || name.trim().length == 0) {
-                        showWarning(
-                            context, "Please enter a valid circle name");
-                        return;
-                      }
-                      await circleProvider.createCircle(name, tags, isPublic);
-                      showSuccess(
-                          context, "Circle $name is successfully created!");
-                      Navigator.of(context).pop();
-                      // should go in to the circle
-                    } catch (e) {
-                      String str = "Fail to create circle:\n";
-                      showError(context, str + e.toString());
-                    }
+                  onPressed: () {
+                    handleCreateCircle(circleProvider);
                   },
                 ),
               ],
