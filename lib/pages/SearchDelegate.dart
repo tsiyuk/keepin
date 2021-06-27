@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/Circle/CirclePage.dart';
 import 'package:keepin/pages/UserProfileDisplay.dart';
+import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/UserProfile.dart';
@@ -48,52 +49,6 @@ class SearchData extends SearchDelegate<dynamic> {
   @override
   Widget buildSuggestions(BuildContext context) {
     return Container();
-  }
-}
-
-class CircleBuilder {
-  static Widget buildCircle(Circle circle, BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).push((MaterialPageRoute(
-            builder: (context) => CirclePage(circle: circle))));
-      },
-      child: Container(
-        width: 130,
-        height: 50,
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
-              child: Image.network(
-                circle.avatarURL,
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
-              ),
-            ),
-            SizedBox(width: 4),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 200,
-                  child: Text(
-                    circle.circleName,
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
-                Text(
-                  'Members: ${circle.numOfMembers}',
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
-            )
-          ],
-        ),
-      ),
-    );
   }
 }
 
@@ -146,7 +101,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
           case ConnectionState.waiting:
             return Center(child: Loading(20.0));
           default:
-            if (snapshot.hasError) {
+            if (snapshot.hasError || !snapshot.hasData) {
               return Container(
                 color: Theme.of(context).accentColor,
                 alignment: Alignment.center,
@@ -156,10 +111,13 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
                 ),
               );
             } else {
-              return ListView.builder(itemBuilder: (context, index) {
-                return CircleBuilder.buildCircle(
-                    snapshot.data![index], context);
-              });
+              return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    return CircleBuilder.buildCircle(
+                        snapshot.data![index], context);
+                  });
             }
         }
       },
@@ -174,7 +132,9 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
           case ConnectionState.waiting:
             return Center(child: Loading(20.0));
           default:
-            if (snapshot.hasError) {
+            if (snapshot.hasError ||
+                !snapshot.hasData ||
+                snapshot.data == null) {
               return Container(
                 color: Theme.of(context).accentColor,
                 alignment: Alignment.center,
@@ -184,46 +144,51 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
                 ),
               );
             } else {
-              return ListView.builder(itemBuilder: (context, index) {
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) =>
-                            UserProfileDisplay(snapshot.data![index].userId)));
-                  },
-                  child: Container(
-                    width: 130,
-                    height: 50,
-                    child: Row(
-                      children: [
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.network(
-                            snapshot.data![index].avatarURL!,
-                            width: 40,
-                            height: 40,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        SizedBox(width: 4),
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+              return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => UserProfileDisplay(
+                                snapshot.data![index].userId)));
+                      },
+                      child: Container(
+                        width: 130,
+                        height: 50,
+                        child: Row(
                           children: [
-                            Container(
-                              width: 200,
-                              child: Text(
-                                snapshot.data![index].userName,
-                                style: TextStyle(fontSize: 18),
-                              ),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: snapshot.data![index].avatarURL != null
+                                  ? Image.network(
+                                      snapshot.data![index].avatarURL!,
+                                      width: 40,
+                                      height: 40,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : defaultAvatar(40),
                             ),
+                            SizedBox(width: 4),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 200,
+                                  child: Text(
+                                    snapshot.data![index].userName,
+                                    style: TextStyle(fontSize: 18),
+                                  ),
+                                ),
+                              ],
+                            )
                           ],
-                        )
-                      ],
-                    ),
-                  ),
-                );
-              });
+                        ),
+                      ),
+                    );
+                  });
             }
         }
       },
@@ -232,5 +197,51 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
 
   Widget _buildPostsFeed(String query) {
     return Container();
+  }
+}
+
+class CircleBuilder {
+  static Widget buildCircle(Circle circle, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push((MaterialPageRoute(
+            builder: (context) => CirclePage(circle: circle))));
+      },
+      child: Container(
+        width: 130,
+        height: 50,
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Image.network(
+                circle.avatarURL,
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
+              ),
+            ),
+            SizedBox(width: 4),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 200,
+                  child: Text(
+                    circle.circleName,
+                    style: TextStyle(fontSize: 18),
+                  ),
+                ),
+                Text(
+                  'Members: ${circle.numOfMembers}',
+                  style: TextStyle(fontSize: 12),
+                ),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
   }
 }
