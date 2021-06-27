@@ -100,10 +100,34 @@ class PostProvider with ChangeNotifier {
     }
   }
 
-  void updateLikes() async {
+  /// Add a like to the post
+  /// Use it when the post provider has been initialized
+  void like() async {
     ++_numOfLikes;
     notifyListeners();
-    _firestoreService.updateLikes(postId, numOfLikes);
+    await _firestoreService.updateLikes(postId, numOfLikes);
+  }
+
+  /// Add a like to the post
+  /// Use it when the post provider has not been initialized
+  void likeViaPost(Post post) async {
+    ++post.numOfLikes;
+    await _firestoreService.updateLikes(post.postId!, post.numOfLikes);
+  }
+
+  /// Reduce a like to the post
+  /// Use it when the post provider has been initialized
+  void unlike() async {
+    --_numOfLikes;
+    notifyListeners();
+    await _firestoreService.updateLikes(postId, numOfLikes);
+  }
+
+  /// Add a like to the post
+  /// Use it when the post provider has not been initialized
+  void unlikeViaPost(Post post) async {
+    --post.numOfLikes;
+    await _firestoreService.updateLikes(post.postId!, post.numOfLikes);
   }
 
   /// upload images
