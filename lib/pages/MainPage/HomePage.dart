@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:keepin/pages/Circle/CreateCirclePage.dart';
 import 'package:keepin/src/CommonWidgets.dart';
+import 'package:keepin/src/models/Circle.dart';
+import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/CircleProvider.dart';
+import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:provider/provider.dart';
 
 import '../Circle/CirclePage.dart';
@@ -17,7 +20,10 @@ class HomePage extends StatelessWidget {
   // https://flutter.dev/docs/cookbook/navigation/navigation-basics
   // refer to this link for navigating to circle page and back
   Widget _buildCircleList(BuildContext context) {
-    CircleProvider circleProvider = Provider.of<CircleProvider>(context);
+    UserProfileProvider userProfileProvider =
+        Provider.of<UserProfileProvider>(context);
+    CircleProvider circleProvider =
+        Provider.of<CircleProvider>(context, listen: false);
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
       child: Row(
@@ -30,27 +36,78 @@ class HomePage extends StatelessWidget {
             },
             child: Icon(Icons.add_box, size: 50, color: Colors.teal),
           ),
-          _buildCircleButton(
-            onPressed: () {
-              Navigator.of(context)
-                  .push(MaterialPageRoute(builder: (context) => CirclePage()));
-            },
-            child: defaultAvatar(50),
-          ),
-          _buildCircleButton(
-            onPressed: () {},
-            child: Container(
-              color: Colors.blue.shade700,
+          SizedBox(
+            height: 63,
+            width: 300,
+            child: StreamBuilder<List<CircleInfo>>(
+              stream: userProfileProvider.circlesJoined,
+              //stream: postProvider.posts,
+              builder: (context, snapshot) {
+                if (snapshot.data != null && snapshot.data!.isNotEmpty) {
+                  return Container(
+                    // height: 50,
+                    child: ListView.separated(
+                      shrinkWrap: true,
+                      scrollDirection: Axis.horizontal,
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        CircleInfo data = snapshot.data![index];
+                        return MaterialButton(
+                          onPressed: () async {
+                            Circle circle = await circleProvider
+                                .readCircleFromName(data.circleName);
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => CirclePage(
+                                        circle: circle,
+                                        circleInfo: data,
+                                      )),
+                            );
+                          },
+                          color: Colors.white,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.network(data.avatarURL,
+                                width: 50, height: 50, fit: BoxFit.cover),
+                          ),
+                          padding: EdgeInsets.all(6),
+                          shape: ContinuousRectangleBorder(
+                              borderRadius: BorderRadius.circular(16)),
+                          minWidth: 50,
+                        );
+                      },
+                      separatorBuilder: (c, i) => VerticalDivider(
+                        indent: 10,
+                        endIndent: 10,
+                        thickness: 1,
+                      ),
+                    ),
+                  );
+                } else {
+                  return Text('No circles joined');
+                }
+              },
             ),
           ),
-          _buildCircleButton(
-            onPressed: () {},
-            child: Container(
-              color: Colors.green.shade700,
-            ),
-          )
-          // create circle button,
-          // my circles StreamBuilder
+          // MaterialButton(
+          //   onPressed: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (context) => CirclePage()),
+          //     );
+          //   },
+          //   color: Colors.white,
+          //   child: ClipRRect(
+          //     borderRadius: BorderRadius.circular(8),
+          //     child: Image.asset('assets/images/nus.png',
+          //         width: 50, height: 50, fit: BoxFit.cover),
+          //   ),
+          //   padding: EdgeInsets.all(6),
+          //   shape: ContinuousRectangleBorder(
+          //       borderRadius: BorderRadius.circular(16)),
+          //   minWidth: 50,
+          // ),
         ],
       ),
     );

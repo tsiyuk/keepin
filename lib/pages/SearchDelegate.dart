@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:keepin/pages/Circle/CirclePage.dart';
 import 'package:keepin/pages/UserProfileDisplay.dart';
 import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/Circle.dart';
@@ -39,7 +40,7 @@ class SearchData extends SearchDelegate<dynamic> {
   Widget buildResultSuccess(List<Circle> datas) {
     return ListView.builder(
       itemBuilder: (context, index) {
-        return CircleBuilder.buildCircle(datas[index]);
+        return CircleBuilder.buildCircle(datas[index], context);
       },
     );
   }
@@ -51,47 +52,53 @@ class SearchData extends SearchDelegate<dynamic> {
 }
 
 class CircleBuilder {
-  static Widget buildCircle(Circle circle) {
-    return Container(
-      width: 130,
-      height: 50,
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: Image.network(
-              circle.avatarURL,
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
+  static Widget buildCircle(Circle circle, BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push((MaterialPageRoute(
+            builder: (context) => CirclePage(circle: circle))));
+      },
+      child: Container(
+        width: 130,
+        height: 50,
+        child: Row(
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(20),
+              child: Image.network(
+                circle.avatarURL,
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          SizedBox(width: 4),
-          Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 200,
-                child: Text(
-                  circle.circleName,
-                  style: TextStyle(fontSize: 18),
+            SizedBox(width: 4),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 200,
+                  child: Text(
+                    circle.circleName,
+                    style: TextStyle(fontSize: 18),
+                  ),
                 ),
-              ),
-              Text(
-                'Members: ${circle.numOfMembers}',
-                style: TextStyle(fontSize: 12),
-              ),
-            ],
-          )
-        ],
+                Text(
+                  'Members: ${circle.numOfMembers}',
+                  style: TextStyle(fontSize: 12),
+                ),
+              ],
+            )
+          ],
+        ),
       ),
     );
   }
 }
 
 class Feed extends StatefulWidget {
-  String query;
+  final String query;
   Feed({Key? key, required this.query}) : super(key: key);
 
   @override
@@ -150,7 +157,8 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
               );
             } else {
               return ListView.builder(itemBuilder: (context, index) {
-                return CircleBuilder.buildCircle(snapshot.data![index]);
+                return CircleBuilder.buildCircle(
+                    snapshot.data![index], context);
               });
             }
         }

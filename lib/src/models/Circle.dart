@@ -1,3 +1,5 @@
+/// Circle contains all the information about an circle
+/// The information is belong to the circle but not a particular user
 class Circle {
   String circleName;
   String avatarURL;
@@ -47,6 +49,7 @@ class Circle {
   }
 }
 
+/// The CircleInfo contains a specific user information about the circle
 class CircleInfo {
   String circleName;
   String avatarURL;

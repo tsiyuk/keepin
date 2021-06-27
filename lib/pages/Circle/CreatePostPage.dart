@@ -16,6 +16,7 @@ class CreatePostPage extends StatefulWidget {
 
 class _CreatePostPageState extends State<CreatePostPage> {
   TextEditingController _textController = TextEditingController();
+  TextEditingController _titleController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     PostProvider postProvider =
@@ -25,6 +26,19 @@ class _CreatePostPageState extends State<CreatePostPage> {
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          Material(
+            child: TextFormField(
+              maxLines: 1,
+              controller: _titleController,
+              decoration: InputDecoration(labelText: 'Title'),
+              onTap: () {
+                postProvider.initPostInfo(widget.user, widget.circleName);
+              },
+              onEditingComplete: () {
+                postProvider.changeTitle(_titleController.text);
+              },
+            ),
+          ),
           Material(
             child: TextFormField(
               maxLines: 8,
@@ -39,16 +53,20 @@ class _CreatePostPageState extends State<CreatePostPage> {
             ),
           ),
           IconButton(
-              icon: Icon(Icons.camera_alt_outlined, size: 50,),
-              onPressed: () async {
-                postProvider.initPostInfo(widget.user, widget.circleName);
-                await postProvider.uploadAssets(context);
-              },
+            icon: Icon(
+              Icons.camera_alt_outlined,
+              size: 50,
+            ),
+            onPressed: () async {
+              postProvider.initPostInfo(widget.user, widget.circleName);
+              await postProvider.uploadAssets(context);
+            },
           ),
           PrimaryButton(
               child: Text('Post'),
               onPressed: () {
                 //postProvider.initPostInfo(widget.user, widget.circleName);
+                postProvider.changeTitle(_titleController.text);
                 postProvider.changeText(_textController.text);
                 postProvider.createPost();
                 Navigator.of(context).pop();

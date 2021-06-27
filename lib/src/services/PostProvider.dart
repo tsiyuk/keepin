@@ -15,6 +15,7 @@ class PostProvider with ChangeNotifier {
   String? _posterAvatarLink;
   late String _circleName;
   late String _text;
+  late String _title;
   List<String> _imageLinks = [];
   num _numOfLikes = 0;
 
@@ -27,6 +28,7 @@ class PostProvider with ChangeNotifier {
   String? get posterAvatarLink => _posterAvatarLink;
   String get circleName => _circleName;
   String get text => _text;
+  String get title => _title;
   List<String> get imageLinks => _imageLinks;
   num get numOfLikes => _numOfLikes;
   Stream<List<Post>> get posts => _firestoreService.getPosts();
@@ -49,7 +51,7 @@ class PostProvider with ChangeNotifier {
     return _firestoreService.getPostsFromUser(userId);
   }
 
-  // Initialize the provider
+  /// Initialize the provider
   void loadAll(Post post) {
     _postId = post.postId!;
     _posterId = post.posterId;
@@ -75,6 +77,11 @@ class PostProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void changeTitle(String title) {
+    _title = title;
+    notifyListeners();
+  }
+
   void createPost() async {
     try {
       await _firestoreService.addPost(Post(
@@ -83,6 +90,7 @@ class PostProvider with ChangeNotifier {
         posterAvatarLink: posterAvatarLink,
         circleName: circleName,
         text: text,
+        title: title,
         imageLinks: imageLinks,
         numOfLikes: numOfLikes,
         timestamp: DateTime.now().millisecondsSinceEpoch,
@@ -92,10 +100,34 @@ class PostProvider with ChangeNotifier {
     }
   }
 
-  void updateLikes() async {
+  /// Add a like to the post
+  /// Use it when the post provider has been initialized
+  void like() async {
     ++_numOfLikes;
     notifyListeners();
-    _firestoreService.updateLikes(postId, numOfLikes);
+    await _firestoreService.updateLikes(postId, numOfLikes);
+  }
+
+  /// Add a like to the post
+  /// Use it when the post provider has not been initialized
+  void likeViaPost(Post post) async {
+    ++post.numOfLikes;
+    await _firestoreService.updateLikes(post.postId!, post.numOfLikes);
+  }
+
+  /// Reduce a like to the post
+  /// Use it when the post provider has been initialized
+  void unlike() async {
+    --_numOfLikes;
+    notifyListeners();
+    await _firestoreService.updateLikes(postId, numOfLikes);
+  }
+
+  /// Add a like to the post
+  /// Use it when the post provider has not been initialized
+  void unlikeViaPost(Post post) async {
+    --post.numOfLikes;
+    await _firestoreService.updateLikes(post.postId!, post.numOfLikes);
   }
 
   /// upload images
@@ -123,7 +155,7 @@ class PostProvider with ChangeNotifier {
   }
 
   void addComments(String postId, User commenter, String text, String? replyTo,
-      String replyToId) {
+      String? replyToId) {
     _firestoreService.addComment(Comment(
       postId: postId,
       commenterName: commenter.displayName!,

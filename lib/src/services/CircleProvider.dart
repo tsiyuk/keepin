@@ -58,6 +58,17 @@ class CircleProvider with ChangeNotifier {
     }
   }
 
+  /// Get the circle info from the current user
+  /// Call this function after using isMember to check whether the current user has joined the circle.
+  Future<CircleInfo> readCircleInfoFromUser() async {
+    if (await isMember(_user.uid)) {
+      return await _firestoreService.getCircleInfoFromUser(
+          user.uid, circleName);
+    } else {
+      throw Exception('The user has not joined the circle');
+    }
+  }
+
   // Checking
   bool isAdmin(String userId) {
     return userId == _adminUserId;
@@ -68,14 +79,16 @@ class CircleProvider with ChangeNotifier {
   }
 
   // Setters
-  void loadAll(Circle circle, CircleInfo circleInfo) {
+  void loadAll(Circle circle, CircleInfo? circleInfo) {
     _circleName = circle.circleName;
     _circleAvatarURL = circle.avatarURL;
     _adminUserId = circle.adminUserId;
     _tags = circle.tags;
     _numOfMembers = circle.numOfMembers;
     _isPublic = circle.isPublic;
-    _clockinCount = circleInfo.clockinCount;
+    if (circleInfo != null) {
+      _clockinCount = circleInfo.clockinCount;
+    }
   }
 
   /// call upload avatar before create a circle
@@ -241,6 +254,24 @@ class FirestoreService {
         .then((value) {
       if (value.data() != null) {
         return Circle.fromJson(value.data()!);
+      } else {
+        throw FirebaseException(
+            plugin: 'FirebaseFirestore',
+            code: 'The circle have not been created');
+      }
+    });
+  }
+
+  Future<CircleInfo> getCircleInfoFromUser(String userId, String circleName) {
+    return _firebaseFirestore
+        .collection('userProfiles')
+        .doc(userId)
+        .collection('circlesJoined')
+        .doc(circleName)
+        .get()
+        .then((value) {
+      if (value.data() != null) {
+        return CircleInfo.fromJson(value.data()!);
       } else {
         throw FirebaseException(
             plugin: 'FirebaseFirestore',
