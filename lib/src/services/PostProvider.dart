@@ -15,6 +15,7 @@ class PostProvider with ChangeNotifier {
   String? _posterAvatarLink;
   late String _circleName;
   late String _text;
+  late String _title;
   List<String> _imageLinks = [];
   num _numOfLikes = 0;
 
@@ -27,6 +28,7 @@ class PostProvider with ChangeNotifier {
   String? get posterAvatarLink => _posterAvatarLink;
   String get circleName => _circleName;
   String get text => _text;
+  String get title => _title;
   List<String> get imageLinks => _imageLinks;
   num get numOfLikes => _numOfLikes;
   Stream<List<Post>> get posts => _firestoreService.getPosts();
@@ -49,7 +51,7 @@ class PostProvider with ChangeNotifier {
     return _firestoreService.getPostsFromUser(userId);
   }
 
-  // Initialize the provider
+  /// Initialize the provider
   void loadAll(Post post) {
     _postId = post.postId!;
     _posterId = post.posterId;
@@ -75,6 +77,11 @@ class PostProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void changeTitle(String title) {
+    _title = title;
+    notifyListeners();
+  }
+
   void createPost() async {
     try {
       await _firestoreService.addPost(Post(
@@ -83,6 +90,7 @@ class PostProvider with ChangeNotifier {
         posterAvatarLink: posterAvatarLink,
         circleName: circleName,
         text: text,
+        title: title,
         imageLinks: imageLinks,
         numOfLikes: numOfLikes,
         timestamp: DateTime.now().millisecondsSinceEpoch,

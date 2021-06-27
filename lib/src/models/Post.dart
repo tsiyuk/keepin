@@ -9,6 +9,7 @@ class Post {
   String posterName;
   String? posterAvatarLink;
   String circleName;
+  String title;
   String text;
   List<String> imageLinks = [];
   num numOfLikes = 0;
@@ -21,6 +22,7 @@ class Post {
       this.posterAvatarLink,
       required this.circleName,
       required this.text,
+      required this.title,
       required this.imageLinks,
       required this.numOfLikes,
       required this.timestamp});
@@ -34,6 +36,7 @@ class Post {
       posterAvatarLink: json['posterAvatarLink'],
       circleName: json['circleName'],
       text: json['text'],
+      title: json['title'],
       imageLinks: List.castFrom(json['imageLinks']),
       numOfLikes: json['numOfLikes'],
       timestamp: json['timestamp'],
@@ -49,6 +52,7 @@ class Post {
       'posterAvatarLink': posterAvatarLink,
       'circleName': circleName,
       'text': text,
+      'title': title,
       'imageLinks': imageLinks,
       'numOfLikes': numOfLikes,
       'timestamp': timestamp,
