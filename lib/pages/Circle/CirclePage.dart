@@ -73,7 +73,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
               subtitle: !isMember
                   ? TextH4(
                       'Join the ${widget.circle.circleName} and clock in every day')
-                  : TextH4('Clock in ${circleProvider.clockinCount} days'),
+                  : TextH4('Clock in ${circleProvider.clockinCount} times'),
             ),
           ),
         ],

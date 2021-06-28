@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/Comment.dart';
 import 'package:keepin/src/models/Post.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
@@ -49,6 +50,10 @@ class PostProvider with ChangeNotifier {
 
   Stream<List<Post>> readPostsFromUser(String userId) {
     return _firestoreService.getPostsFromUser(userId);
+  }
+
+  Future<List<Post>> readFollowPosts(String userId) {
+    return _firestoreService.getPostsFromCirclesJoined(userId);
   }
 
   /// Initialize the provider
@@ -194,6 +199,37 @@ class FirestoreService {
         .snapshots()
         .map((snapshot) =>
             snapshot.docs.map((doc) => Post.fromJson(doc.data())).toList());
+  }
+
+  // TODO: maybe return a stream
+  Future<List<Post>> getPostsFromCirclesJoined(String userId) async {
+    List<String> circleNames = await _firestore
+        .collection('userProfiles')
+        .doc(userId)
+        .collection('circlesJoined')
+        .get()
+        .then((value) => value.docs
+            .map((value) => CircleInfo.fromJson(value.data()).circleName)
+            .toList());
+
+    List<Post> result = [];
+    for (String circleName in circleNames) {
+      var r = await _firestore
+          .collection('posts')
+          .where('circleName', isEqualTo: circleName)
+          .orderBy('timestamp', descending: true)
+          .get()
+          .then((snapshot) {
+        List<Post> result = [];
+        for (QueryDocumentSnapshot item in snapshot.docs) {
+          result.add(Post.fromJson(item.data()));
+        }
+        return result;
+      });
+      result.addAll(r);
+    }
+    // result.sort((x, y) => x.compareTo(y));
+    return result;
   }
 
   /// Read comments from the post specified by the postId

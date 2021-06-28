@@ -1,11 +1,14 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:keepin/pages/Circle/CreateCirclePage.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/models/Circle.dart';
+import 'package:keepin/src/models/Post.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/CircleProvider.dart';
+import 'package:keepin/src/services/PostProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:provider/provider.dart';
 
@@ -175,15 +178,37 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
         Expanded(
           child: TabBarView(
             controller: _tabController,
-            children: [_buildFollowFeed(), _buildRecommendation()],
+            children: [_buildFollowFeed(context), _buildRecommendation()],
           ),
         )
       ],
     );
   }
 
-  Widget _buildFollowFeed() {
-    return Center(child: Text("follow feed"));
+  Widget _buildFollowFeed(BuildContext context) {
+    // return Center(child: Text("follow feed"));
+    PostProvider postProvider =
+        Provider.of<PostProvider>(context, listen: false);
+    return FutureBuilder<List<Post>>(
+        future: postProvider
+            .readFollowPosts(FirebaseAuth.instance.currentUser!.uid),
+        builder: (context, snapshot) {
+          if (snapshot.data != null) {
+            return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    leading:
+                        Image.network(snapshot.data![index].posterAvatarLink!),
+                    title: Text(snapshot.data![index].posterName),
+                    subtitle: Text(snapshot.data![index].text),
+                    shape: Border.all(),
+                  );
+                });
+          } else {
+            return Text('No posts');
+          }
+        });
   }
 
   Widget _buildRecommendation() {

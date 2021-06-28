@@ -58,4 +58,8 @@ class Post {
       'timestamp': timestamp,
     };
   }
+
+  int compareTo(Post other) {
+    return other.timestamp.compareTo(timestamp);
+  }
 }

@@ -38,14 +38,6 @@ class SearchData extends SearchDelegate<dynamic> {
     return Feed(query: query);
   }
 
-  Widget buildResultSuccess(List<Circle> datas) {
-    return ListView.builder(
-      itemBuilder: (context, index) {
-        return CircleBuilder.buildCircle(datas[index], context);
-      },
-    );
-  }
-
   @override
   Widget buildSuggestions(BuildContext context) {
     return Container();
@@ -101,13 +93,16 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
           case ConnectionState.waiting:
             return Center(child: Loading(20.0));
           default:
-            if (snapshot.hasError || !snapshot.hasData) {
+            if (snapshot.hasError ||
+                !snapshot.hasData ||
+                snapshot.data!.length == 0) {
               return Container(
-                color: Theme.of(context).accentColor,
+                color: Colors.white,
                 alignment: Alignment.center,
                 child: Text(
                   'No result for $query!',
-                  style: TextStyle(fontSize: 28, color: Colors.white),
+                  style: TextStyle(
+                      fontSize: 20, color: Theme.of(context).primaryColor),
                 ),
               );
             } else {
@@ -134,7 +129,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
           default:
             if (snapshot.hasError ||
                 !snapshot.hasData ||
-                snapshot.data == null) {
+                snapshot.data!.length == 0) {
               return Container(
                 color: Theme.of(context).accentColor,
                 alignment: Alignment.center,
