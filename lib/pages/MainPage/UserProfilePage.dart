@@ -31,7 +31,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   void initUser(UserProfileProvider userProfileProvider) async {
     final UserProfile userProfile =
-        await userProfileProvider.userProfile(widget.user.uid);
+        await userProfileProvider.readUserProfile(widget.user.uid);
     userProfileProvider.load(userProfile);
     setState(() {
       initialUserName = userProfile.userName;
@@ -68,7 +68,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             children: [
               Container(
                 padding:
-              const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
+                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
                 decoration: BoxDecoration(
                   color: Colors.teal.withAlpha(0x20),
                   // image: DecorationImage(

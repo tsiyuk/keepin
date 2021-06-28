@@ -6,7 +6,9 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:keepin/src/models/Circle.dart';
+import 'package:keepin/src/models/Post.dart';
 import 'package:keepin/src/models/UserProfile.dart';
+import 'package:keepin/src/services/PostProvider.dart';
 
 /*
   This class provide the methods related to CURD of UserProfile
@@ -76,9 +78,27 @@ class UserProfileProvider with ChangeNotifier {
     }
   }
 
-  // get the userProfile instance specified by the userId
-  Future<UserProfile> userProfile(String userId) async {
+  /// get the userProfile instance specified by the userId
+  Future<UserProfile> readUserProfile(String userId) async {
     return await firestoreService.getUserProfile(userId);
+  }
+
+  /// Check if the posterName and posterAvatar have been updated
+  /// If so, update it in the post
+  void updatePosterInfo(Post post) async {
+    UserProfile userProfile = await readUserProfile(post.posterId);
+    bool dirty = false;
+    if (userProfile.userName != post.posterName) {
+      post.posterName = userProfile.userName;
+      dirty = true;
+    }
+    if (userProfile.avatarURL != post.posterAvatarLink) {
+      post.posterAvatarLink = userProfile.avatarURL;
+      dirty = true;
+    }
+    if (dirty) {
+      PostProvider.setPost(post);
+    }
   }
 }
 

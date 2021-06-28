@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:keepin/pages/Circle/CreateCirclePage.dart';
 import 'package:keepin/src/CommonWidgets.dart';
+import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/Post.dart';
 import 'package:keepin/src/models/UserProfile.dart';
@@ -189,19 +190,26 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
     // return Center(child: Text("follow feed"));
     PostProvider postProvider =
         Provider.of<PostProvider>(context, listen: false);
+    UserProfileProvider userProfileProvider =
+        Provider.of<UserProfileProvider>(context, listen: false);
     return FutureBuilder<List<Post>>(
+        initialData: [],
         future: postProvider
             .readFollowPosts(FirebaseAuth.instance.currentUser!.uid),
         builder: (context, snapshot) {
+          if (snapshot.data == []) {
+            return Loading(40);
+          }
           if (snapshot.data != null) {
             return ListView.builder(
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
+                  Post post = snapshot.data![index];
+                  userProfileProvider.updatePosterInfo(post);
                   return ListTile(
-                    leading:
-                        Image.network(snapshot.data![index].posterAvatarLink!),
-                    title: Text(snapshot.data![index].posterName),
-                    subtitle: Text(snapshot.data![index].text),
+                    leading: Image.network(post.posterAvatarLink!),
+                    title: Text(post.posterName),
+                    subtitle: Text(post.text),
                     shape: Border.all(),
                   );
                 });
@@ -212,6 +220,6 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
   }
 
   Widget _buildRecommendation() {
-    return Center(child: Text("Recommendation feed"));
+    return Center(child: Text("Coming soon"));
   }
 }

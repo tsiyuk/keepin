@@ -105,6 +105,11 @@ class PostProvider with ChangeNotifier {
     }
   }
 
+  /// Set an existing post in the firestore
+  static void setPost(Post post) async {
+    await FirestoreService.setPost(post);
+  }
+
   /// Add a like to the post
   /// Use it when the post provider has been initialized
   void like() async {
@@ -174,7 +179,7 @@ class PostProvider with ChangeNotifier {
 }
 
 class FirestoreService {
-  FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  static FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Stream<List<Post>> getPosts() {
     return _firestore.collection('posts').snapshots().map((snapshot) =>
@@ -248,6 +253,14 @@ class FirestoreService {
     var docRef = _firestore.collection('posts').doc();
     post.postId = docRef.id;
     return docRef.set(post.toMap());
+  }
+
+  static Future<void> setPost(Post post) {
+    var setOption = SetOptions(merge: true);
+    return _firestore
+        .collection('posts')
+        .doc(post.postId)
+        .set(post.toMap(), setOption);
   }
 
   Future<void> updateLikes(String postId, num newNum) {
