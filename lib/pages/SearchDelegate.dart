@@ -149,39 +149,19 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
                             builder: (context) => UserProfileDisplay(
                                 snapshot.data![index].userId)));
                       },
-                      child: Container(
-                        width: 130,
-                        height: 50,
-                        child: Row(
-                          children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: snapshot.data![index].avatarURL != null
-                                  ? Image.network(
-                                      snapshot.data![index].avatarURL!,
-                                      width: 40,
-                                      height: 40,
-                                      fit: BoxFit.cover,
+                      child: ListTile(
+                        leading: snapshot.data![index].avatarURL != null
+                                    ? ClipOval(
+                                      child: Image.network(
+                                          snapshot.data![index].avatarURL!,
+                                          width: 40,
+                                          height: 40,
+                                          fit: BoxFit.cover,
+                                        ),
                                     )
-                                  : defaultAvatar(40),
-                            ),
-                            SizedBox(width: 4),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: 200,
-                                  child: Text(
-                                    snapshot.data![index].userName,
-                                    style: TextStyle(fontSize: 18),
-                                  ),
-                                ),
-                              ],
-                            )
-                          ],
-                        ),
-                      ),
+                                    : defaultAvatar(40),
+                        title: TextH3(snapshot.data![index].userName),
+                      )
                     );
                   });
             }
@@ -202,13 +182,8 @@ class CircleBuilder {
         Navigator.of(context).push((MaterialPageRoute(
             builder: (context) => CirclePage(circle: circle))));
       },
-      child: Container(
-        width: 130,
-        height: 50,
-        child: Row(
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(20),
+      child: ListTile(
+        leading: ClipOval(
               child: Image.network(
                 circle.avatarURL,
                 width: 40,
@@ -216,26 +191,8 @@ class CircleBuilder {
                 fit: BoxFit.cover,
               ),
             ),
-            SizedBox(width: 4),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 200,
-                  child: Text(
-                    circle.circleName,
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
-                Text(
-                  'Members: ${circle.numOfMembers}',
-                  style: TextStyle(fontSize: 12),
-                ),
-              ],
-            )
-          ],
-        ),
+        title: TextH3(circle.circleName),
+        subtitle: TextH4('Members: ${circle.numOfMembers}'),
       ),
     );
   }

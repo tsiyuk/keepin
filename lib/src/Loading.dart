@@ -9,7 +9,7 @@ class Loading extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       child: Center(
-        child: SpinKitFadingCube(
+        child: SpinKitChasingDots(
           color: Theme.of(context).primaryColorLight,
           size: size,
         ),

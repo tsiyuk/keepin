@@ -22,12 +22,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
     PostProvider postProvider =
         Provider.of<PostProvider>(context, listen: false);
     return Scaffold(
-      body: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Material(
-            child: TextFormField(
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TextFormField(
               maxLines: 1,
               controller: _titleController,
               decoration: InputDecoration(labelText: 'Title'),
@@ -38,9 +39,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 postProvider.changeTitle(_titleController.text);
               },
             ),
-          ),
-          Material(
-            child: TextFormField(
+            TextFormField(
               maxLines: 8,
               controller: _textController,
               decoration: InputDecoration(labelText: 'Text'),
@@ -51,27 +50,27 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 postProvider.changeText(_textController.text);
               },
             ),
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.camera_alt_outlined,
-              size: 50,
+            IconButton(
+              iconSize: 60,
+              icon: Icon(
+                Icons.camera_alt_outlined,
+              ),
+              onPressed: () async {
+                postProvider.initPostInfo(widget.user, widget.circleName);
+                await postProvider.uploadAssets(context);
+              },
             ),
-            onPressed: () async {
-              postProvider.initPostInfo(widget.user, widget.circleName);
-              await postProvider.uploadAssets(context);
-            },
-          ),
-          PrimaryButton(
-              child: Text('Post'),
-              onPressed: () {
-                //postProvider.initPostInfo(widget.user, widget.circleName);
-                postProvider.changeTitle(_titleController.text);
-                postProvider.changeText(_textController.text);
-                postProvider.createPost();
-                Navigator.of(context).pop();
-              }),
-        ],
+            PrimaryButton(
+                child: Text('Post'),
+                onPressed: () {
+                  //postProvider.initPostInfo(widget.user, widget.circleName);
+                  postProvider.changeTitle(_titleController.text);
+                  postProvider.changeText(_textController.text);
+                  postProvider.createPost();
+                  Navigator.of(context).pop();
+                }),
+          ],
+        ),
       ),
     );
   }
