@@ -9,6 +9,8 @@ import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:keepin/src/services/PostProvider.dart';
 import 'package:provider/provider.dart';
 
+import '../UserProfileDisplay.dart';
+
 class CirclePage extends StatefulWidget {
   final CircleInfo? circleInfo;
   final Circle circle;
@@ -134,53 +136,89 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                   child: TabBarView(
                     controller: _tabController,
                     children: [
-                      Text('1'),
+                      Center(
+                          child: circleProvider.description != null
+                              ? Text(circleProvider.description!)
+                              : Text("No Description")),
                       StreamBuilder<List<Post>>(
                           stream: postProvider
                               .readPostsFromCircle(widget.circle.circleName),
                           //stream: postProvider.posts,
                           builder: (context, snapshot) {
                             if (snapshot.data != null) {
-                              return ListView.builder(
-                                  itemCount: snapshot.data!.length,
-                                  itemBuilder: (context, index) {
-                                    return ListTile(
-                                      leading: Image.network(snapshot
-                                          .data![index].posterAvatarLink!),
-                                      // title: Column(
-                                      //   children: [
-                                      //     Text(snapshot.data![index].posterName),
-                                      //     Text(snapshot.data![index].text),
-                                      //     snapshot.data![index].imageLinks[0] != null
-                                      //         ? Image.network(
-                                      //             snapshot.data![index].imageLinks[0])
-                                      //         : SizedBox(),
-                                      //   ],
-                                      // ),
-                                      title: Text(
-                                          snapshot.data![index].posterName),
-                                      subtitle:
-                                          Text(snapshot.data![index].text),
-                                      shape: Border.all(),
-                                    );
-                                  });
+                              return ListView.separated(
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  return ListTile(
+                                    // to be refactored
+                                    leading: Container(
+                                      height: 150,
+                                      width: 50,
+                                      child: Column(
+                                        children: [
+                                          Container(
+                                            height: 40,
+                                            child: ImageButton(
+                                              onPressed: () {
+                                                Navigator.of(context).push(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            UserProfileDisplay(
+                                                                snapshot
+                                                                    .data![
+                                                                        index]
+                                                                    .posterId)));
+                                              },
+                                              image: Image.network(
+                                                snapshot.data![index]
+                                                    .posterAvatarLink!,
+                                                fit: BoxFit.cover,
+                                              ),
+                                              size: 40,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          TextH5(
+                                              snapshot.data![index].posterName)
+                                        ],
+                                      ),
+                                    ),
+                                    title: Text(snapshot.data![index].title),
+                                    subtitle: Container(
+                                        height: 100,
+                                        child: Text(
+                                          snapshot.data![index].text,
+                                          maxLines: 8,
+                                        )),
+                                    minLeadingWidth: 20,
+                                  );
+                                },
+                                separatorBuilder: (c, i) => Container(
+                                  height: 10,
+                                  color: Colors.blueGrey.shade100,
+                                ),
+                              );
                             } else {
                               return Text('null');
                             }
                           }),
-                      PrimaryButton(
-                          child: Text('Join the Circle'),
-                          onPressed: () {
-                            if (isMember) {
-                              showSuccess(context,
-                                  'You have been a member of ${circleProvider.circleName}');
-                            } else {
-                              circleProvider.joinCircle();
-                              setState(() {
-                                isMember = true;
-                              });
-                            }
-                          }),
+                      Center(
+                        child: PrimaryButton(
+                            child: Text('Join the Circle'),
+                            onPressed: () {
+                              if (isMember) {
+                                showSuccess(context,
+                                    'You have been a member of ${circleProvider.circleName}');
+                              } else {
+                                circleProvider.joinCircle();
+                                setState(() {
+                                  isMember = true;
+                                });
+                              }
+                            }),
+                      ),
                     ],
                   ),
                 ),

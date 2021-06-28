@@ -61,8 +61,8 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    padding:
-                    const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8.0, vertical: 16),
                     decoration: BoxDecoration(
                       color: Colors.teal.withAlpha(0x20),
                     ),

@@ -144,25 +144,24 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
                     return GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => UserProfileDisplay(
-                                snapshot.data![index].userId)));
-                      },
-                      child: ListTile(
-                        leading: snapshot.data![index].avatarURL != null
-                                    ? ClipOval(
-                                      child: Image.network(
-                                          snapshot.data![index].avatarURL!,
-                                          width: 40,
-                                          height: 40,
-                                          fit: BoxFit.cover,
-                                        ),
-                                    )
-                                    : defaultAvatar(40),
-                        title: TextH3(snapshot.data![index].userName),
-                      )
-                    );
+                        onTap: () {
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) => UserProfileDisplay(
+                                  snapshot.data![index].userId)));
+                        },
+                        child: ListTile(
+                          leading: snapshot.data![index].avatarURL != null
+                              ? ClipOval(
+                                  child: Image.network(
+                                    snapshot.data![index].avatarURL!,
+                                    width: 40,
+                                    height: 40,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : defaultAvatar(40),
+                          title: TextH3(snapshot.data![index].userName),
+                        ));
                   });
             }
         }
@@ -184,13 +183,13 @@ class CircleBuilder {
       },
       child: ListTile(
         leading: ClipOval(
-              child: Image.network(
-                circle.avatarURL,
-                width: 40,
-                height: 40,
-                fit: BoxFit.cover,
-              ),
-            ),
+          child: Image.network(
+            circle.avatarURL,
+            width: 40,
+            height: 40,
+            fit: BoxFit.cover,
+          ),
+        ),
         title: TextH3(circle.circleName),
         subtitle: TextH4('Members: ${circle.numOfMembers}'),
       ),
