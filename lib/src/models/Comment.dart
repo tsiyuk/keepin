@@ -6,6 +6,7 @@ class Comment {
   String? replyToId;
   String text;
   num timestamp;
+  String time;
 
   Comment(
       {required this.postId,
@@ -13,6 +14,7 @@ class Comment {
       required this.commenterId,
       required this.text,
       required this.timestamp,
+      required this.time,
       this.replyTo,
       this.replyToId});
 
@@ -25,6 +27,7 @@ class Comment {
       replyToId: json['replyToId'],
       text: json['text'],
       timestamp: json['timestamp'],
+      time: json['time'],
     );
   }
 

@@ -14,6 +14,7 @@ class Post {
   List<String> imageLinks = [];
   num numOfLikes = 0;
   num timestamp;
+  String time;
 
   Post(
       {this.postId,
@@ -25,7 +26,8 @@ class Post {
       required this.title,
       required this.imageLinks,
       required this.numOfLikes,
-      required this.timestamp});
+      required this.timestamp,
+      required this.time});
 
   // factory method to retrive data from firestore
   factory Post.fromJson(Map<String, dynamic> json) {
@@ -40,6 +42,7 @@ class Post {
       imageLinks: List.castFrom(json['imageLinks']),
       numOfLikes: json['numOfLikes'],
       timestamp: json['timestamp'],
+      time: json['time'],
     );
   }
 
@@ -56,6 +59,7 @@ class Post {
       'imageLinks': imageLinks,
       'numOfLikes': numOfLikes,
       'timestamp': timestamp,
+      'time': time,
     };
   }
 

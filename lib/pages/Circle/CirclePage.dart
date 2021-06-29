@@ -149,6 +149,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                               return ListView.separated(
                                 itemCount: snapshot.data!.length,
                                 itemBuilder: (context, index) {
+                                  Post post = snapshot.data![index];
                                   return ListTile(
                                     // to be refactored
                                     leading: Container(
@@ -164,14 +165,10 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                                                     MaterialPageRoute(
                                                         builder: (context) =>
                                                             UserProfileDisplay(
-                                                                snapshot
-                                                                    .data![
-                                                                        index]
-                                                                    .posterId)));
+                                                                post.posterId)));
                                               },
                                               image: Image.network(
-                                                snapshot.data![index]
-                                                    .posterAvatarLink!,
+                                                post.posterAvatarLink!,
                                                 fit: BoxFit.cover,
                                               ),
                                               size: 40,
@@ -180,18 +177,23 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                                           SizedBox(
                                             height: 10,
                                           ),
-                                          TextH5(
-                                              snapshot.data![index].posterName)
+                                          TextH5(post.posterName)
                                         ],
                                       ),
                                     ),
-                                    title: Text(snapshot.data![index].title),
-                                    subtitle: Container(
-                                        height: 100,
-                                        child: Text(
-                                          snapshot.data![index].text,
-                                          maxLines: 8,
-                                        )),
+                                    title: Text(post.title),
+                                    subtitle: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Container(
+                                              height: 100,
+                                              child: Text(
+                                                post.text,
+                                                maxLines: 8,
+                                              )),
+                                          getTimeDisplay(post.time),
+                                        ]),
                                     minLeadingWidth: 20,
                                   );
                                 },

@@ -99,6 +99,7 @@ class PostProvider with ChangeNotifier {
         imageLinks: imageLinks,
         numOfLikes: numOfLikes,
         timestamp: DateTime.now().millisecondsSinceEpoch,
+        time: DateTime.now().toString(),
       ));
     } on Exception catch (e) {
       print(e);
@@ -173,6 +174,7 @@ class PostProvider with ChangeNotifier {
       commenterId: commenter.uid,
       text: text,
       timestamp: DateTime.now().millisecondsSinceEpoch,
+      time: DateTime.now().toString(),
       replyTo: replyTo,
       replyToId: replyToId,
     ));
@@ -207,7 +209,7 @@ class FirestoreService {
             snapshot.docs.map((doc) => Post.fromJson(doc.data())).toList());
   }
 
-  // TODO: maybe return a stream
+  // TODO: maybe change to return a stream
   Future<List<Post>> getPostsFromCirclesJoined(String userId) async {
     List<String> circleNames = await _firestore
         .collection('userProfiles')
@@ -234,7 +236,7 @@ class FirestoreService {
       });
       result.addAll(r);
     }
-    // result.sort((x, y) => x.compareTo(y));
+    result.sort((x, y) => x.compareTo(y));
     return result;
   }
 

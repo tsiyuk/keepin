@@ -271,3 +271,8 @@ void showWarning(BuildContext context, String str) {
     content: Text(str),
   ));
 }
+
+/// Return a substring of time to display
+TextH5 getTimeDisplay(String str) {
+  return TextH5(str.substring(0, 16));
+}

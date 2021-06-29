@@ -231,12 +231,17 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
                     ),
                   ),
                   title: Text(post.title),
-                  subtitle: Container(
-                      height: 100,
-                      child: Text(
-                        post.text,
-                        maxLines: 8,
-                      )),
+                  subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                            height: 100,
+                            child: Text(
+                              post.text,
+                              maxLines: 8,
+                            )),
+                        getTimeDisplay(post.time),
+                      ]),
                   minLeadingWidth: 20,
                 );
               },
