@@ -142,7 +142,8 @@ class PostProvider with ChangeNotifier {
 
   /// upload images
   Future uploadAssets(BuildContext context) async {
-    final List<AssetEntity>? assets = await AssetPicker.pickAssets(context);
+    final List<AssetEntity>? assets =
+        await AssetPicker.pickAssets(context, maxAssets: 3);
     if (assets != null) {
       for (AssetEntity asset in assets) {
         if (await asset.exists) {

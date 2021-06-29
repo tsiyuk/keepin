@@ -222,6 +222,20 @@ class TextH4 extends StatelessWidget {
       );
 }
 
+class TextH5 extends StatelessWidget {
+  const TextH5(this.str);
+  final String str;
+  @override
+  Widget build(BuildContext context) => Text(
+        str,
+        style: TextStyle(
+          fontSize: 12.0,
+          fontWeight: FontWeight.w400,
+          color: Colors.black54,
+        ),
+      );
+}
+
 Image defaultAvatar(double size) {
   return Image.asset(
     'assets/images/placeholder.png',

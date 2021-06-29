@@ -14,6 +14,7 @@ import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:provider/provider.dart';
 
 import '../Circle/CirclePage.dart';
+import '../UserProfileDisplay.dart';
 
 class HomePage extends StatelessWidget {
   // to prevent creating multiple HomePage at different time to save memory
@@ -28,8 +29,9 @@ class HomePage extends StatelessWidget {
         Provider.of<UserProfileProvider>(context);
     CircleProvider circleProvider =
         Provider.of<CircleProvider>(context, listen: false);
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+    return Container(
+      padding: const EdgeInsets.all(10.0),
+      height: 90,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
@@ -40,51 +42,44 @@ class HomePage extends StatelessWidget {
             },
             child: Icon(Icons.add_box, size: 50, color: Colors.teal),
           ),
-          SizedBox(
-            height: 63,
-            width: 300,
+          VerticalDivider(
+            thickness: 1,
+          ),
+          Container(
+            width: MediaQuery.of(context).size.width - 100,
             child: StreamBuilder<List<CircleInfo>>(
               stream: userProfileProvider.circlesJoined,
-              //stream: postProvider.posts,
               builder: (context, snapshot) {
                 if (snapshot.data != null && snapshot.data!.isNotEmpty) {
                   return Container(
-                    // height: 50,
                     child: ListView.separated(
                       shrinkWrap: true,
                       scrollDirection: Axis.horizontal,
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
                         CircleInfo data = snapshot.data![index];
-                        return MaterialButton(
-                          onPressed: () async {
-                            Circle circle = await circleProvider
-                                .readCircleFromName(data.circleName);
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => CirclePage(
-                                        circle: circle,
-                                        circleInfo: data,
-                                      )),
-                            );
-                          },
-                          color: Colors.white,
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
+                        return Padding(
+                          padding: const EdgeInsets.all(4.0),
+                          child: _buildCircleButton(
+                            onPressed: () async {
+                              Circle circle = await circleProvider
+                                  .readCircleFromName(data.circleName);
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => CirclePage(
+                                          circle: circle,
+                                          circleInfo: data,
+                                        )),
+                              );
+                            },
                             child: Image.network(data.avatarURL,
-                                width: 50, height: 50, fit: BoxFit.cover),
+                                fit: BoxFit.cover),
                           ),
-                          padding: EdgeInsets.all(6),
-                          shape: ContinuousRectangleBorder(
-                              borderRadius: BorderRadius.circular(16)),
-                          minWidth: 50,
                         );
                       },
-                      separatorBuilder: (c, i) => VerticalDivider(
-                        indent: 10,
-                        endIndent: 10,
-                        thickness: 1,
+                      separatorBuilder: (c, i) => SizedBox(
+                        width: 6.0,
                       ),
                     ),
                   );
@@ -201,18 +196,55 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
             return Loading(40);
           }
           if (snapshot.data != null) {
-            return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  Post post = snapshot.data![index];
-                  userProfileProvider.updatePosterInfo(post);
-                  return ListTile(
-                    leading: Image.network(post.posterAvatarLink!),
-                    title: Text(post.posterName),
-                    subtitle: Text(post.text),
-                    shape: Border.all(),
-                  );
-                });
+            return ListView.separated(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                Post post = snapshot.data![index];
+                userProfileProvider.updatePosterInfo(post);
+                return ListTile(
+                  // to be refactored
+                  leading: Container(
+                    height: 150,
+                    width: 50,
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 40,
+                          child: ImageButton(
+                            onPressed: () {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) =>
+                                      UserProfileDisplay(post.posterId)));
+                            },
+                            image: Image.network(
+                              post.posterAvatarLink!,
+                              fit: BoxFit.cover,
+                            ),
+                            size: 40,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        TextH5(post.posterName)
+                      ],
+                    ),
+                  ),
+                  title: Text(post.title),
+                  subtitle: Container(
+                      height: 100,
+                      child: Text(
+                        post.text,
+                        maxLines: 8,
+                      )),
+                  minLeadingWidth: 20,
+                );
+              },
+              separatorBuilder: (c, i) => Container(
+                height: 10,
+                color: Colors.blueGrey.shade100,
+              ),
+            );
           } else {
             return Text('No posts');
           }

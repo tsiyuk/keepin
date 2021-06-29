@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:keepin/src/CommonWidgets.dart';
+import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:keepin/src/services/PostProvider.dart';
 import 'package:provider/provider.dart';
 
@@ -17,6 +18,7 @@ class CreatePostPage extends StatefulWidget {
 class _CreatePostPageState extends State<CreatePostPage> {
   TextEditingController _textController = TextEditingController();
   TextEditingController _titleController = TextEditingController();
+  bool isUploadCompleted = true;
   @override
   Widget build(BuildContext context) {
     PostProvider postProvider =
@@ -56,18 +58,28 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 Icons.camera_alt_outlined,
               ),
               onPressed: () async {
+                setState(() {
+                  isUploadCompleted = false;
+                });
                 postProvider.initPostInfo(widget.user, widget.circleName);
                 await postProvider.uploadAssets(context);
+                setState(() {
+                  isUploadCompleted = true;
+                });
               },
             ),
             PrimaryButton(
                 child: Text('Post'),
                 onPressed: () {
-                  //postProvider.initPostInfo(widget.user, widget.circleName);
                   postProvider.changeTitle(_titleController.text);
                   postProvider.changeText(_textController.text);
-                  postProvider.createPost();
-                  Navigator.of(context).pop();
+                  if (isUploadCompleted) {
+                    postProvider.createPost();
+                    Navigator.of(context).pop();
+                    showSuccess(context, 'Create post!');
+                  } else {
+                    showWarning(context, 'Please wait for uploading images');
+                  }
                 }),
           ],
         ),
