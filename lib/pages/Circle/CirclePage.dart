@@ -75,7 +75,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
               subtitle: !isMember
                   ? TextH4(
                       'Join the ${widget.circle.circleName} and clock in every day')
-                  : TextH4('Clock in ${circleProvider.clockinCount} times'),
+                  : TextH4('Clock in days: ${circleProvider.clockinCount}'),
             ),
           ),
         ],
@@ -207,19 +207,31 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                             }
                           }),
                       Center(
-                        child: PrimaryButton(
-                            child: Text('Join the Circle'),
-                            onPressed: () {
-                              if (isMember) {
-                                showSuccess(context,
-                                    'You have been a member of ${circleProvider.circleName}');
-                              } else {
-                                circleProvider.joinCircle();
-                                setState(() {
-                                  isMember = true;
-                                });
+                        child: Column(children: [
+                          PrimaryButton(
+                              child: Text('Join the Circle'),
+                              onPressed: () {
+                                if (isMember) {
+                                  showSuccess(context,
+                                      'You have been a member of ${circleProvider.circleName}');
+                                } else {
+                                  circleProvider.joinCircle();
+                                  setState(() {
+                                    isMember = true;
+                                  });
+                                }
+                              }),
+                          PrimaryButton(
+                            child: Text('Clock in'),
+                            onPressed: () async {
+                              try {
+                                await circleProvider.clockin();
+                              } on FirebaseException catch (e) {
+                                showError(context, e.code);
                               }
-                            }),
+                            },
+                          )
+                        ]),
                       ),
                     ],
                   ),
