@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/MainPage/HomePage.dart';
+import 'package:keepin/pages/MainPage/MessagePage.dart';
 import 'package:keepin/pages/SearchDelegate.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/services/UserState.dart';
@@ -28,7 +29,7 @@ class _MainPageState extends State<MainPage> {
       // TODO to add sub-pages
       HomePage(),
       Text('Discover'),
-      Text('Messages'),
+      MessagePage(),
       // assume that the user has logged in
       UserProfilePage(userState.user!),
       // PrimaryButton(onPressed: userState.signOut, child: Text("Sign out")),

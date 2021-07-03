@@ -1,24 +1,23 @@
+import 'Utils.dart';
+
 class Message {
   String text;
   String userId;
   String? inviteCircleName;
-  num timestamp;
-  String time;
+  DateTime timestamp;
 
   Message({
     required this.text,
     required this.userId,
     this.inviteCircleName,
     required this.timestamp,
-    required this.time,
   });
 
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
         text: json['text'],
         userId: json['userId'],
-        timestamp: json['timestamp'],
-        time: json['time'],
+        timestamp: Utils.toDateTime(json['timestamp']),
         inviteCircleName: json['inviteCircleName']);
   }
 
@@ -27,8 +26,7 @@ class Message {
       'text': text,
       'userId': userId,
       'inviteCircleName': inviteCircleName,
-      'time': time,
-      'timestamp': timestamp,
+      'timestamp': timestamp.toUtc(),
     };
   }
 }

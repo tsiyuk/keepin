@@ -31,6 +31,11 @@ class UserProfileProvider with ChangeNotifier {
   Stream<List<CircleInfo>> get circlesJoined =>
       firestoreService.getCirclesJoined(userId);
 
+  /// get the userProfile instance specified by the userId
+  Future<UserProfile> readUserProfile(String userId) async {
+    return await firestoreService.getUserProfile(userId);
+  }
+
   // Setters
   void changeUserName(String userName) {
     _userName = userName;
@@ -76,11 +81,6 @@ class UserProfileProvider with ChangeNotifier {
       _avatarURL = await firebaseStorageRef.getDownloadURL();
       notifyListeners();
     }
-  }
-
-  /// get the userProfile instance specified by the userId
-  Future<UserProfile> readUserProfile(String userId) async {
-    return await firestoreService.getUserProfile(userId);
   }
 
   /// Check if the posterName and posterAvatar have been updated

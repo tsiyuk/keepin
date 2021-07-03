@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/StartPage.dart';
+import 'package:keepin/src/services/ChatRoomProvider.dart';
 import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:keepin/src/services/PostProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
@@ -19,6 +20,7 @@ void main() {
         create: (context) => PostProvider(),
       ),
       ChangeNotifierProvider(create: (context) => CircleProvider()),
+      ChangeNotifierProvider(create: (context) => ChatRoomProvider()),
     ],
     builder: (context, child) => MyApp(),
   ));
