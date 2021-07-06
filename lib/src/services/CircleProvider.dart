@@ -20,7 +20,8 @@ class CircleProvider with ChangeNotifier {
   late bool _isPublic;
 
   /// clockinCount is for the specifiled user
-  late num _clockinCount;
+  num _clockinCount = 0;
+  DateTime _lateClockinTime = DateTime(1970);
   String? _description;
   List<String>? _descriptionImageURLs = [];
   File? _avatar;
@@ -35,6 +36,7 @@ class CircleProvider with ChangeNotifier {
   num get numOfMembers => _numOfMembers;
   bool get isPublic => _isPublic;
   num get clockinCount => _clockinCount;
+  DateTime get lastClockinTime => _lateClockinTime;
   String? get description => _description;
   List<String>? get descriptionImageURLs => _descriptionImageURLs;
 
@@ -88,6 +90,7 @@ class CircleProvider with ChangeNotifier {
     _isPublic = circle.isPublic;
     if (circleInfo != null) {
       _clockinCount = circleInfo.clockinCount;
+      _lateClockinTime = circleInfo.lastClockinTime;
     }
   }
 
@@ -176,11 +179,26 @@ class CircleProvider with ChangeNotifier {
     await Future.wait(futures);
   }
 
-  void clockin() async {
-    ++_clockinCount;
-    notifyListeners();
-    await _firestoreService.updateClockinCount(
-        circleName, user.uid, clockinCount);
+  Future<void> clockin() async {
+    if (await isMember(user.uid)) {
+      DateTime last = lastClockinTime;
+      DateTime now = DateTime.now();
+      if (now.day != last.day ||
+          now.month != last.month ||
+          now.year != last.year) {
+        ++_clockinCount;
+        notifyListeners();
+        await _firestoreService.updateClockin(
+            circleName, user.uid, clockinCount, now);
+      } else {
+        throw FirebaseException(
+            plugin: 'Firebase',
+            code: 'Can not clock in twice in the same day!');
+      }
+    } else {
+      throw FirebaseException(
+          plugin: 'Firebase', code: 'Please join the circle first');
+    }
   }
 
   /// Upload Descirption Images
@@ -207,11 +225,16 @@ class CircleProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addDescritpion(String text) {
+  void addDescritpion(String text) async {
     _description = text;
-    _firestoreService.updateDescription(
+    await _firestoreService.updateDescription(
         circleName, _description, _descriptionImageURLs);
     notifyListeners();
+  }
+
+  /// quit the circle
+  void quitCircle() async {
+    await _firestoreService.removeUser(circleName, user.uid);
   }
 }
 
@@ -321,16 +344,18 @@ class FirestoreService {
         .doc(userId)
         .collection('circlesJoined')
         .doc(circleName)
-        .set(CircleInfo(circleName, circleAvatar, 0).toMap());
+        .set(CircleInfo(circleName, circleAvatar, 0, DateTime.utc(1970))
+            .toMap());
   }
 
-  Future<void> updateClockinCount(String circleName, String userId, num count) {
+  Future<void> updateClockin(
+      String circleName, String userId, num count, DateTime newTime) {
     return _firebaseFirestore
         .collection('userProfiles')
         .doc(userId)
         .collection('circlesJoined')
         .doc(circleName)
-        .update({'clockinCount': count});
+        .update({'clockinCount': count, 'lastClockinTime': newTime});
   }
 
   /// Add an admin
@@ -378,12 +403,20 @@ class FirestoreService {
 
   // remove a user from the circle
   Future<void> removeUser(String circleName, String userId) {
-    return _firebaseFirestore
+    var futures = <Future>[];
+    futures.add(_firebaseFirestore
+        .collection('userProfiles')
+        .doc(userId)
+        .collection('circlesJoined')
+        .doc(circleName)
+        .delete());
+    futures.add(_firebaseFirestore
         .collection('circles')
         .doc(circleName)
         .collection('userIds')
         .doc(userId)
-        .delete();
+        .delete());
+    return Future.wait(futures);
   }
 
   // Take note that the userIds will not be removed because

@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 /// Circle contains all the information about an circle
 /// The information is belong to the circle but not a particular user
 class Circle {
@@ -54,19 +56,26 @@ class CircleInfo {
   String circleName;
   String avatarURL;
   num clockinCount;
+  DateTime lastClockinTime;
 
-  CircleInfo(this.circleName, this.avatarURL, this.clockinCount);
+  CircleInfo(
+      this.circleName, this.avatarURL, this.clockinCount, this.lastClockinTime);
 
   factory CircleInfo.fromJson(Map<String, dynamic> json) {
-    return CircleInfo(
-        json['circleName'], json['avatarURL'], json['clockinCount']);
+    return CircleInfo(json['circleName'], json['avatarURL'],
+        json['clockinCount'], toDateTime(json['lastClockinTime']));
+  }
+
+  static DateTime toDateTime(Timestamp value) {
+    return value.toDate();
   }
 
   Map<String, dynamic> toMap() {
     return {
       'circleName': circleName,
       'avatarURL': avatarURL,
-      'clockinCount': clockinCount
+      'clockinCount': clockinCount,
+      'lastClockinTime': lastClockinTime.toUtc(),
     };
   }
 }
