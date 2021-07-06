@@ -23,8 +23,8 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
   Widget build(BuildContext context) {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context, listen: false);
-    ChatRoomProvider chatRoomProvider =
-        Provider.of<ChatRoomProvider>(context, listen: false);
+    ChatRoomProvider chatRoomProvider = Provider.of<ChatRoomProvider>(context);
+    chatRoomProvider.loadAll(widget.chatRoom);
     String otherId = chatRoomProvider.getOtherUserId(widget.chatRoom);
     Future<UserProfile> otherUser =
         userProfileProvider.readUserProfile(otherId);
@@ -70,5 +70,11 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
             }
           }),
     );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 }

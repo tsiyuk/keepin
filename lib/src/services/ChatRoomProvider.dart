@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:keepin/src/models/ChatRoom.dart';
 import 'package:keepin/src/models/Message.dart';
+import 'package:keepin/src/services/UserState.dart';
 
 /// Only support two people in one chat room
 class ChatRoomProvider extends ChangeNotifier {
@@ -10,7 +11,7 @@ class ChatRoomProvider extends ChangeNotifier {
   String _chatRoomId = '';
   List<bool> _unread = [];
   Message? _latestMessage;
-  User currentUser = FirebaseAuth.instance.currentUser!;
+  User currentUser = UserState.user!;
 
   // Getters
   List<String> get userIds => _userIds;
@@ -40,17 +41,17 @@ class ChatRoomProvider extends ChangeNotifier {
 
   /// Get the userId of the other user in the chat room
   String getOtherUserId(ChatRoom chatRoom) {
-    if (currentUser.uid == userIds[0]) {
-      return userIds[1];
+    if (currentUser.uid == chatRoom.userIds[0]) {
+      return chatRoom.userIds[1];
     } else {
-      return userIds[0];
+      return chatRoom.userIds[0];
     }
   }
 
   // Setters
-  void addNewUser(String userId) {
-    _userIds.add(currentUser.uid);
-    _userIds.add(userId);
+  void setNewUser(String userId) {
+    _userIds[0] = currentUser.uid;
+    _userIds[1] = userId;
     notifyListeners();
   }
 
@@ -62,11 +63,18 @@ class ChatRoomProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  void clear() {
+    _userIds = [];
+    _chatRoomId = '';
+    _unread = [];
+  }
+
   Future<ChatRoom> createChatRoom() async {
     String uid = FirestoreService.firestore.doc().id;
     ChatRoom chatRoom =
         ChatRoom(uid: uid, userIds: userIds, unread: [false, false]);
     await FirestoreService.addChatRoom(chatRoom);
+    notifyListeners();
     return chatRoom;
   }
 

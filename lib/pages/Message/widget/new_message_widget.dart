@@ -23,7 +23,6 @@ class _NewMessageWidgetState extends State<NewMessageWidget> {
   @override
   Widget build(BuildContext context) {
     ChatRoomProvider chatRoomProvider = Provider.of<ChatRoomProvider>(context);
-    chatRoomProvider.loadAll(widget.chatRoom);
     return Container(
       color: Colors.white,
       padding: EdgeInsets.all(8),

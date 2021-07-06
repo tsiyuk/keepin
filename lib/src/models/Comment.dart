@@ -1,3 +1,5 @@
+import 'package:keepin/src/models/Utils.dart';
+
 class Comment {
   String postId;
   String commenterName;
@@ -5,8 +7,7 @@ class Comment {
   String? replyTo;
   String? replyToId;
   String text;
-  num timestamp;
-  String time;
+  DateTime timestamp;
 
   Comment(
       {required this.postId,
@@ -14,7 +15,6 @@ class Comment {
       required this.commenterId,
       required this.text,
       required this.timestamp,
-      required this.time,
       this.replyTo,
       this.replyToId});
 
@@ -26,8 +26,7 @@ class Comment {
       replyTo: json['replyTo'],
       replyToId: json['replyToId'],
       text: json['text'],
-      timestamp: json['timestamp'],
-      time: json['time'],
+      timestamp: Utils.toDateTime(json['timestamp']),
     );
   }
 
@@ -39,7 +38,7 @@ class Comment {
       'replyTo': replyTo,
       'replyToId': replyToId,
       'text': text,
-      'timestamp': timestamp,
+      'timestamp': timestamp.toUtc(),
     };
   }
 }

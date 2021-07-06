@@ -31,7 +31,7 @@ class _MainPageState extends State<MainPage> {
       Text('Discover'),
       MessagePage(),
       // assume that the user has logged in
-      UserProfilePage(userState.user!),
+      UserProfilePage(UserState.user!),
       // PrimaryButton(onPressed: userState.signOut, child: Text("Sign out")),
     ];
 

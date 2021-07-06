@@ -192,7 +192,8 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                                                 post.text,
                                                 maxLines: 8,
                                               )),
-                                          getTimeDisplay(post.time),
+                                          getTimeDisplay(
+                                              post.timestamp.toString()),
                                         ]),
                                     minLeadingWidth: 20,
                                   );

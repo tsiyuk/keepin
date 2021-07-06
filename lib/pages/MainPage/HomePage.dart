@@ -239,7 +239,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
                               post.text,
                               maxLines: 8,
                             )),
-                        getTimeDisplay(post.time),
+                        getTimeDisplay(post.timestamp.toString()),
                       ]),
                   minLeadingWidth: 20,
                 );

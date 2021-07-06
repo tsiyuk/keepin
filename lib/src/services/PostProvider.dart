@@ -98,8 +98,7 @@ class PostProvider with ChangeNotifier {
         title: title,
         imageLinks: imageLinks,
         numOfLikes: numOfLikes,
-        timestamp: DateTime.now().millisecondsSinceEpoch,
-        time: DateTime.now().toString(),
+        timestamp: DateTime.now(),
       ));
     } on Exception catch (e) {
       print(e);
@@ -173,8 +172,7 @@ class PostProvider with ChangeNotifier {
       commenterName: commenter.displayName!,
       commenterId: commenter.uid,
       text: text,
-      timestamp: DateTime.now().millisecondsSinceEpoch,
-      time: DateTime.now().toString(),
+      timestamp: DateTime.now(),
       replyTo: replyTo,
       replyToId: replyToId,
     ));
