@@ -130,17 +130,17 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
                         child: Text('Contact'),
                         onPressed: () async {
                           ChatRoom chatRoom;
-                          // if (await chatRoomProvider.isNotExist()) {
-                          //   chatRoomProvider
-                          //       .setNewUser(userProfileProvider.userId);
-                          //   chatRoom = await chatRoomProvider.createChatRoom();
-                          // } else {
-                          //   var temp = await chatRoomProvider.specifiedChatRoom;
-                          //   chatRoom = temp[0];
-                          // }
-                          chatRoomProvider
-                              .setNewUser(userProfileProvider.userId);
-                          chatRoom = await chatRoomProvider.createChatRoom();
+                          if (await chatRoomProvider.isNotExist()) {
+                            chatRoomProvider
+                                .setNewUser(userProfileProvider.userId);
+                            chatRoom = await chatRoomProvider.createChatRoom();
+                          } else {
+                            var temp = await chatRoomProvider.specifiedChatRoom;
+                            chatRoom = temp[0];
+                          }
+                          // chatRoomProvider
+                          //     .setNewUser(userProfileProvider.userId);
+                          // chatRoom = await chatRoomProvider.createChatRoom();
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) =>
                                   ChatRoomPage(chatRoom: chatRoom)));

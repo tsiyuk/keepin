@@ -22,6 +22,7 @@ class CircleProvider with ChangeNotifier {
   /// clockinCount is for the specifiled user
   num _clockinCount = 0;
   DateTime _lateClockinTime = DateTime(1970);
+  num _exp = 0;
   String? _description;
   List<String>? _descriptionImageURLs = [];
   File? _avatar;
@@ -37,6 +38,7 @@ class CircleProvider with ChangeNotifier {
   bool get isPublic => _isPublic;
   num get clockinCount => _clockinCount;
   DateTime get lastClockinTime => _lateClockinTime;
+  num get exp => _exp;
   String? get description => _description;
   List<String>? get descriptionImageURLs => _descriptionImageURLs;
 
@@ -201,6 +203,12 @@ class CircleProvider with ChangeNotifier {
     }
   }
 
+  Future<void> addExp(num exp) async {
+    ++_exp;
+    notifyListeners();
+    await _firestoreService.updateExp(circleName, user.uid, exp);
+  }
+
   /// Upload Descirption Images
   Future uploadDescirptionImages(BuildContext context) async {
     final List<AssetEntity>? assets = await AssetPicker.pickAssets(context);
@@ -344,7 +352,7 @@ class FirestoreService {
         .doc(userId)
         .collection('circlesJoined')
         .doc(circleName)
-        .set(CircleInfo(circleName, circleAvatar, 0, DateTime.utc(1970))
+        .set(CircleInfo(circleName, circleAvatar, 0, DateTime.utc(1970), 0)
             .toMap());
   }
 
@@ -356,6 +364,16 @@ class FirestoreService {
         .collection('circlesJoined')
         .doc(circleName)
         .update({'clockinCount': count, 'lastClockinTime': newTime});
+  }
+
+  /// Update the exp of the user
+  Future<void> updateExp(String circleName, String userId, num exp) {
+    return _firebaseFirestore
+        .collection('userProfiles')
+        .doc(userId)
+        .collection('circlesJoined')
+        .doc(circleName)
+        .update({'exp': exp});
   }
 
   /// Add an admin

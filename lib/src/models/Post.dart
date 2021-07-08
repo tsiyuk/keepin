@@ -16,6 +16,7 @@ class Post {
   List<String> imageLinks = [];
   num numOfLikes = 0;
   DateTime timestamp;
+  List<String> tags = [];
 
   Post({
     this.postId,
@@ -28,6 +29,7 @@ class Post {
     required this.imageLinks,
     required this.numOfLikes,
     required this.timestamp,
+    required this.tags,
   });
 
   // factory method to retrive data from firestore
@@ -43,6 +45,7 @@ class Post {
       imageLinks: List.castFrom(json['imageLinks']),
       numOfLikes: json['numOfLikes'],
       timestamp: Utils.toDateTime(json['timestamp']),
+      tags: List.castFrom(json['tags']),
     );
   }
 
@@ -59,6 +62,7 @@ class Post {
       'imageLinks': imageLinks,
       'numOfLikes': numOfLikes,
       'timestamp': timestamp.toUtc(),
+      'tags': tags,
     };
   }
 

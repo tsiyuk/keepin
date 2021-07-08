@@ -18,6 +18,7 @@ class PostProvider with ChangeNotifier {
   late String _text;
   late String _title;
   List<String> _imageLinks = [];
+  List<String> _tags = [];
   num _numOfLikes = 0;
 
   FirestoreService _firestoreService = FirestoreService();
@@ -31,6 +32,7 @@ class PostProvider with ChangeNotifier {
   String get text => _text;
   String get title => _title;
   List<String> get imageLinks => _imageLinks;
+  List<String> get tags => _tags;
   num get numOfLikes => _numOfLikes;
   Stream<List<Post>> get posts => _firestoreService.getPosts();
 
@@ -65,15 +67,17 @@ class PostProvider with ChangeNotifier {
     _text = post.text;
     _imageLinks = post.imageLinks;
     _numOfLikes = post.numOfLikes;
+    _tags = post.tags;
   }
 
   /// Must call it before create the post and upload the images
-  void initPostInfo(User user, String circleName) {
+  void initPostInfo(User user, String circleName, List<String> tags) {
     _posterId = user.uid;
     _posterName = user.displayName!;
     _posterAvatarLink = user.photoURL;
     _circleName = circleName;
     _imageLinks = [];
+    _tags = tags;
     notifyListeners();
   }
 
@@ -99,6 +103,7 @@ class PostProvider with ChangeNotifier {
         imageLinks: imageLinks,
         numOfLikes: numOfLikes,
         timestamp: DateTime.now(),
+        tags: tags,
       ));
     } on Exception catch (e) {
       print(e);

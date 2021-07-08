@@ -52,6 +52,7 @@ class ChatRoomProvider extends ChangeNotifier {
   void setNewUser(String userId) {
     _userIds[0] = currentUser.uid;
     _userIds[1] = userId;
+    _userIds.sort();
     notifyListeners();
   }
 
@@ -146,11 +147,11 @@ class FirestoreService {
   }
 
   static Future<bool> isNotExist(List<String> ids) {
-    return firestore.where('userIds', arrayContains: ids).snapshots().isEmpty;
+    return firestore.where('userIds', isEqualTo: ids).snapshots().isEmpty;
   }
 
   static Future<List<ChatRoom>> getChatRoom(List<String> ids) {
-    return firestore.where('userIds', arrayContains: ids).get().then(
+    return firestore.where('userIds', isEqualTo: ids).get().then(
         (value) => value.docs.map((e) => ChatRoom.fromJson(e.data())).toList());
   }
 
