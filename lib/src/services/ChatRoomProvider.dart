@@ -17,6 +17,7 @@ class ChatRoomProvider extends ChangeNotifier {
   List<String> get userIds => _userIds;
   Message? get latestMessage => _latestMessage;
   String get chatRoomId => _chatRoomId;
+  List<bool> get unread => _unread;
 
   /// Return a stream of all the chat room the user belonged to
   Stream<List<ChatRoom>> get chatRooms =>
@@ -34,9 +35,10 @@ class ChatRoomProvider extends ChangeNotifier {
   }
 
   /// Check if the chat room has been read by the current user
-  bool isRead(ChatRoom chatRoom) {
-    int index = userIds.indexOf(currentUser.uid);
-    return _unread[index];
+  bool isUnRead(ChatRoom chatRoom) {
+    List<String> ids = chatRoom.userIds;
+    int index = ids.indexOf(currentUser.uid);
+    return chatRoom.unread[index];
   }
 
   /// Get the userId of the other user in the chat room
@@ -96,6 +98,14 @@ class ChatRoomProvider extends ChangeNotifier {
     notifyListeners();
     return FirestoreService.addMessage(chatRoomId, message, _unread);
   }
+
+  /// Read the unread message,
+  /// use it after check if the current user has read the message or not
+  void readMessage() async {
+    int index = userIds.indexOf(currentUser.uid);
+    _unread[index] = false;
+    FirestoreService.updateRead(chatRoomId, _unread);
+  }
 }
 
 class FirestoreService {
@@ -121,10 +131,8 @@ class FirestoreService {
     return Future.wait(futures);
   }
 
-  static Future<void> updateRead(String chatRoomId) {
-    return firestore.doc(chatRoomId).update({
-      'unread': [false, false]
-    });
+  static Future<void> updateRead(String chatRoomId, List<bool> unread) {
+    return firestore.doc(chatRoomId).update({'unread': unread});
   }
 
   static Stream<List<ChatRoom>> getChatRoomsByUser(String userId) {

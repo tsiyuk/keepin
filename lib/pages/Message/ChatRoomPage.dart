@@ -29,6 +29,10 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
     Future<UserProfile> otherUser =
         userProfileProvider.readUserProfile(otherId);
 
+    if (chatRoomProvider.isUnRead(widget.chatRoom)) {
+      chatRoomProvider.readMessage();
+    }
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.blue,

@@ -41,6 +41,8 @@ class _MessagePageState extends State<MessagePage> {
                       itemBuilder: (context, index) {
                         String otherId =
                             chatRoomProvider.getOtherUserId(chatRooms[index]);
+                        bool unRead =
+                            chatRoomProvider.isUnRead(chatRooms[index]);
                         return FutureBuilder<UserProfile>(
                             future:
                                 userProfileProvider.readUserProfile(otherId),
@@ -57,9 +59,17 @@ class _MessagePageState extends State<MessagePage> {
                                           Text(snapshot.data!.userName),
                                           chatRooms[index].latestMessage == null
                                               ? Text('')
-                                              : Text(chatRooms[index]
-                                                  .latestMessage!
-                                                  .text),
+                                              : unRead
+                                                  ? Text(
+                                                      chatRooms[index]
+                                                          .latestMessage!
+                                                          .text,
+                                                      style: TextStyle(
+                                                          color: Colors.red),
+                                                    )
+                                                  : Text(chatRooms[index]
+                                                      .latestMessage!
+                                                      .text),
                                         ],
                                       ),
                                     ],
