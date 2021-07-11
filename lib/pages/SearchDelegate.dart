@@ -4,6 +4,7 @@ import 'package:keepin/pages/UserProfileDisplay.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/Circle.dart';
+import 'package:keepin/src/models/Post.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/SearchService.dart';
 
@@ -170,7 +171,69 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
   }
 
   Widget _buildPostsFeed(String query) {
-    return Container();
+    return StreamBuilder<List<Post>>(
+        stream: SearchService.searchPost(query),
+        //stream: postProvider.posts,
+        builder: (context, snapshot) {
+          if (snapshot.data != null) {
+            return ListView.separated(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  // to be refactored
+                  leading: Container(
+                    height: 150,
+                    width: 50,
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 40,
+                          child: ImageButton(
+                            onPressed: () {
+                              Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          UserProfileDisplay(
+                                              snapshot
+                                                  .data![
+                                              index]
+                                                  .posterId)));
+                            },
+                            image: Image.network(
+                              snapshot.data![index]
+                                  .posterAvatarLink!,
+                              fit: BoxFit.cover,
+                            ),
+                            size: 40,
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        TextH5(
+                            snapshot.data![index].posterName)
+                      ],
+                    ),
+                  ),
+                  title: Text(snapshot.data![index].title),
+                  subtitle: Container(
+                      height: 100,
+                      child: Text(
+                        snapshot.data![index].text,
+                        maxLines: 8,
+                      )),
+                  minLeadingWidth: 20,
+                );
+              },
+              separatorBuilder: (c, i) => Container(
+                height: 10,
+                color: Colors.blueGrey.shade100,
+              ),
+            );
+          } else {
+            return Text('null');
+          }
+        });
   }
 }
 
