@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/MainPage/HomePage.dart';
+import 'package:keepin/pages/SearchDelegate.dart';
 import 'package:keepin/src/CommonWidgets.dart';
-import 'package:keepin/src/UserState.dart';
+import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
+
+import 'UserProfilePage.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -11,8 +14,6 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
-
-
 
   void _onItemTapped(int index) {
     setState(() {
@@ -28,12 +29,21 @@ class _MainPageState extends State<MainPage> {
       HomePage(),
       Text('Discover'),
       Text('Messages'),
-      PrimaryButton(onPressed: userState.signOut, child: Text("Sign out")),
+      // assume that the user has logged in
+      UserProfilePage(userState.user!),
+      // PrimaryButton(onPressed: userState.signOut, child: Text("Sign out")),
     ];
 
     return Scaffold(
       appBar: AppBar(
         title: const Text('Search Bar'),
+        actions: [
+          IconButton(
+              onPressed: () async {
+                await showSearch(context: context, delegate: SearchData());
+              },
+              icon: Icon(Icons.search)),
+        ],
       ),
       body: Center(
         child: _subPages.elementAt(_selectedIndex),

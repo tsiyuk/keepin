@@ -1,19 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:keepin/pages/CirclePage.dart';
 import 'package:keepin/pages/MainPage/MainPage.dart';
 import 'package:keepin/src/AuthenticationForms.dart';
-import 'package:keepin/src/UserState.dart';
+import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
 
 import 'CommonWidgets.dart';
-
-enum LoginState {
-  loggedOut,
-  register,
-  logInWithEmail,
-  forgetPassword,
-  loggedIn,
-}
 
 class Authentication extends StatelessWidget {
   @override
@@ -44,7 +35,7 @@ class Authentication extends StatelessWidget {
         );
     }
   }
-
+/*
   void _showErrorDialog(BuildContext context, String title, Exception e) {
     showDialog<void>(
       context: context,
@@ -78,5 +69,5 @@ class Authentication extends StatelessWidget {
         );
       },
     );
-  }
+  }*/
 }

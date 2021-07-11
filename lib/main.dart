@@ -1,15 +1,27 @@
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/StartPage.dart';
-import 'package:keepin/src/UserState.dart';
+import 'package:keepin/src/services/CircleProvider.dart';
+import 'package:keepin/src/services/PostProvider.dart';
+import 'package:keepin/src/services/UserProfileProvider.dart';
+import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
 
 void main() {
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => UserState(),
-      builder: (context, _) => MyApp(),
-    ),
-  );
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (context) => UserState(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => UserProfileProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (context) => PostProvider(),
+      ),
+      ChangeNotifierProvider(create: (context) => CircleProvider()),
+    ],
+    builder: (context, child) => MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
@@ -18,9 +30,10 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'keepin sketch',
       theme: ThemeData(
-        primaryColorDark: Color(0xff0B4229),
-        primaryColor: Color(0xff115c45),
-        primaryColorLight: Color(0xff248F7D),
+        primaryColorDark: Color(0xff104028),
+        primaryColor: Color(0xff287050),
+        primaryColorLight: Color(0xff70bb90),
+        // primaryColorLight: Color(0xffE4EFE7),
       ),
       home: StartPage(),
     );

@@ -2,11 +2,18 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:keepin/src/Authentication.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
+enum LoginState {
+  loggedOut,
+  register,
+  logInWithEmail,
+  forgetPassword,
+  loggedIn,
+}
+
 /*
-  The UserState class will handle all the program related to Firebase
+  The UserState class handles the backend log in and register workflow with firebase
 */
 class UserState extends ChangeNotifier {
   UserState() {
@@ -19,6 +26,9 @@ class UserState extends ChangeNotifier {
 
   LoginState _loginState = LoginState.loggedOut;
   LoginState get loginState => _loginState;
+
+  User? _user;
+  User? get user => _user;
 
   // methods related to log in
 
@@ -37,17 +47,7 @@ class UserState extends ChangeNotifier {
     notifyListeners();
   }
 
-  void verifyEmail(
-    String email,
-  ) async {
-    User user = FirebaseAuth.instance.currentUser!;
-    if (!user.emailVerified) {
-      await user.sendEmailVerification();
-    }
-  }
-
-  Future<UserCredential?> signInWithEmailAndPassword(
-    //void signInWithEmailAndPassword(
+  Future<UserCredential> signInWithEmailAndPassword(
     String email,
     String password,
   ) async {
@@ -57,8 +57,14 @@ class UserState extends ChangeNotifier {
         email: email,
         password: password,
       );
-      _loginState = LoginState.loggedIn;
-      notifyListeners();
+      _user = credential.user;
+      if (_user!.emailVerified) {
+        _loginState = LoginState.loggedIn;
+        notifyListeners();
+      } else {
+        _user!.delete();
+        throw FirebaseAuthException(code: 'The user has not been verified!');
+      }
       return credential;
     } on FirebaseAuthException catch (e) {
       throw e;
@@ -66,7 +72,6 @@ class UserState extends ChangeNotifier {
   }
 
   Future<UserCredential> registerAccount(
-    //void registerAccount(
     String email,
     String displayName,
     String password,
@@ -74,55 +79,35 @@ class UserState extends ChangeNotifier {
     try {
       UserCredential credential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-      await credential.user!.updateProfile(displayName: displayName);
-      _loginState = LoginState.loggedIn;
-      notifyListeners();
+      User user = credential.user!;
+      await user.sendEmailVerification();
+      Timer.periodic(Duration(seconds: 3), (timer) async {
+        user = FirebaseAuth.instance.currentUser!;
+        await user.reload();
+        if (user.emailVerified) {
+          timer.cancel();
+          await user.updateDisplayName(displayName);
+          _loginState = LoginState.loggedIn;
+          _user = user;
+          notifyListeners();
+        }
+      });
       return credential;
     } on FirebaseAuthException catch (e) {
       throw e;
     }
   }
 
-  //Future<UserCredential> signInWithGoogle
-  // void signInWithGoogle(
-  //     void Function(FirebaseAuthException e) errorCallback) async {
-  //   // Trigger the authentication flow
-  //   final GoogleSignInAccount googleUser = await GoogleSignIn().signIn();
-
-  //   // Obtain the auth details from the request
-  //   final GoogleSignInAuthentication googleAuth =
-  //       await googleUser.authentication;
-
-  //   // Create a new credential
-  //   final credential = GoogleAuthProvider.credential(
-  //     accessToken: googleAuth.accessToken,
-  //     idToken: googleAuth.idToken,
-  //   );
-
-  //   // Once signed in, return the UserCredential
-  //   try {
-  //     await FirebaseAuth.instance.signInWithCredential(credential);
-  //   } on FirebaseAuthException catch (e) {
-  //     errorCallback(e);
-  //   }
-  // }
-
   void signInWithGoogle() async {
-    // Trigger the authentication flow
     final GoogleSignInAccount googleUser = (await GoogleSignIn().signIn())!;
-
-    // Obtain the auth details from the request
     final GoogleSignInAuthentication googleAuth =
         await googleUser.authentication;
-
-    // Create a new credential
     final credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
-
-    // Once signed in, return the UserCredential
-    await FirebaseAuth.instance.signInWithCredential(credential);
+    var temp = await FirebaseAuth.instance.signInWithCredential(credential);
+    _user = temp.user;
     _loginState = LoginState.loggedIn;
     notifyListeners();
   }

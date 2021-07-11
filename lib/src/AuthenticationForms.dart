@@ -1,8 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:keepin/src/UserState.dart';
+import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
 import 'CommonWidgets.dart';
+
+/*
+  The authentication forms contains the layout of log in page.
+  
+*/
 
 class EmailPasswordForm extends StatefulWidget {
   @override
@@ -32,11 +37,6 @@ class _EmailPasswordState extends State<EmailPasswordForm> {
         final userState = Provider.of<UserState>(context, listen: false);
         await userState.signInWithEmailAndPassword(
             _emailController.text, _passwordController.text);
-        // String userId = await userState.signInWithEmailAndPassword(
-        //   _emailController.text,
-        //   _passwordController.text,
-        // );
-        // print('Signed in $userId');
       } on FirebaseAuthException catch (e) {
         setState(() {
           _errorMessage = e.code;
@@ -123,7 +123,7 @@ class _RegisterFormState extends State<RegisterForm> {
       try {
         // print("sign up start");
         final userState = Provider.of<UserState>(context, listen: false);
-        userState.verifyEmail(_emailController.text);
+        //userState.verifyEmail(_emailController.text);
         await userState.registerAccount(_emailController.text,
             _userNameController.text, _passwordController.text);
         // print("sign up success");
@@ -160,7 +160,14 @@ class _RegisterFormState extends State<RegisterForm> {
                     : SizedBox(),
                 _buildSecondaryButtons(userState),
                 PrimaryButton(
-                  onPressed: submit,
+                  onPressed: () {
+                    submit();
+                    final snackBar = SnackBar(
+                      content: Text(
+                          'A verification email has been sent to ${_emailController.text}'),
+                    );
+                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                  },
                   child: Text('SIGN UP'),
                 ),
               ],
