@@ -100,6 +100,10 @@ class UserProfileProvider with ChangeNotifier {
       PostProvider.setPost(post);
     }
   }
+
+  void updateToken(String token) async {
+    await firestoreService.updateNotificationToken(userId, token);
+  }
 }
 
 class FirestoreService {
@@ -146,6 +150,13 @@ class FirestoreService {
         .collection('userProfiles')
         .doc(userProfile.userId)
         .set(userProfile.toMap(), options);
+  }
+
+  Future<void> updateNotificationToken(String userId, String token) {
+    return _firestore
+        .collection('userProfiles')
+        .doc(userId)
+        .update({'notificationToken': token});
   }
 
   // Delete

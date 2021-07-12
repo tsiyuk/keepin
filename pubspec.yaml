@@ -33,6 +33,7 @@ dependencies:
   wechat_assets_picker: ^5.5.5
   flutter_spinkit: "^5.0.0"
   firebase_messaging: ^10.0.3
+  flutter_local_notifications: ^5.0.0
 
 
   # The following adds the Cupertino Icons font to your application.

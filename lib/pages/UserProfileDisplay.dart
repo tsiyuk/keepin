@@ -130,9 +130,9 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
                         child: Text('Contact'),
                         onPressed: () async {
                           ChatRoom chatRoom;
+                          chatRoomProvider
+                              .setNewUser(userProfileProvider.userId);
                           if (await chatRoomProvider.isNotExist()) {
-                            chatRoomProvider
-                                .setNewUser(userProfileProvider.userId);
                             chatRoom = await chatRoomProvider.createChatRoom();
                           } else {
                             var temp = await chatRoomProvider.specifiedChatRoom;

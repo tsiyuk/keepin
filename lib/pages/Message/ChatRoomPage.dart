@@ -75,10 +75,4 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           }),
     );
   }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-  }
 }

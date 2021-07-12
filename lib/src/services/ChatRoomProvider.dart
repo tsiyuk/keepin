@@ -50,10 +50,18 @@ class ChatRoomProvider extends ChangeNotifier {
     }
   }
 
+  String getReceiverId() {
+    if (currentUser.uid == userIds[0]) {
+      return userIds[1];
+    } else {
+      return userIds[0];
+    }
+  }
+
   // Setters
   void setNewUser(String userId) {
-    _userIds[0] = currentUser.uid;
-    _userIds[1] = userId;
+    _userIds.insert(0, currentUser.uid);
+    _userIds.insert(1, userId);
     _userIds.sort();
     notifyListeners();
   }
@@ -89,6 +97,7 @@ class ChatRoomProvider extends ChangeNotifier {
     var message = Message(
         text: text,
         userId: currentUser.uid,
+        receiverId: getReceiverId(),
         timestamp: DateTime.now(),
         inviteCircleName: inviteCircleName);
     _latestMessage = message;
