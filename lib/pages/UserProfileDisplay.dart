@@ -132,10 +132,10 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
                           ChatRoom chatRoom;
                           chatRoomProvider
                               .setNewUser(userProfileProvider.userId);
-                          if (await chatRoomProvider.isNotExist()) {
+                          var temp = await chatRoomProvider.specifiedChatRoom;
+                          if (temp.isEmpty) {
                             chatRoom = await chatRoomProvider.createChatRoom();
                           } else {
-                            var temp = await chatRoomProvider.specifiedChatRoom;
                             chatRoom = temp[0];
                           }
                           // chatRoomProvider
