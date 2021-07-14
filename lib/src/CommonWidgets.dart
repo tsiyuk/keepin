@@ -281,10 +281,13 @@ TextH5 getTimeDisplay(String str) {
 
 Widget postDetail(BuildContext context, Post post) {
   return Row(
+    crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Container(
-        width: 50,
+        width: 70,
+        padding: EdgeInsets.all(10),
         child: Column(
+          mainAxisSize: MainAxisSize.max,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
             ImageButton(
@@ -296,7 +299,7 @@ Widget postDetail(BuildContext context, Post post) {
                 post.posterAvatarLink!,
                 fit: BoxFit.cover,
               ),
-              size: 40,
+              size: 46,
             ),
             SizedBox(
               height: 10,
@@ -305,14 +308,31 @@ Widget postDetail(BuildContext context, Post post) {
           ],
         ),
       ),
+      SizedBox(width: 10),
       Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          SizedBox(height: 10),
           TextH2(post.title),
-          Text(
-            post.text,
-            maxLines: 8,
+          ConstrainedBox(
+            constraints: new BoxConstraints(
+              minHeight: 60.0,
+              maxWidth: MediaQuery.of(context).size.width - 100,
+              maxHeight: 200.0,
+            ),
+            child: Container(
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Text(
+                  post.text,
+                ),
+              ),
+            ),
           ),
-          getTimeDisplay(post.timestamp.toString()),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: getTimeDisplay(post.timestamp.toString()),
+          ),
         ],
       )
     ],
