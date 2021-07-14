@@ -322,6 +322,7 @@ Widget postDetail(BuildContext context, Post post) {
             ),
             child: Container(
               child: SingleChildScrollView(
+                physics: BouncingScrollPhysics(),
                 scrollDirection: Axis.vertical,
                 child: Text(
                   post.text,

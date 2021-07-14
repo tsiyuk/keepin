@@ -11,38 +11,25 @@ class ProfileHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        height: 80,
+        height: 70,
         padding: EdgeInsets.all(16).copyWith(left: 0),
-        child: Column(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                BackButton(color: Colors.white),
-                Expanded(
-                  child: Text(
-                    userProfile.userName,
-                    style: TextStyle(
-                      fontSize: 24,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
+            BackButton(color: Colors.white),
+            Expanded(
+              child: Text(
+                userProfile.userName,
+                style: TextStyle(
+                  fontSize: 24,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
                 ),
-                SizedBox(width: 4),
-              ],
-            )
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            SizedBox(width: 4),
           ],
         ),
-      );
-
-  Widget buildIcon(IconData icon) => Container(
-        padding: EdgeInsets.all(5),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.white54,
-        ),
-        child: Icon(icon, size: 25, color: Colors.white),
       );
 }
