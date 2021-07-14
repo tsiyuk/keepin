@@ -317,44 +317,4 @@ Widget postDetail(BuildContext context, Post post) {
       )
     ],
   );
-
-  ListTile(
-    leading: Container(
-      height: 150,
-      width: 50,
-      child: Column(
-        children: [
-          Container(
-            height: 40,
-            child: ImageButton(
-              onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => UserProfileDisplay(post.posterId)));
-              },
-              image: Image.network(
-                post.posterAvatarLink!,
-                fit: BoxFit.cover,
-              ),
-              size: 40,
-            ),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          TextH5(post.posterName)
-        ],
-      ),
-    ),
-    title: Text(post.title),
-    subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(
-          height: 100,
-          child: Text(
-            post.text,
-            maxLines: 8,
-          )),
-      getTimeDisplay(post.timestamp.toString()),
-    ]),
-    minLeadingWidth: 20,
-  );
 }
