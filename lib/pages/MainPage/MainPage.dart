@@ -49,22 +49,20 @@ class _MainPageState extends State<MainPage> {
 
     flutterLocalNotificationsPlugin.initialize(initializationSettings);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      RemoteNotification? notification = message.notification;
-      AndroidNotification? android = message.notification?.android;
-      if (notification != null && android != null) {
-        flutterLocalNotificationsPlugin.show(
-            notification.hashCode,
-            notification.title,
-            notification.body,
-            NotificationDetails(
-              android: AndroidNotificationDetails(
-                channel.id,
-                channel.name,
-                channel.description,
-                icon: android.smallIcon,
-              ),
-            ));
-      }
+      RemoteNotification notification = message.notification!;
+      AndroidNotification android = notification.android!;
+      flutterLocalNotificationsPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              channel.id,
+              channel.name,
+              channel.description,
+              icon: android.smallIcon,
+            ),
+          ));
     });
     getToken();
   }
@@ -80,7 +78,11 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context);
-    userProfileProvider.updateToken(token!);
+    if (token != null) {
+      // this is to avoid the error ! used on null value
+      userProfileProvider.updateToken(token!);
+    }
+
     List<Widget> _subPages = <Widget>[
       // TODO to add sub-pages
       HomePage(),

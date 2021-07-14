@@ -188,7 +188,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
               ),
             );
           } else {
-            return Text('null');
+            return Center(child: Text('No follow feed'));
           }
         });
   }
