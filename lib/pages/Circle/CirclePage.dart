@@ -46,7 +46,8 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
       isMember = temp;
       loading = false;
     });
-    cp.addCircleHistory();
+    //will add history repeatedly because build is called repeatedly
+    //cp.addCircleHistory();
   }
 
   @override

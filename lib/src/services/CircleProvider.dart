@@ -374,12 +374,20 @@ class FirestoreService {
 
   /// Update the exp of the user
   Future<void> updateExp(String circleName, String userId, num exp) {
-    return _firebaseFirestore
+    var futures = <Future>[];
+    futures.add(_firebaseFirestore
+        .collection('circles')
+        .doc(circleName)
+        .collection('userIds')
+        .doc(userId)
+        .update({'exp': exp}));
+    futures.add(_firebaseFirestore
         .collection('userProfiles')
         .doc(userId)
         .collection('circlesJoined')
         .doc(circleName)
-        .update({'exp': exp});
+        .update({'exp': exp}));
+    return Future.wait(futures);
   }
 
   /// Add an admin
@@ -393,6 +401,7 @@ class FirestoreService {
         .set({
       'userId': circle.adminUserId,
       'isAdmin': true,
+      'exp': 0,
     });
   }
 
@@ -406,6 +415,7 @@ class FirestoreService {
         .set({
       'userId': userId,
       'isAdmin': false,
+      'exp': 0,
     });
   }
 

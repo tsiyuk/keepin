@@ -13,7 +13,6 @@ import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:provider/provider.dart';
 
 import '../Circle/CirclePage.dart';
-import '../UserProfileDisplay.dart';
 
 class HomePage extends StatelessWidget {
   // to prevent creating multiple HomePage at different time to save memory
