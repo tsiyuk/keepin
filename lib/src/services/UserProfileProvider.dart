@@ -8,7 +8,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/Post.dart';
 import 'package:keepin/src/models/UserProfile.dart';
+import 'package:keepin/src/models/Utils.dart';
 import 'package:keepin/src/services/PostProvider.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 
 /*
   This class provide the methods related to CURD of UserProfile
@@ -70,16 +72,22 @@ class UserProfileProvider with ChangeNotifier {
     ImagePicker imagePicker = ImagePicker();
     final pickedFile = await imagePicker.getImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      File image = File(pickedFile.path);
-      String fileName = image.path;
-      Reference firebaseStorageRef = FirebaseStorage.instance
-          .ref()
-          .child('userAvatars')
-          .child(userId)
-          .child(fileName);
-      TaskSnapshot task = await firebaseStorageRef.putFile(image);
-      _avatarURL = await firebaseStorageRef.getDownloadURL();
-      notifyListeners();
+      File file = File(pickedFile.path);
+      File? image = await Utils.compress(file);
+      if (image != null) {
+        String fileName = image.path;
+        Reference firebaseStorageRef = FirebaseStorage.instance
+            .ref()
+            .child('userAvatars')
+            .child(userId)
+            .child(fileName);
+        TaskSnapshot task = await firebaseStorageRef.putFile(image);
+        _avatarURL = await firebaseStorageRef.getDownloadURL();
+        notifyListeners();
+      } else {
+        throw FirebaseException(
+            plugin: 'Firebase upload', code: 'Upload failed');
+      }
     }
   }
 

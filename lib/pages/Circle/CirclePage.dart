@@ -9,8 +9,6 @@ import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:keepin/src/services/PostProvider.dart';
 import 'package:provider/provider.dart';
 
-import '../UserProfileDisplay.dart';
-
 class CirclePage extends StatefulWidget {
   final CircleInfo? circleInfo;
   final Circle circle;

@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:keepin/src/models/Circle.dart';
+import 'package:keepin/src/models/Utils.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class CircleProvider with ChangeNotifier {
@@ -101,7 +102,8 @@ class CircleProvider with ChangeNotifier {
     final List<AssetEntity>? assets =
         await AssetPicker.pickAssets(context, maxAssets: 1);
     if (assets != null) {
-      _avatar = await assets[0].file;
+      File? image = await Utils.compress(await assets[0].file);
+      _avatar = image;
       notifyListeners();
       return Future.value(_avatar!);
     } else {
