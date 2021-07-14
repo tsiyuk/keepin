@@ -46,6 +46,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
       isMember = temp;
       loading = false;
     });
+    cp.addCircleHistory();
   }
 
   @override

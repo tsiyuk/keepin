@@ -242,6 +242,10 @@ class CircleProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void addCircleHistory() async {
+    await _firestoreService.updateCircleHistory(user.uid, circleName, tags);
+  }
+
   /// quit the circle
   void quitCircle() async {
     await _firestoreService.removeUser(circleName, user.uid);
@@ -419,6 +423,19 @@ class FirestoreService {
         .collection('circles')
         .doc(circleName)
         .update({'description': description, 'descritpionImageURLs': urls});
+  }
+
+  Future<void> updateCircleHistory(
+      String userId, String circleName, List<String> tags) {
+    return _firebaseFirestore
+        .collection('userProfiles')
+        .doc(userId)
+        .collection('circleHistory')
+        .add({
+      'circleName': circleName,
+      'tags': tags,
+      'timestamp': DateTime.now().toUtc(),
+    });
   }
 
   // remove a user from the circle

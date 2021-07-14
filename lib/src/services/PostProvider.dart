@@ -20,6 +20,7 @@ class PostProvider with ChangeNotifier {
   List<String> _imageLinks = [];
   List<String> _tags = [];
   num _numOfLikes = 0;
+  User currentUser = FirebaseAuth.instance.currentUser!;
 
   FirestoreService _firestoreService = FirestoreService();
 
@@ -170,17 +171,21 @@ class PostProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addComments(String postId, User commenter, String text, String? replyTo,
-      String? replyToId) {
-    _firestoreService.addComment(Comment(
+  void addComments(
+      String postId, String text, String? replyTo, String? replyToId) async {
+    await _firestoreService.addComment(Comment(
       postId: postId,
-      commenterName: commenter.displayName!,
-      commenterId: commenter.uid,
+      commenterName: currentUser.displayName!,
+      commenterId: currentUser.uid,
       text: text,
       timestamp: DateTime.now(),
       replyTo: replyTo,
       replyToId: replyToId,
     ));
+  }
+
+  void addPostHistory(String postId, List<String> tags) async {
+    await _firestoreService.updatePostHistory(currentUser.uid, postId, tags);
   }
 }
 
@@ -289,6 +294,19 @@ class FirestoreService {
         .doc(comment.postId)
         .collection('comments')
         .add(comment.toMap());
+  }
+
+  Future<void> updatePostHistory(
+      String userId, String postId, List<String> tags) {
+    return _firestore
+        .collection('userProfiles')
+        .doc(userId)
+        .collection('postHistory')
+        .add({
+      'postId': postId,
+      'tags': tags,
+      'timestamp': DateTime.now().toUtc(),
+    });
   }
 
   Future<void> removePost(String postId) {
