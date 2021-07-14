@@ -27,8 +27,8 @@ class UserState extends ChangeNotifier {
   LoginState _loginState = LoginState.loggedOut;
   LoginState get loginState => _loginState;
 
-  User? _user;
-  User? get user => _user;
+  static User? _user;
+  static User? get user => _user;
 
   // methods related to log in
 

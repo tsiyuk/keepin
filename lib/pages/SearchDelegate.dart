@@ -179,51 +179,8 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
             return ListView.separated(
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  // to be refactored
-                  leading: Container(
-                    height: 150,
-                    width: 50,
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 40,
-                          child: ImageButton(
-                            onPressed: () {
-                              Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          UserProfileDisplay(
-                                              snapshot
-                                                  .data![
-                                              index]
-                                                  .posterId)));
-                            },
-                            image: Image.network(
-                              snapshot.data![index]
-                                  .posterAvatarLink!,
-                              fit: BoxFit.cover,
-                            ),
-                            size: 40,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        TextH5(
-                            snapshot.data![index].posterName)
-                      ],
-                    ),
-                  ),
-                  title: Text(snapshot.data![index].title),
-                  subtitle: Container(
-                      height: 100,
-                      child: Text(
-                        snapshot.data![index].text,
-                        maxLines: 8,
-                      )),
-                  minLeadingWidth: 20,
-                );
+                Post post = snapshot.data![index];
+                return postDetail(context, post);
               },
               separatorBuilder: (c, i) => Container(
                 height: 10,
@@ -231,7 +188,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
               ),
             );
           } else {
-            return Text('null');
+            return Center(child: Text('No follow feed'));
           }
         });
   }

@@ -2,6 +2,8 @@
   This class contains the information of the post: its poster, content, likes and comments
 */
 
+import 'package:keepin/src/models/Utils.dart';
+
 class Post {
   // postId will be initialized when a document in firestore is created
   String? postId;
@@ -13,21 +15,22 @@ class Post {
   String text;
   List<String> imageLinks = [];
   num numOfLikes = 0;
-  num timestamp;
-  String time;
+  DateTime timestamp;
+  List<String> tags = [];
 
-  Post(
-      {this.postId,
-      required this.posterId,
-      required this.posterName,
-      this.posterAvatarLink,
-      required this.circleName,
-      required this.text,
-      required this.title,
-      required this.imageLinks,
-      required this.numOfLikes,
-      required this.timestamp,
-      required this.time});
+  Post({
+    this.postId,
+    required this.posterId,
+    required this.posterName,
+    this.posterAvatarLink,
+    required this.circleName,
+    required this.text,
+    required this.title,
+    required this.imageLinks,
+    required this.numOfLikes,
+    required this.timestamp,
+    required this.tags,
+  });
 
   // factory method to retrive data from firestore
   factory Post.fromJson(Map<String, dynamic> json) {
@@ -41,8 +44,8 @@ class Post {
       title: json['title'],
       imageLinks: List.castFrom(json['imageLinks']),
       numOfLikes: json['numOfLikes'],
-      timestamp: json['timestamp'],
-      time: json['time'],
+      timestamp: Utils.toDateTime(json['timestamp']),
+      tags: List.castFrom(json['tags']),
     );
   }
 
@@ -58,8 +61,8 @@ class Post {
       'title': title,
       'imageLinks': imageLinks,
       'numOfLikes': numOfLikes,
-      'timestamp': timestamp,
-      'time': time,
+      'timestamp': timestamp.toUtc(),
+      'tags': tags,
     };
   }
 

@@ -1,0 +1,69 @@
+import 'package:flutter/material.dart';
+import 'package:keepin/src/Loading.dart';
+import 'package:keepin/src/models/ChatRoom.dart';
+import 'package:keepin/src/models/Message.dart';
+import 'package:keepin/src/models/UserProfile.dart';
+import 'package:keepin/src/services/ChatRoomProvider.dart';
+import 'package:keepin/src/services/UserProfileProvider.dart';
+import 'package:provider/provider.dart';
+
+import 'Message.dart';
+
+class MessagesWidget extends StatelessWidget {
+  final ChatRoom chatRoom;
+  final UserProfile userProfile;
+
+  const MessagesWidget({
+    Key? key,
+    required this.chatRoom,
+    required this.userProfile,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    ChatRoomProvider chatRoomProvider =
+        Provider.of<ChatRoomProvider>(context, listen: false);
+    UserProfileProvider userProfileProvider =
+        Provider.of<UserProfileProvider>(context, listen: false);
+    var myId = chatRoomProvider.currentUser.uid;
+    return StreamBuilder<List<Message>>(
+      stream: chatRoomProvider.messages,
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return Loading(50);
+          default:
+            if (snapshot.hasError) {
+              return buildText('Something Went Wrong Try later');
+            } else {
+              var messages = snapshot.data;
+
+              return messages == null || messages.isEmpty
+                  ? buildText('Say Hi..')
+                  : ListView.builder(
+                      physics: BouncingScrollPhysics(),
+                      reverse: true,
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        final message = messages[index];
+
+                        return MessageWidget(
+                          message: message,
+                          isMe: message.userId == myId,
+                          userProfile: userProfile,
+                        );
+                      },
+                    );
+            }
+        }
+      },
+    );
+  }
+
+  Widget buildText(String text) => Center(
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 24),
+        ),
+      );
+}

@@ -1,10 +1,14 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:keepin/pages/Message/ChatRoomPage.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/Loading.dart';
+import 'package:keepin/src/models/ChatRoom.dart';
 import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/UserProfile.dart';
+import 'package:keepin/src/services/ChatRoomProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:provider/provider.dart';
 
@@ -50,7 +54,7 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context);
     initUser(userProfileProvider);
-
+    ChatRoomProvider chatRoomProvider = Provider.of<ChatRoomProvider>(context);
     return Scaffold(
       appBar: AppBar(),
       body: loading
@@ -121,10 +125,39 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
                       ],
                     ),
                   ),
+                  if (widget.userId != FirebaseAuth.instance.currentUser!.uid)
+                    PrimaryButton(
+                        child: Text('Contact'),
+                        onPressed: () async {
+                          ChatRoom chatRoom;
+                          chatRoomProvider
+                              .setNewUser(userProfileProvider.userId);
+                          var temp = await chatRoomProvider.specifiedChatRoom;
+                          if (temp.isEmpty) {
+                            chatRoom = await chatRoomProvider.createChatRoom();
+                          } else {
+                            chatRoom = temp[0];
+                          }
+                          // chatRoomProvider
+                          //     .setNewUser(userProfileProvider.userId);
+                          // chatRoom = await chatRoomProvider.createChatRoom();
+                          Navigator.of(context).push(MaterialPageRoute(
+                              builder: (context) =>
+                                  ChatRoomPage(chatRoom: chatRoom)));
+                        })
+                  else
+                    Container(),
                 ],
               ),
             ),
     );
+  }
+
+  @override
+  void setState(fn) {
+    if (mounted) {
+      super.setState(fn);
+    }
   }
 }
 

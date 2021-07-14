@@ -7,7 +7,6 @@ import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/Post.dart';
-import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:keepin/src/services/PostProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
@@ -201,49 +200,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
               itemBuilder: (context, index) {
                 Post post = snapshot.data![index];
                 userProfileProvider.updatePosterInfo(post);
-                return ListTile(
-                  // to be refactored
-                  leading: Container(
-                    height: 150,
-                    width: 50,
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 40,
-                          child: ImageButton(
-                            onPressed: () {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) =>
-                                      UserProfileDisplay(post.posterId)));
-                            },
-                            image: Image.network(
-                              post.posterAvatarLink!,
-                              fit: BoxFit.cover,
-                            ),
-                            size: 40,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        TextH5(post.posterName)
-                      ],
-                    ),
-                  ),
-                  title: Text(post.title),
-                  subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                            height: 100,
-                            child: Text(
-                              post.text,
-                              maxLines: 8,
-                            )),
-                        getTimeDisplay(post.time),
-                      ]),
-                  minLeadingWidth: 20,
-                );
+                return postDetail(context, post);
               },
               separatorBuilder: (c, i) => Container(
                 height: 10,
@@ -251,7 +208,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
               ),
             );
           } else {
-            return Text('No posts');
+            return Center(child: Text('No posts'));
           }
         });
   }

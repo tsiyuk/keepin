@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:keepin/pages/Circle/CirclePage.dart';
 import 'package:keepin/pages/UserProfileDisplay.dart';
 import 'package:keepin/src/CommonWidgets.dart';
-import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/CircleProvider.dart';

@@ -23,6 +23,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
   Widget build(BuildContext context) {
     PostProvider postProvider =
         Provider.of<PostProvider>(context, listen: false);
+    CircleProvider circleProvider =
+        Provider.of<CircleProvider>(context, listen: false);
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -35,7 +37,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
               controller: _titleController,
               decoration: InputDecoration(labelText: 'Title'),
               onTap: () {
-                postProvider.initPostInfo(widget.user, widget.circleName);
+                postProvider.initPostInfo(
+                    widget.user, widget.circleName, circleProvider.tags);
               },
               onEditingComplete: () {
                 postProvider.changeTitle(_titleController.text);
@@ -46,7 +49,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
               controller: _textController,
               decoration: InputDecoration(labelText: 'Text'),
               onTap: () {
-                postProvider.initPostInfo(widget.user, widget.circleName);
+                postProvider.initPostInfo(
+                    widget.user, widget.circleName, circleProvider.tags);
               },
               onEditingComplete: () {
                 postProvider.changeText(_textController.text);
@@ -61,7 +65,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 setState(() {
                   isUploadCompleted = false;
                 });
-                postProvider.initPostInfo(widget.user, widget.circleName);
+                postProvider.initPostInfo(
+                    widget.user, widget.circleName, circleProvider.tags);
                 await postProvider.uploadAssets(context);
                 setState(() {
                   isUploadCompleted = true;
