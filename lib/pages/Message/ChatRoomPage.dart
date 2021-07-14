@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:keepin/pages/Message/widget/messages_widget.dart';
-import 'package:keepin/pages/Message/widget/new_message_widget.dart';
-import 'package:keepin/pages/Message/widget/profile_header_widget.dart';
+import 'package:keepin/pages/Message/widget/Messages.dart';
+import 'package:keepin/pages/Message/widget/NewMessage.dart';
+import 'package:keepin/pages/Message/widget/ProfileHeader.dart';
 import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/ChatRoom.dart';
 import 'package:keepin/src/models/UserProfile.dart';

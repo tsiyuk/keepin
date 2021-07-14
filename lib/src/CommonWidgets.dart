@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:keepin/pages/UserProfileDisplay.dart';
+import 'package:keepin/src/models/Post.dart';
 
 class Header extends StatelessWidget {
   const Header(this.heading);
@@ -275,4 +277,84 @@ void showWarning(BuildContext context, String str) {
 /// Return a substring of time to display
 TextH5 getTimeDisplay(String str) {
   return TextH5(str.substring(0, 16));
+}
+
+Widget postDetail(BuildContext context, Post post) {
+  return Row(
+    children: [
+      Container(
+        width: 50,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            ImageButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => UserProfileDisplay(post.posterId)));
+              },
+              image: Image.network(
+                post.posterAvatarLink!,
+                fit: BoxFit.cover,
+              ),
+              size: 40,
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            TextH5(post.posterName)
+          ],
+        ),
+      ),
+      Column(
+        children: [
+          TextH2(post.title),
+          Text(
+            post.text,
+            maxLines: 8,
+          ),
+          getTimeDisplay(post.timestamp.toString()),
+        ],
+      )
+    ],
+  );
+
+  ListTile(
+    leading: Container(
+      height: 150,
+      width: 50,
+      child: Column(
+        children: [
+          Container(
+            height: 40,
+            child: ImageButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => UserProfileDisplay(post.posterId)));
+              },
+              image: Image.network(
+                post.posterAvatarLink!,
+                fit: BoxFit.cover,
+              ),
+              size: 40,
+            ),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          TextH5(post.posterName)
+        ],
+      ),
+    ),
+    title: Text(post.title),
+    subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(
+          height: 100,
+          child: Text(
+            post.text,
+            maxLines: 8,
+          )),
+      getTimeDisplay(post.timestamp.toString()),
+    ]),
+    minLeadingWidth: 20,
+  );
 }

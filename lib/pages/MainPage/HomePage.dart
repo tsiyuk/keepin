@@ -250,7 +250,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
               ),
             );
           } else {
-            return Text('No posts');
+            return Center(child: Text('No posts'));
           }
         });
   }
