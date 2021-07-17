@@ -7,6 +7,7 @@ import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/Post.dart';
+import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:keepin/src/services/PostProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
@@ -62,6 +63,7 @@ class HomePage extends StatelessWidget {
                             onPressed: () async {
                               Circle circle = await circleProvider
                                   .readCircleFromName(data.circleName);
+                              circleProvider.addCircleHistory(circle);
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -172,7 +174,10 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
         Expanded(
           child: TabBarView(
             controller: _tabController,
-            children: [_buildFollowFeed(context), _buildRecommendation()],
+            children: [
+              _buildFollowFeed(context),
+              _buildRecommendation(context)
+            ],
           ),
         )
       ],
@@ -212,7 +217,41 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
         });
   }
 
-  Widget _buildRecommendation() {
-    return Center(child: Text("Coming soon"));
+  Widget _buildRecommendation(BuildContext context) {
+    UserProfileProvider userProfileProvider =
+        Provider.of<UserProfileProvider>(context, listen: false);
+    initUser(context);
+    return StreamBuilder<List<Post>>(
+        initialData: [],
+        stream: userProfileProvider.recommandPost,
+        builder: (context, snapshot) {
+          if (snapshot.data == []) {
+            return Loading(40);
+          }
+          if (snapshot.data != null) {
+            return ListView.separated(
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                Post post = snapshot.data![index];
+                userProfileProvider.updatePosterInfo(post);
+                return postDetail(context, post);
+              },
+              separatorBuilder: (c, i) => Container(
+                height: 10,
+                color: Colors.blueGrey.shade100,
+              ),
+            );
+          } else {
+            return Center(child: Text('No recommand posts'));
+          }
+        });
+  }
+
+  void initUser(BuildContext context) async {
+    UserProfileProvider userProfileProvider =
+        Provider.of<UserProfileProvider>(context);
+    final UserProfile userProfile = await userProfileProvider
+        .readUserProfile(FirebaseAuth.instance.currentUser!.uid);
+    userProfileProvider.load(userProfile);
   }
 }

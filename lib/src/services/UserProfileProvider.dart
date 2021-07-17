@@ -43,6 +43,11 @@ class UserProfileProvider with ChangeNotifier {
     return await firestoreService.getUserProfile(userId);
   }
 
+  Stream<List<Circle>> get recommandCircles =>
+      firestoreService.getRecommandCircle(tags);
+  Stream<List<Post>> get recommandPost =>
+      firestoreService.getRecommandPost(tags);
+
   // Setters
   void changeUserName(String userName) {
     _userName = userName;
@@ -224,6 +229,24 @@ class FirestoreService {
       result.add(r);
     }
     return result;
+  }
+
+  Stream<List<Circle>> getRecommandCircle(List<String> tags) {
+    return _firestore
+        .collection('circles')
+        .where('tags', arrayContainsAny: tags)
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => Circle.fromJson(doc.data())).toList());
+  }
+
+  Stream<List<Post>> getRecommandPost(List<String> tags) {
+    return _firestore
+        .collection('posts')
+        .where('tags', arrayContainsAny: tags)
+        .snapshots()
+        .map((snapshot) =>
+            snapshot.docs.map((doc) => Post.fromJson(doc.data())).toList());
   }
 
   // Delete

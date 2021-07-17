@@ -6,7 +6,9 @@ import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/Post.dart';
 import 'package:keepin/src/models/UserProfile.dart';
+import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:keepin/src/services/SearchService.dart';
+import 'package:provider/provider.dart';
 
 class SearchData extends SearchDelegate<dynamic> {
   @override
@@ -196,8 +198,10 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
 
 class CircleBuilder {
   static Widget buildCircle(Circle circle, BuildContext context) {
+    CircleProvider circleProvider = Provider.of<CircleProvider>(context);
     return GestureDetector(
       onTap: () {
+        circleProvider.addCircleHistory(circle);
         Navigator.of(context).push((MaterialPageRoute(
             builder: (context) => CirclePage(circle: circle))));
       },

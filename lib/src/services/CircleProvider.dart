@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:keepin/src/models/Circle.dart';
+import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/models/Utils.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
@@ -72,6 +73,11 @@ class CircleProvider with ChangeNotifier {
     } else {
       throw Exception('The user has not joined the circle');
     }
+  }
+
+  /// Get the user ranking of the circle
+  Future<List<UserProfile>> readUserRank() {
+    return _firestoreService.getUsers(circleName);
   }
 
   // Checking
@@ -235,15 +241,16 @@ class CircleProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addDescritpion(String text) async {
+  void setDescritpion(String text) async {
     _description = text;
     await _firestoreService.updateDescription(
         circleName, _description, _descriptionImageURLs);
     notifyListeners();
   }
 
-  void addCircleHistory() async {
-    await _firestoreService.updateCircleHistory(user.uid, circleName, tags);
+  void addCircleHistory(Circle circle) async {
+    await _firestoreService.updateCircleHistory(
+        user.uid, circle.circleName, circle.tags);
   }
 
   /// quit the circle
@@ -315,6 +322,28 @@ class FirestoreService {
             code: 'The circle have not been created');
       }
     });
+  }
+
+  Future<List<UserProfile>> getUsers(String circleName) async {
+    List<String> userIds = await _firebaseFirestore
+        .collection('circles')
+        .doc(circleName)
+        .collection('userIds')
+        .orderBy('exp', descending: true)
+        .get()
+        .then((value) => value.docs
+            .map((value) => value.data()['userId'].toString())
+            .toList());
+    List<UserProfile> result = [];
+    for (String userId in userIds) {
+      var r = await _firebaseFirestore
+          .collection('userProfiles')
+          .doc(userId)
+          .get()
+          .then((value) => UserProfile.fromJson(value.data()!));
+      result.add(r);
+    }
+    return result;
   }
 
   Future<bool> isCircleExist(String name) {

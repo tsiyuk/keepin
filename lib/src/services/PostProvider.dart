@@ -184,8 +184,9 @@ class PostProvider with ChangeNotifier {
     ));
   }
 
-  void addPostHistory(String postId, List<String> tags) async {
-    await _firestoreService.updatePostHistory(currentUser.uid, postId, tags);
+  void addPostHistory(Post post) async {
+    await _firestoreService.updatePostHistory(
+        currentUser.uid, post.posterId, post.tags);
   }
 }
 
