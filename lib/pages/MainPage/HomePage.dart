@@ -221,30 +221,34 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context, listen: false);
     initUser(context);
-    return StreamBuilder<List<Post>>(
-        initialData: [],
-        stream: userProfileProvider.recommandPost,
-        builder: (context, snapshot) {
-          if (snapshot.data == []) {
-            return Loading(40);
-          }
-          if (snapshot.data != null) {
-            return ListView.separated(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                Post post = snapshot.data![index];
-                userProfileProvider.updatePosterInfo(post);
-                return postDetail(context, post);
-              },
-              separatorBuilder: (c, i) => Container(
-                height: 10,
-                color: Colors.blueGrey.shade100,
-              ),
-            );
-          } else {
-            return Center(child: Text('No recommand posts'));
-          }
-        });
+    return userProfileProvider.tags.isEmpty
+        ? Container(
+            child: Text('No recommand posts'),
+          )
+        : StreamBuilder<List<Post>>(
+            initialData: [],
+            stream: userProfileProvider.recommandPost,
+            builder: (context, snapshot) {
+              if (snapshot.data == []) {
+                return Loading(40);
+              }
+              if (snapshot.data != null) {
+                return ListView.separated(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    Post post = snapshot.data![index];
+                    userProfileProvider.updatePosterInfo(post);
+                    return postDetail(context, post);
+                  },
+                  separatorBuilder: (c, i) => Container(
+                    height: 10,
+                    color: Colors.blueGrey.shade100,
+                  ),
+                );
+              } else {
+                return Center(child: Text('No recommand posts'));
+              }
+            });
   }
 
   void initUser(BuildContext context) async {
