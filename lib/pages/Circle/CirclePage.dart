@@ -10,6 +10,8 @@ import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:keepin/src/services/PostProvider.dart';
 import 'package:provider/provider.dart';
 
+import '../TagSelector.dart';
+
 class CirclePage extends StatefulWidget {
   final CircleInfo? circleInfo;
   final Circle circle;
@@ -137,10 +139,17 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                   child: TabBarView(
                     controller: _tabController,
                     children: [
-                      Center(
-                          child: circleProvider.description != null
-                              ? Text(circleProvider.description!)
-                              : Text("No Description")),
+                      Column(
+                        children: [
+                          Center(
+                              child: circleProvider.description != null
+                                  ? Text(circleProvider.description!)
+                                  : Text("No Description")),
+                          circleProvider.isAdmin(user.uid)
+                              ? _buildTags(context, circleProvider.tags)
+                              : Container(),
+                        ],
+                      ),
                       StreamBuilder<List<Post>>(
                           stream: postProvider
                               .readPostsFromCircle(widget.circle.circleName),
@@ -213,6 +222,23 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
           size: 30,
         ),
       ),
+    );
+  }
+
+  Widget _buildTags(BuildContext context, List<String> tags) {
+    CircleProvider circleProvider =
+        Provider.of<CircleProvider>(context, listen: false);
+    List<String> temp = circleProvider.tags;
+    return Column(
+      children: [
+        TagSelector(texts: temp),
+        PrimaryButton(
+          child: Text('Save'),
+          onPressed: () {
+            circleProvider.setTags(temp);
+          },
+        )
+      ],
     );
   }
 }

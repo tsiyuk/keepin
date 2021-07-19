@@ -13,7 +13,6 @@ class CreateCirclePage extends StatefulWidget {
 
 class _CreateCirclePageState extends State<CreateCirclePage> {
   final _textController = TextEditingController();
-  final _tagsController = TextEditingController();
   final tags = <String>[];
   final double _avatarSize = 120;
   bool isPublic = true;

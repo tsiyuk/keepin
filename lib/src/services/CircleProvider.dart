@@ -253,6 +253,10 @@ class CircleProvider with ChangeNotifier {
         user.uid, circle.circleName, circle.tags);
   }
 
+  void setTags(List<String> tags) async {
+    await _firestoreService.updateTags(circleName, tags);
+  }
+
   /// quit the circle
   void quitCircle() async {
     await _firestoreService.removeUser(circleName, user.uid);
@@ -475,6 +479,13 @@ class FirestoreService {
       'tags': tags,
       'timestamp': DateTime.now().toUtc(),
     });
+  }
+
+  Future<void> updateTags(String circleName, List<String> tags) {
+    return _firebaseFirestore
+        .collection('circles')
+        .doc(circleName)
+        .update({'tags': tags});
   }
 
   // remove a user from the circle

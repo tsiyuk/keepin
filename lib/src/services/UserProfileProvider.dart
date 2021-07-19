@@ -249,6 +249,7 @@ class FirestoreService {
   Stream<List<Post>> getRecommandPost(List<String> tags) {
     return _firestore
         .collection('posts')
+        //.orderBy('timestamp', descending: true)
         .where('tags', arrayContainsAny: tags)
         .snapshots()
         .map((snapshot) =>
