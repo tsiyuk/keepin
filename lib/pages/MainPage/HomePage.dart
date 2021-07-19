@@ -254,8 +254,8 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
   void initUser(BuildContext context) async {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context);
-    final UserProfile userProfile = await userProfileProvider
-        .readUserProfile(FirebaseAuth.instance.currentUser!.uid);
+    final UserProfile userProfile =
+        await userProfileProvider.readUserProfile(userProfileProvider.userId);
     userProfileProvider.load(userProfile);
   }
 }

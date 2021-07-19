@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:keepin/pages/TagSelector.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:provider/provider.dart';
@@ -74,15 +75,18 @@ class _CreateCirclePageState extends State<CreateCirclePage> {
               controller: _textController,
               decoration: InputDecoration(labelText: 'circleName'),
             ),
-            TextFormField(
-              controller: _tagsController,
-              decoration: InputDecoration(labelText: 'tag'),
-              onEditingComplete: () {
-                setState(() {
-                  tags.add(_tagsController.text);
-                });
-              },
-            ),
+            // TextFormField(
+            //   controller: _tagsController,
+            //   decoration: InputDecoration(labelText: 'tag'),
+            //   onEditingComplete: () {
+            //     setState(() {
+            //       tags.add(_tagsController.text);
+            //     });
+            //   },
+            // ),
+
+            // tag selector
+            TagSelector(texts: tags),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20.0),
               child: SwitchListTile(

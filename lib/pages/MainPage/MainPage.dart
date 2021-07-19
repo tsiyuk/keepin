@@ -1,6 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:keepin/pages/DiscoverPage.dart';
 import 'package:keepin/pages/MainPage/HomePage.dart';
 import 'package:keepin/pages/MainPage/MessagePage.dart';
 import 'package:keepin/pages/SearchDelegate.dart';
@@ -84,9 +85,8 @@ class _MainPageState extends State<MainPage> {
     }
 
     List<Widget> _subPages = <Widget>[
-      // TODO to add sub-pages
       HomePage(),
-      Text('Discover'),
+      DiscoverPage(),
       MessagePage(),
       // assume that the user has logged in
       UserProfilePage(UserState.user!),

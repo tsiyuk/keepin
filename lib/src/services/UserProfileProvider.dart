@@ -123,6 +123,12 @@ class UserProfileProvider with ChangeNotifier {
   void updateToken(String token) async {
     await firestoreService.updateNotificationToken(userId, token);
   }
+
+  void changeTags(List<String> tags) async {
+    _tags = tags;
+    await firestoreService.updateTags(userId, tags);
+    notifyListeners();
+  }
 }
 
 class FirestoreService {
@@ -247,6 +253,13 @@ class FirestoreService {
         .snapshots()
         .map((snapshot) =>
             snapshot.docs.map((doc) => Post.fromJson(doc.data())).toList());
+  }
+
+  Future<void> updateTags(String userId, List<String> tags) {
+    return _firestore
+        .collection('userProfiles')
+        .doc(userId)
+        .update({'tags': tags});
   }
 
   // Delete
