@@ -68,6 +68,14 @@ class UserProfileProvider with ChangeNotifier {
     _tags = userProfile.tags;
   }
 
+  void clear() {
+    _userId = '';
+    _userName = '';
+    _avatarURL = '';
+    _bio = '';
+    _tags = [];
+  }
+
   // save all the changes
   void saveChanges() {
     UserProfile userProfile =
@@ -249,8 +257,8 @@ class FirestoreService {
   Stream<List<Post>> getRecommandPost(List<String> tags) {
     return _firestore
         .collection('posts')
-        //.orderBy('timestamp', descending: true)
         .where('tags', arrayContainsAny: tags)
+        .orderBy('timestamp', descending: true)
         .snapshots()
         .map((snapshot) =>
             snapshot.docs.map((doc) => Post.fromJson(doc.data())).toList());

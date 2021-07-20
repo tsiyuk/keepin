@@ -32,7 +32,7 @@ class Circle {
         isPublic: json['isPublic'],
         adminUserId: json['adminUserId'],
         numOfMembers: json['numOfMembers'],
-        description: json['descritpyion'],
+        description: json['description'],
         descriptionImageURLs: json['descriptionImageURLs']);
   }
 

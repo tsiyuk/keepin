@@ -18,7 +18,6 @@ class _TagSelectorState extends State<TagSelector> {
   @override
   void initState() {
     super.initState();
-    // if you store data on a local database (sqflite), then you could do something like this
     getList();
   }
 
@@ -36,6 +35,7 @@ class _TagSelectorState extends State<TagSelector> {
       textField: TagsTextField(
         lowerCase: true,
         textStyle: TextStyle(fontSize: _fontSize),
+        autofocus: false,
         onSubmitted: (String str) {
           // Add item to the data source.
           TagProvider.addTag(str);

@@ -11,6 +11,7 @@ import 'package:keepin/src/services/PostProvider.dart';
 import 'package:provider/provider.dart';
 
 import '../TagSelector.dart';
+import '../UserProfileDisplay.dart';
 
 class CirclePage extends StatefulWidget {
   final CircleInfo? circleInfo;
@@ -28,7 +29,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 3, vsync: this, initialIndex: 1);
   }
 
   @override
@@ -49,15 +50,12 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
       isMember = temp;
       loading = false;
     });
-    //will add history repeatedly because build is called repeatedly
-    //cp.addCircleHistory();
   }
 
   @override
   Widget build(BuildContext context) {
     PostProvider postProvider = Provider.of<PostProvider>(context);
-    CircleProvider circleProvider =
-        Provider.of<CircleProvider>(context, listen: false);
+    CircleProvider circleProvider = Provider.of<CircleProvider>(context);
     initCircleInfo(circleProvider);
     Widget _profileSection = Container(
       padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 20.0),
@@ -78,7 +76,12 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
               subtitle: !isMember
                   ? TextH4(
                       'Join the ${widget.circle.circleName} and clock in every day')
-                  : TextH4('Clock in days: ${circleProvider.clockinCount}'),
+                  : Column(
+                      children: [
+                        TextH5('Clock in days: ${circleProvider.clockinCount}'),
+                        TextH5('Exp: ${circleProvider.exp}'),
+                      ],
+                    ),
             ),
           ),
         ],
@@ -148,6 +151,11 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                           circleProvider.isAdmin(user.uid)
                               ? _buildTags(context, circleProvider.tags)
                               : Container(),
+                          circleProvider.isAdmin(user.uid)
+                              ? Description(
+                                  initDescription: circleProvider.description,
+                                )
+                              : Container(),
                         ],
                       ),
                       StreamBuilder<List<Post>>(
@@ -195,7 +203,8 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                                 showError(context, e.code);
                               }
                             },
-                          )
+                          ),
+                          _buildRanks(context),
                         ]),
                       ),
                     ],
@@ -233,12 +242,114 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
       children: [
         TagSelector(texts: temp),
         PrimaryButton(
-          child: Text('Save'),
+          child: Text('Save Tags'),
           onPressed: () {
             circleProvider.setTags(temp);
           },
         )
       ],
     );
+  }
+
+  Widget _buildRanks(BuildContext context) {
+    CircleProvider circleProvider = Provider.of<CircleProvider>(context);
+    return Expanded(
+      child: FutureBuilder<List<UserProfile>>(
+        future: circleProvider.readUserRank(),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.waiting:
+              return Center(child: Loading(20.0));
+            default:
+              if (snapshot.hasError ||
+                  !snapshot.hasData ||
+                  snapshot.data!.length == 0) {
+                return Container(
+                  color: Theme.of(context).accentColor,
+                  alignment: Alignment.center,
+                  child: Text(
+                    'Error',
+                    style: TextStyle(fontSize: 28, color: Colors.white),
+                  ),
+                );
+              } else {
+                return ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: snapshot.data!.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => UserProfileDisplay(
+                                    snapshot.data![index].userId)));
+                          },
+                          child: Row(children: [
+                            TextH1(index.toString()),
+                            ListTile(
+                              leading: snapshot.data![index].avatarURL != null
+                                  ? ClipOval(
+                                      child: Image.network(
+                                        snapshot.data![index].avatarURL!,
+                                        width: 40,
+                                        height: 40,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : defaultAvatar(40),
+                              title: TextH3(snapshot.data![index].userName),
+                            ),
+                          ]));
+                    });
+              }
+          }
+        },
+      ),
+    );
+  }
+}
+
+class Description extends StatefulWidget {
+  final String? initDescription;
+  const Description({Key? key, this.initDescription}) : super(key: key);
+
+  @override
+  _DescriptionState createState() => _DescriptionState(initDescription);
+}
+
+class _DescriptionState extends State<Description> {
+  final String? text;
+  late final TextEditingController descriptionController;
+  _DescriptionState(this.text);
+  @override
+  void initState() {
+    descriptionController = TextEditingController(text: text);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    CircleProvider circleProvider = Provider.of<CircleProvider>(context);
+    return Column(
+      children: [
+        TextFormField(
+          controller: descriptionController,
+          decoration: InputDecoration(labelText: 'description'),
+          validator: validator("description"),
+        ),
+        SecondaryButton(
+            child: Text('Save Description'),
+            onPressed: () {
+              circleProvider.setDescritpion(descriptionController.text);
+            })
+      ],
+    );
+  }
+
+  static String? Function(String?) validator(String field) {
+    return (String? value) {
+      return value == null || value.isEmpty
+          ? "Please enter your $field."
+          : null;
+    };
   }
 }

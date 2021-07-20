@@ -159,7 +159,10 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ),
               ),
               SecondaryButton(
-                onPressed: userState.signOut,
+                onPressed: () {
+                  userState.signOut();
+                  userProfileProvider.clear();
+                },
                 child: Text("Sign out"),
               ),
             ],

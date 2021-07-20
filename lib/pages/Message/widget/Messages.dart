@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/ChatRoom.dart';
 import 'package:keepin/src/models/Message.dart';
 import 'package:keepin/src/models/UserProfile.dart';

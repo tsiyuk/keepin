@@ -75,12 +75,13 @@ class _CreatePostPageState extends State<CreatePostPage> {
             ),
             PrimaryButton(
                 child: Text('Post'),
-                onPressed: () {
+                onPressed: () async {
                   postProvider.changeTitle(_titleController.text);
                   postProvider.changeText(_textController.text);
                   if (isUploadCompleted) {
                     postProvider.createPost();
                     Navigator.of(context).pop();
+                    await circleProvider.addExp(circleProvider.POST_EXP);
                     showSuccess(context, 'Create post!');
                   } else {
                     showWarning(context, 'Please wait for uploading images');

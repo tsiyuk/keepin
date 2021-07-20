@@ -12,9 +12,10 @@ import 'package:keepin/src/models/Utils.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class CircleProvider with ChangeNotifier {
+  final num CLOCK_IN_EXP = 10;
+  final num POST_EXP = 20;
   late String _circleName;
   late String _circleAvatarURL;
-  // assume we only allow
   User _user = FirebaseAuth.instance.currentUser!;
   List<String> _tags = [];
   late String _adminUserId;
@@ -97,9 +98,12 @@ class CircleProvider with ChangeNotifier {
     _tags = circle.tags;
     _numOfMembers = circle.numOfMembers;
     _isPublic = circle.isPublic;
+    _description = circle.description;
+    _descriptionImageURLs = circle.descriptionImageURLs;
     if (circleInfo != null) {
       _clockinCount = circleInfo.clockinCount;
       _lateClockinTime = circleInfo.lastClockinTime;
+      _exp = circleInfo.exp;
     }
   }
 
@@ -198,8 +202,11 @@ class CircleProvider with ChangeNotifier {
           now.year != last.year) {
         ++_clockinCount;
         notifyListeners();
-        await _firestoreService.updateClockin(
-            circleName, user.uid, clockinCount, now);
+        var futures = <Future>[];
+        futures.add(addExp(CLOCK_IN_EXP));
+        futures.add(_firestoreService.updateClockin(
+            circleName, user.uid, clockinCount, now));
+        await Future.wait(futures);
       } else {
         throw FirebaseException(
             plugin: 'Firebase',
@@ -211,10 +218,10 @@ class CircleProvider with ChangeNotifier {
     }
   }
 
-  Future<void> addExp(num exp) async {
-    ++_exp;
+  Future<void> addExp(num exp) {
+    _exp += exp;
     notifyListeners();
-    await _firestoreService.updateExp(circleName, user.uid, exp);
+    return _firestoreService.updateExp(circleName, user.uid, _exp);
   }
 
   /// Upload Descirption Images
@@ -334,6 +341,7 @@ class FirestoreService {
         .doc(circleName)
         .collection('userIds')
         .orderBy('exp', descending: true)
+        .limit(10)
         .get()
         .then((value) => value.docs
             .map((value) => value.data()['userId'].toString())
@@ -465,7 +473,7 @@ class FirestoreService {
     return _firebaseFirestore
         .collection('circles')
         .doc(circleName)
-        .update({'description': description, 'descritpionImageURLs': urls});
+        .update({'description': description, 'descriptionImageURLs': urls});
   }
 
   Future<void> updateCircleHistory(
