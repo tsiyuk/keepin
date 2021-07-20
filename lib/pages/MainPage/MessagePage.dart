@@ -64,7 +64,8 @@ class _MessagePageState extends State<MessagePage> {
                                       children: [
                                         ImageButton(
                                           image: Image.network(
-                                              snapshot.data!.avatarURL!, fit: BoxFit.cover),
+                                              snapshot.data!.avatarURL!,
+                                              fit: BoxFit.cover),
                                           size: 50,
                                         ),
                                         Column(
