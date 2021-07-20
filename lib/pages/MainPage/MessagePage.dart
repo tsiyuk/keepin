@@ -40,7 +40,11 @@ class _MessagePageState extends State<MessagePage> {
                 } else {
                   return ListView.separated(
                       itemCount: chatRooms.length,
-                      separatorBuilder: (context, index) => Divider(thickness: 1, indent: 20, endIndent: 20,),
+                      separatorBuilder: (context, index) => Divider(
+                            thickness: 1,
+                            indent: 20,
+                            endIndent: 20,
+                          ),
                       itemBuilder: (context, index) {
                         String otherId =
                             chatRoomProvider.getOtherUserId(chatRooms[index]);
@@ -53,13 +57,14 @@ class _MessagePageState extends State<MessagePage> {
                               if (snapshot.data != null) {
                                 return GestureDetector(
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
                                     child: Row(
                                       mainAxisSize: MainAxisSize.max,
                                       children: [
                                         ImageButton(
                                           image: Image.network(
-                                              snapshot.data!.avatarURL!),
+                                              snapshot.data!.avatarURL!, fit: BoxFit.cover),
                                           size: 50,
                                         ),
                                         Column(
