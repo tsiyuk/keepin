@@ -1,8 +1,10 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/Message/ChatRoomPage.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/ChatRoom.dart';
+import 'package:keepin/src/models/Message.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/ChatRoomProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
@@ -29,15 +31,20 @@ class _MessagePageState extends State<MessagePage> {
               return Loading(50);
             default:
               if (snapshot.hasError) {
-                print(snapshot.error);
-                return Text("Error");
+                showError(context, snapshot.error.toString());
+                return Center(child: Text("Error"));
               } else {
                 var chatRooms = snapshot.data!;
                 if (chatRooms.isEmpty) {
-                  return Text("Start a conversation");
+                  return Center(child: Text("Start a conversation"));
                 } else {
-                  return ListView.builder(
+                  return ListView.separated(
                       itemCount: chatRooms.length,
+                      separatorBuilder: (context, index) => Divider(
+                            thickness: 1,
+                            indent: 20,
+                            endIndent: 20,
+                          ),
                       itemBuilder: (context, index) {
                         String otherId =
                             chatRoomProvider.getOtherUserId(chatRooms[index]);
@@ -47,37 +54,40 @@ class _MessagePageState extends State<MessagePage> {
                             future:
                                 userProfileProvider.readUserProfile(otherId),
                             builder: (context, snapshot) {
-                              return GestureDetector(
-                                  child: Row(
-                                    children: [
-                                      CircleAvatar(
-                                        child: buildAvatar(
-                                            snapshot.data!.avatarURL!),
-                                      ),
-                                      Column(
-                                        children: [
-                                          Text(snapshot.data!.userName),
-                                          chatRooms[index].latestMessage == null
-                                              ? Text('')
-                                              : unRead
-                                                  ? Text(
-                                                      chatRooms[index]
-                                                          .latestMessage!
-                                                          .text,
-                                                      style: TextStyle(
-                                                          color: Colors.red),
-                                                    )
-                                                  : Text(chatRooms[index]
-                                                      .latestMessage!
-                                                      .text),
-                                        ],
-                                      ),
-                                    ],
+                              if (snapshot.data != null) {
+                                return GestureDetector(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Row(
+                                      mainAxisSize: MainAxisSize.max,
+                                      children: [
+                                        ImageButton(
+                                          image: Image.network(
+                                              snapshot.data!.avatarURL!, fit: BoxFit.cover),
+                                          size: 50,
+                                        ),
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            TextH2(snapshot.data!.userName),
+                                            showLastMessage(
+                                                chatRooms[index].latestMessage,
+                                                unRead),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                   onTap: () => Navigator.of(context).push(
                                       MaterialPageRoute(
                                           builder: (context) => ChatRoomPage(
-                                              chatRoom: chatRooms[index]))));
+                                              chatRoom: chatRooms[index]))),
+                                );
+                              } else {
+                                return SizedBox();
+                              }
                             });
                       });
                 }
@@ -86,11 +96,12 @@ class _MessagePageState extends State<MessagePage> {
         });
   }
 
-  Widget buildAvatar(String? url) {
-    if (url == null) {
-      return defaultAvatar(16);
-    } else {
-      return CircleAvatar(radius: 16, backgroundImage: NetworkImage(url));
-    }
+  Widget showLastMessage(Message? latestMessage, bool unRead) {
+    return latestMessage == null
+        ? Text('')
+        : Text(
+            latestMessage.text,
+            style: TextStyle(color: unRead ? Colors.red : Colors.black),
+          );
   }
 }

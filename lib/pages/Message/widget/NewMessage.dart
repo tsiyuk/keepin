@@ -25,7 +25,7 @@ class _NewMessageWidgetState extends State<NewMessageWidget> {
     ChatRoomProvider chatRoomProvider = Provider.of<ChatRoomProvider>(context);
     return Container(
       color: Colors.white,
-      padding: EdgeInsets.all(8),
+      padding: EdgeInsets.all(12),
       child: Row(
         children: <Widget>[
           Expanded(
@@ -35,12 +35,13 @@ class _NewMessageWidgetState extends State<NewMessageWidget> {
               autocorrect: true,
               enableSuggestions: true,
               decoration: InputDecoration(
+                focusColor: Theme.of(context).primaryColorLight,
                 filled: true,
-                fillColor: Colors.grey[100],
-                labelText: 'Type your message',
+                fillColor: Colors.grey.shade100,
+                hintText: 'Type your message',
                 border: OutlineInputBorder(
                   borderSide: BorderSide(width: 0),
-                  gapPadding: 10,
+                  gapPadding: 4,
                   borderRadius: BorderRadius.circular(25),
                 ),
               ),
@@ -49,7 +50,7 @@ class _NewMessageWidgetState extends State<NewMessageWidget> {
               }),
             ),
           ),
-          SizedBox(width: 20),
+          SizedBox(width: 10),
           GestureDetector(
             onTap: message.trim().isEmpty
                 ? null
@@ -59,12 +60,12 @@ class _NewMessageWidgetState extends State<NewMessageWidget> {
                     _controller.clear();
                   },
             child: Container(
-              padding: EdgeInsets.all(8),
+              padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.blue,
+                color: Theme.of(context).primaryColorLight,
               ),
-              child: Icon(Icons.send, color: Colors.white),
+              child: Icon(Icons.send_rounded, color: Colors.white),
             ),
           ),
         ],

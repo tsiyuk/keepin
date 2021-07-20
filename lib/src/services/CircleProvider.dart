@@ -7,6 +7,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:keepin/src/models/Circle.dart';
+import 'package:keepin/src/models/UserProfile.dart';
+import 'package:keepin/src/models/Utils.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class CircleProvider with ChangeNotifier {
@@ -73,6 +75,11 @@ class CircleProvider with ChangeNotifier {
     }
   }
 
+  /// Get the user ranking of the circle
+  Future<List<UserProfile>> readUserRank() {
+    return _firestoreService.getUsers(circleName);
+  }
+
   // Checking
   bool isAdmin(String userId) {
     return userId == _adminUserId;
@@ -101,7 +108,8 @@ class CircleProvider with ChangeNotifier {
     final List<AssetEntity>? assets =
         await AssetPicker.pickAssets(context, maxAssets: 1);
     if (assets != null) {
-      _avatar = await assets[0].file;
+      File? image = await Utils.compress(await assets[0].file);
+      _avatar = image;
       notifyListeners();
       return Future.value(_avatar!);
     } else {
@@ -233,11 +241,16 @@ class CircleProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addDescritpion(String text) async {
+  void setDescritpion(String text) async {
     _description = text;
     await _firestoreService.updateDescription(
         circleName, _description, _descriptionImageURLs);
     notifyListeners();
+  }
+
+  void addCircleHistory(Circle circle) async {
+    await _firestoreService.updateCircleHistory(
+        user.uid, circle.circleName, circle.tags);
   }
 
   /// quit the circle
@@ -311,6 +324,28 @@ class FirestoreService {
     });
   }
 
+  Future<List<UserProfile>> getUsers(String circleName) async {
+    List<String> userIds = await _firebaseFirestore
+        .collection('circles')
+        .doc(circleName)
+        .collection('userIds')
+        .orderBy('exp', descending: true)
+        .get()
+        .then((value) => value.docs
+            .map((value) => value.data()['userId'].toString())
+            .toList());
+    List<UserProfile> result = [];
+    for (String userId in userIds) {
+      var r = await _firebaseFirestore
+          .collection('userProfiles')
+          .doc(userId)
+          .get()
+          .then((value) => UserProfile.fromJson(value.data()!));
+      result.add(r);
+    }
+    return result;
+  }
+
   Future<bool> isCircleExist(String name) {
     return _firebaseFirestore
         .collection('circles')
@@ -368,12 +403,20 @@ class FirestoreService {
 
   /// Update the exp of the user
   Future<void> updateExp(String circleName, String userId, num exp) {
-    return _firebaseFirestore
+    var futures = <Future>[];
+    futures.add(_firebaseFirestore
+        .collection('circles')
+        .doc(circleName)
+        .collection('userIds')
+        .doc(userId)
+        .update({'exp': exp}));
+    futures.add(_firebaseFirestore
         .collection('userProfiles')
         .doc(userId)
         .collection('circlesJoined')
         .doc(circleName)
-        .update({'exp': exp});
+        .update({'exp': exp}));
+    return Future.wait(futures);
   }
 
   /// Add an admin
@@ -387,6 +430,7 @@ class FirestoreService {
         .set({
       'userId': circle.adminUserId,
       'isAdmin': true,
+      'exp': 0,
     });
   }
 
@@ -400,6 +444,7 @@ class FirestoreService {
         .set({
       'userId': userId,
       'isAdmin': false,
+      'exp': 0,
     });
   }
 
@@ -417,6 +462,19 @@ class FirestoreService {
         .collection('circles')
         .doc(circleName)
         .update({'description': description, 'descritpionImageURLs': urls});
+  }
+
+  Future<void> updateCircleHistory(
+      String userId, String circleName, List<String> tags) {
+    return _firebaseFirestore
+        .collection('userProfiles')
+        .doc(userId)
+        .collection('circleHistory')
+        .add({
+      'circleName': circleName,
+      'tags': tags,
+      'timestamp': DateTime.now().toUtc(),
+    });
   }
 
   // remove a user from the circle

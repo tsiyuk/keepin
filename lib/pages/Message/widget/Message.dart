@@ -28,19 +28,21 @@ class _MessageWidgetState extends State<MessageWidget> {
     final borderRadius = BorderRadius.all(radius);
 
     return Row(
-      mainAxisAlignment:
-          widget.isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
-      children: <Widget>[
+      mainAxisSize: MainAxisSize.min,
+      textDirection: widget.isMe ? TextDirection.rtl : TextDirection.ltr,
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: [
         widget.isMe
             ? buildAvatar(FirebaseAuth.instance.currentUser!.photoURL)
             : buildAvatar(widget.userProfile.avatarURL),
         Container(
-          padding: EdgeInsets.all(16),
-          margin: EdgeInsets.all(16),
+          padding: EdgeInsets.all(12),
+          margin: EdgeInsets.symmetric(vertical: 6),
           constraints: BoxConstraints(maxWidth: 140),
           decoration: BoxDecoration(
-            color:
-                widget.isMe ? Colors.grey[100] : Theme.of(context).accentColor,
+            color: widget.isMe
+                ? Colors.grey[100]
+                : Theme.of(context).primaryColorLight,
             borderRadius: widget.isMe
                 ? borderRadius.subtract(BorderRadius.only(bottomRight: radius))
                 : borderRadius.subtract(BorderRadius.only(bottomLeft: radius)),
@@ -51,33 +53,32 @@ class _MessageWidgetState extends State<MessageWidget> {
     );
   }
 
-  Widget buildMessage() => Column(
-        crossAxisAlignment:
-            widget.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: <Widget>[
-          Text(
-            widget.message.text,
-            style: TextStyle(color: widget.isMe ? Colors.black : Colors.white),
-            textAlign: widget.isMe ? TextAlign.end : TextAlign.start,
-          ),
-        ],
+  Widget buildMessage() => Text(
+        widget.message.text,
+        style: TextStyle(color: widget.isMe ? Colors.black : Colors.white),
       );
+
   Widget buildAvatar(String? url) {
     if (url == null) {
-      return defaultAvatar(16);
+      return defaultAvatar(40);
     } else {
-      if (map.containsKey(url)) {
-        return CircleAvatar(
-          radius: 16,
-          child: map[url]!,
-        );
-      } else {
-        map.addEntries([MapEntry(url, Image.network(url))]);
-        return CircleAvatar(
-          radius: 16,
-          child: map[url]!,
-        );
+      if (!map.containsKey(url)) {
+        map.addEntries([
+          MapEntry(
+              url,
+              Image.network(
+                url,
+                fit: BoxFit.cover,
+              ))
+        ]);
       }
+      return Container(
+        width: 60,
+        child: ImageButton(
+          image: map[url]!,
+          size: 40,
+        ),
+      );
     }
   }
 }

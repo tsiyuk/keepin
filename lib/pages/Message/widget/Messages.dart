@@ -29,32 +29,27 @@ class MessagesWidget extends StatelessWidget {
     return StreamBuilder<List<Message>>(
       stream: chatRoomProvider.messages,
       builder: (context, snapshot) {
-        switch (snapshot.connectionState) {
-          case ConnectionState.waiting:
-            return Loading(50);
-          default:
-            if (snapshot.hasError) {
-              return buildText('Something Went Wrong Try later');
-            } else {
-              var messages = snapshot.data;
+        if (snapshot.hasError) {
+          return buildText('Something Went Wrong Try later');
+        } else {
+          var messages = snapshot.data;
 
-              return messages == null || messages.isEmpty
-                  ? buildText('Say Hi..')
-                  : ListView.builder(
-                      physics: BouncingScrollPhysics(),
-                      reverse: true,
-                      itemCount: messages.length,
-                      itemBuilder: (context, index) {
-                        final message = messages[index];
+          return messages == null || messages.isEmpty
+              ? buildText('Say Hi..')
+              : ListView.builder(
+                  physics: BouncingScrollPhysics(),
+                  reverse: true,
+                  itemCount: messages.length,
+                  itemBuilder: (context, index) {
+                    final message = messages[index];
 
-                        return MessageWidget(
-                          message: message,
-                          isMe: message.userId == myId,
-                          userProfile: userProfile,
-                        );
-                      },
+                    return MessageWidget(
+                      message: message,
+                      isMe: message.userId == myId,
+                      userProfile: userProfile,
                     );
-            }
+                  },
+                );
         }
       },
     );

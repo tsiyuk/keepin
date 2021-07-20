@@ -5,11 +5,10 @@ import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/Post.dart';
+import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:keepin/src/services/PostProvider.dart';
 import 'package:provider/provider.dart';
-
-import '../UserProfileDisplay.dart';
 
 class CirclePage extends StatefulWidget {
   final CircleInfo? circleInfo;
@@ -48,6 +47,8 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
       isMember = temp;
       loading = false;
     });
+    //will add history repeatedly because build is called repeatedly
+    //cp.addCircleHistory();
   }
 
   @override

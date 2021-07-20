@@ -130,6 +130,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                   onTap: () async {
                                     Circle circle = await circleProvider
                                         .readCircleFromName(data.circleName);
+                                    circleProvider.addCircleHistory(circle);
                                     Navigator.of(context).push(
                                         (MaterialPageRoute(
                                             builder: (context) => CirclePage(

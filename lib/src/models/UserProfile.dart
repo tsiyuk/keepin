@@ -10,12 +10,15 @@ class UserProfile {
   final String userName;
   String? avatarURL;
   String? bio;
+  List<String> tags;
 
-  UserProfile(this.userId, this.userName, {this.avatarURL, this.bio});
+  UserProfile(this.userId, this.userName, this.tags,
+      {this.avatarURL, this.bio});
 
   // factory method to retrive data from firestore
   factory UserProfile.fromJson(Map<String, dynamic> json) {
-    return UserProfile(json['userId'], json['userName'],
+    return UserProfile(
+        json['userId'], json['userName'], List.castFrom(json['tags']),
         avatarURL: json['avatarURL'], bio: json['bio']);
   }
 
@@ -26,6 +29,7 @@ class UserProfile {
       'userName': userName,
       'avatarURL': avatarURL,
       'bio': bio,
+      'tags': tags,
     };
   }
 }

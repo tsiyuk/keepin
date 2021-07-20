@@ -36,13 +36,13 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: Colors.blue,
+      backgroundColor: Theme.of(context).primaryColorLight,
       body: FutureBuilder<UserProfile>(
           future: otherUser,
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.waiting:
-                return Loading(50);
+                return Text("yo");
               default:
                 if (snapshot.hasError) {
                   return Text('Something Went Wrong Try later');
@@ -53,12 +53,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                         ProfileHeaderWidget(userProfile: snapshot.data!),
                         Expanded(
                           child: Container(
-                            padding: EdgeInsets.all(10),
+                            padding: EdgeInsets.symmetric(vertical: 8),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(25),
-                                topRight: Radius.circular(25),
+                                topLeft: Radius.circular(20),
+                                topRight: Radius.circular(20),
                               ),
                             ),
                             child: MessagesWidget(
