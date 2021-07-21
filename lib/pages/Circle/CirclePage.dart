@@ -181,19 +181,27 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                           }),
                       Center(
                         child: Column(children: [
-                          PrimaryButton(
-                              child: Text('Join the Circle'),
-                              onPressed: () {
-                                if (isMember) {
-                                  showSuccess(context,
-                                      'You have been a member of ${circleProvider.circleName}');
-                                } else {
-                                  circleProvider.joinCircle();
-                                  setState(() {
-                                    isMember = true;
-                                  });
-                                }
-                              }),
+                          isMember
+                              ? PrimaryButton(
+                                  child: Text('Quit Circle'),
+                                  onPressed: () async {
+                                    try {
+                                      await circleProvider.quitCircle();
+                                    } on FirebaseException catch (e) {
+                                      showError(context, e.code);
+                                    }
+                                    setState(() {
+                                      isMember = false;
+                                    });
+                                  })
+                              : PrimaryButton(
+                                  child: Text('Join Circle'),
+                                  onPressed: () {
+                                    circleProvider.joinCircle();
+                                    setState(() {
+                                      isMember = true;
+                                    });
+                                  }),
                           PrimaryButton(
                             child: Text('Clock in'),
                             onPressed: () async {

@@ -269,8 +269,13 @@ class CircleProvider with ChangeNotifier {
   }
 
   /// quit the circle
-  void quitCircle() async {
-    await _firestoreService.removeUser(circleName, user.uid);
+  Future<void> quitCircle() async {
+    if (isAdmin(user.uid)) {
+      throw FirebaseException(
+          plugin: 'firebasefirestore', code: 'Admin can not quit the circle');
+    } else {
+      await _firestoreService.removeUser(circleName, user.uid);
+    }
   }
 }
 

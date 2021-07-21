@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/Comment.dart';
 import 'package:keepin/src/models/Post.dart';
+import 'package:keepin/src/models/UserProfile.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class PostProvider with ChangeNotifier {
@@ -36,6 +37,8 @@ class PostProvider with ChangeNotifier {
   List<String> get tags => _tags;
   num get numOfLikes => _numOfLikes;
   Stream<List<Post>> get posts => _firestoreService.getPosts();
+  Future<List<UserProfile>> get likedList =>
+      _firestoreService.getLikedList(postId);
 
   Stream<List<Comment>> getComments(String postId) {
     return _firestoreService.getComments(postId);
@@ -322,6 +325,27 @@ class FirestoreService {
         .collection('likes')
         .doc(userId)
         .delete();
+  }
+
+  Future<List<UserProfile>> getLikedList(String postId) async {
+    List<String> userIds = await _firestore
+        .collection('posts')
+        .doc(postId)
+        .collection('likes')
+        .get()
+        .then((value) => value.docs
+            .map((value) => value.data()['userId'].toString())
+            .toList());
+    List<UserProfile> result = [];
+    for (String userId in userIds) {
+      var r = await FirebaseFirestore.instance
+          .collection('userProfiles')
+          .doc(userId)
+          .get()
+          .then((value) => UserProfile.fromJson(value.data()!));
+      result.add(r);
+    }
+    return result;
   }
 
   Future<bool> hasLiked(String postId, String userId) {
