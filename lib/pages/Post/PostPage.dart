@@ -11,12 +11,12 @@ class LikeCommentShare extends StatefulWidget {
 }
 
 class _LikeCommentShareState extends State<LikeCommentShare> {
+  final double iconSize = 20;
   bool hasLiked = false;
   num numOfLikes = 0;
 
   @override
   void initState() {
-    numOfLikes = widget.post.numOfLikes;
     super.initState();
   }
 
@@ -32,6 +32,7 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
     final bool temp = await PostProvider.hasLiked(widget.post);
     setState(() {
       hasLiked = temp;
+      numOfLikes = widget.post.numOfLikes;
     });
   }
 
@@ -42,43 +43,51 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
     return Container(
       child: Row(
         children: [
-          hasLiked
-              ? TextButton(
-                  style: TextButton.styleFrom(primary: Colors.pinkAccent),
-                  child: Container(
-                    child: Row(
-                      children: [
-                        Icon(Icons.favorite),
-                        Text(numOfLikes.toString())
-                      ],
-                    ),
-                  ),
-                  onPressed: () {
-                    postProvider.unlikeViaPost(widget.post);
-                    setState(() {
-                      hasLiked = false;
-                      numOfLikes = numOfLikes - 1;
-                    });
-                  },
-                )
-              : TextButton(
-                  style: TextButton.styleFrom(primary: Colors.grey),
-                  child: Container(
-                    child: Row(
-                      children: [
-                        Icon(Icons.favorite_border_rounded),
-                        Text(numOfLikes.toString())
-                      ],
-                    ),
-                  ),
-                  onPressed: () {
-                    postProvider.likeViaPost(widget.post);
-                    setState(() {
-                      hasLiked = true;
-                      numOfLikes = numOfLikes + 1;
-                    });
-                  },
-                )
+          TextButton(
+            style: TextButton.styleFrom(primary: Colors.grey),
+            child: Container(
+              child: Row(
+                children: [
+                  hasLiked
+                      ? Icon(Icons.favorite_rounded,
+                          color: Colors.red.shade200, size: iconSize)
+                      : Icon(Icons.favorite_border_rounded, size: iconSize),
+                  Text(" " + numOfLikes.toString())
+                ],
+              ),
+            ),
+            onPressed: () {
+              if (hasLiked) {
+                postProvider.unlikeViaPost(widget.post);
+              } else {
+                postProvider.likeViaPost(widget.post);
+              }
+            },
+          ),
+          TextButton(
+            style: TextButton.styleFrom(primary: Colors.grey),
+            child: Container(
+              child: Row(
+                children: [
+                  Icon(Icons.messenger_outline_rounded, size: iconSize),
+                  Text(" comment")
+                ],
+              ),
+            ),
+            onPressed: () {},
+          ),
+          TextButton(
+            style: TextButton.styleFrom(primary: Colors.grey),
+            child: Container(
+              child: Row(
+                children: [
+                  Icon(Icons.share_outlined, size: iconSize),
+                  Text(" share")
+                ],
+              ),
+            ),
+            onPressed: () {},
+          )
         ],
       ),
     );
