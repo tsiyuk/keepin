@@ -135,9 +135,9 @@ class PostProvider with ChangeNotifier {
   /// Add a like to the post
   /// Use it when the post provider has not been initialized
   void likeViaPost(Post post) async {
-    ++post.numOfLikes;
+    num newNum = post.numOfLikes + 1;
     var futures = <Future>[];
-    futures.add(_firestoreService.updateLikes(post.postId!, post.numOfLikes,
+    futures.add(_firestoreService.updateLikes(post.postId!, newNum,
         currentUser.uid, currentUser.displayName!));
     futures.add(_firestoreService.addLikeList(
         post.postId!, currentUser.uid, currentUser.displayName!));

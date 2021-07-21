@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:keepin/pages/Post/PostPage.dart';
 import 'package:keepin/pages/UserProfileDisplay.dart';
 import 'package:keepin/src/models/Post.dart';
+import 'package:keepin/src/services/PostProvider.dart';
+import 'package:keepin/src/services/UserProfileProvider.dart';
+import 'package:provider/provider.dart';
 
 class Header extends StatelessWidget {
   const Header(this.heading);
@@ -279,7 +283,7 @@ TextH5 getTimeDisplay(String str) {
   return TextH5(str.substring(0, 16));
 }
 
-Widget postDetail(BuildContext context, Post post) {
+Widget postDetail(BuildContext context, Post post, {bool detail = true}) {
   return Row(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -314,26 +318,25 @@ Widget postDetail(BuildContext context, Post post) {
         children: [
           SizedBox(height: 10),
           TextH2(post.title),
-          ConstrainedBox(
+          detail
+              ? Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 0.0),
+                  child: getTimeDisplay(post.timestamp.toString()),
+                )
+              : SizedBox(),
+          Container(
             constraints: new BoxConstraints(
               minHeight: 60.0,
               maxWidth: MediaQuery.of(context).size.width - 100,
               maxHeight: 200.0,
             ),
-            child: Container(
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                child: Text(
-                  post.text,
-                ),
-              ),
+            child: SingleChildScrollView(
+              physics: BouncingScrollPhysics(),
+              scrollDirection: Axis.vertical,
+              child: Text(post.text),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: getTimeDisplay(post.timestamp.toString()),
-          ),
+          detail ? LikeCommentShare(post: post) : SizedBox()
         ],
       )
     ],
