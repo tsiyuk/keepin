@@ -48,6 +48,9 @@ class UserProfileProvider with ChangeNotifier {
   Stream<List<Post>> get recommandPost =>
       firestoreService.getRecommandPost(tags);
 
+  Stream<List<CircleInfo>> readCircleJoined(String id) =>
+      firestoreService.getCirclesJoined(id);
+
   // Setters
   void changeUserName(String userName) {
     _userName = userName;

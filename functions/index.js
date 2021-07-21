@@ -73,7 +73,7 @@ exports.sendNotification = functions.firestore
       const doc = snap.data()
       const idFrom = doc['userId']
       const nameFrom = doc['userName']
-      const postid = doc['postId']
+      const postId = doc['postId']
 
       admin
       .firestore()

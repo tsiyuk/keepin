@@ -274,6 +274,9 @@ class CircleProvider with ChangeNotifier {
       throw FirebaseException(
           plugin: 'firebasefirestore', code: 'Admin can not quit the circle');
     } else {
+      _exp = 0;
+      _clockinCount = 0;
+      notifyListeners();
       await _firestoreService.removeUser(circleName, user.uid);
     }
   }

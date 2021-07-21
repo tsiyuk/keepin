@@ -21,7 +21,7 @@ class PostProvider with ChangeNotifier {
   List<String> _imageLinks = [];
   List<String> _tags = [];
   num _numOfLikes = 0;
-  User currentUser = FirebaseAuth.instance.currentUser!;
+  static User currentUser = FirebaseAuth.instance.currentUser!;
 
   FirestoreService _firestoreService = FirestoreService();
 
@@ -126,7 +126,7 @@ class PostProvider with ChangeNotifier {
     notifyListeners();
     var futures = <Future>[];
     futures.add(_firestoreService.updateLikes(
-        postId, numOfLikes, currentUser.uid, currentUser.displayName!));
+        postId, _numOfLikes, currentUser.uid, currentUser.displayName!));
     futures.add(_firestoreService.addLikeList(
         postId, currentUser.uid, currentUser.displayName!));
     await Future.wait(futures);
@@ -135,9 +135,9 @@ class PostProvider with ChangeNotifier {
   /// Add a like to the post
   /// Use it when the post provider has not been initialized
   void likeViaPost(Post post) async {
-    num newNum = post.numOfLikes + 1;
+    ++post.numOfLikes;
     var futures = <Future>[];
-    futures.add(_firestoreService.updateLikes(post.postId!, newNum,
+    futures.add(_firestoreService.updateLikes(post.postId!, post.numOfLikes,
         currentUser.uid, currentUser.displayName!));
     futures.add(_firestoreService.addLikeList(
         post.postId!, currentUser.uid, currentUser.displayName!));
@@ -168,8 +168,8 @@ class PostProvider with ChangeNotifier {
     await Future.wait(futures);
   }
 
-  Future<bool> hasLiked(Post post) {
-    return _firestoreService.hasLiked(post.posterId, currentUser.uid);
+  static Future<bool> hasLiked(Post post) {
+    return FirestoreService.hasLiked(post.postId!, currentUser.uid);
   }
 
   /// upload images
@@ -348,8 +348,8 @@ class FirestoreService {
     return result;
   }
 
-  Future<bool> hasLiked(String postId, String userId) {
-    return _firestore
+  static Future<bool> hasLiked(String postId, String userId) {
+    return FirebaseFirestore.instance
         .collection('posts')
         .doc(postId)
         .collection('likes')

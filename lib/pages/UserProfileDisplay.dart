@@ -21,39 +21,57 @@ class UserProfileDisplay extends StatefulWidget {
 }
 
 class _UserProfileDisplayState extends State<UserProfileDisplay> {
+  @override
+  Widget build(BuildContext context) {
+    UserProfileProvider userProfileProvider =
+        Provider.of<UserProfileProvider>(context, listen: false);
+    return FutureBuilder<UserProfile>(
+        future: userProfileProvider.readUserProfile(widget.userId),
+        builder: (context, snapshot) =>
+            snapshot.connectionState == ConnectionState.waiting
+                ? Loading(30)
+                : Helper(userProfile: snapshot.data!));
+  }
+}
+
+class Helper extends StatefulWidget {
+  final UserProfile userProfile;
+  const Helper({Key? key, required this.userProfile}) : super(key: key);
+
+  @override
+  _HelperState createState() => _HelperState();
+}
+
+class _HelperState extends State<Helper> {
   final double avatarSize = 90;
   String userName = "";
   String bio = "";
   late Widget avatar;
   bool loading = true;
 
-  void initUser(UserProfileProvider userProfileProvider) async {
-    final UserProfile userProfile =
-        await userProfileProvider.readUserProfile(widget.userId);
-    userProfileProvider.load(userProfile);
-    setState(() {
-      userName = userProfile.userName;
-      bio = userProfile.bio == null
-          ? "Please tell us more about you!"
-          : userProfile.bio!;
-      avatar = userProfileProvider.avatarURL == null
-          ? defaultAvatar(avatarSize)
-          : CachedNetworkImage(
-              fit: BoxFit.cover,
-              imageUrl: userProfileProvider.avatarURL!,
-              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  CircularProgressIndicator(value: downloadProgress.progress),
-              errorWidget: (context, url, error) => Icon(Icons.error),
-            );
-      loading = false;
-    });
+  @override
+  void initState() {
+    userName = widget.userProfile.userName;
+    bio = widget.userProfile.bio == null
+        ? "Please tell us more about you!"
+        : widget.userProfile.bio!;
+    avatar = widget.userProfile.avatarURL == null
+        ? defaultAvatar(avatarSize)
+        : CachedNetworkImage(
+            fit: BoxFit.cover,
+            imageUrl: widget.userProfile.avatarURL!,
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                CircularProgressIndicator(value: downloadProgress.progress),
+            errorWidget: (context, url, error) => Icon(Icons.error),
+          );
+    loading = false;
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context);
-    initUser(userProfileProvider);
+        Provider.of<UserProfileProvider>(context, listen: false);
     ChatRoomProvider chatRoomProvider = Provider.of<ChatRoomProvider>(context);
     return Scaffold(
       appBar: AppBar(),
@@ -93,8 +111,8 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
                       children: [
                         TextH3("Circles Joined: "),
                         StreamBuilder<List<CircleInfo>>(
-                          stream: userProfileProvider.circlesJoined,
-                          //stream: postProvider.posts,
+                          stream: userProfileProvider
+                              .readCircleJoined(widget.userProfile.userId),
                           builder: (context, snapshot) {
                             if (snapshot.data != null &&
                                 snapshot.data!.isNotEmpty) {
@@ -125,22 +143,20 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
                       ],
                     ),
                   ),
-                  if (widget.userId != FirebaseAuth.instance.currentUser!.uid)
+                  if (widget.userProfile.userId !=
+                      FirebaseAuth.instance.currentUser!.uid)
                     PrimaryButton(
                         child: Text('Contact'),
                         onPressed: () async {
                           ChatRoom chatRoom;
                           chatRoomProvider
-                              .setNewUser(userProfileProvider.userId);
+                              .setNewUser(widget.userProfile.userId);
                           var temp = await chatRoomProvider.specifiedChatRoom;
                           if (temp.isEmpty) {
                             chatRoom = await chatRoomProvider.createChatRoom();
                           } else {
                             chatRoom = temp[0];
                           }
-                          // chatRoomProvider
-                          //     .setNewUser(userProfileProvider.userId);
-                          // chatRoom = await chatRoomProvider.createChatRoom();
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) =>
                                   ChatRoomPage(chatRoom: chatRoom)));

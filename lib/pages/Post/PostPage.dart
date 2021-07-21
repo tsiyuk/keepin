@@ -16,6 +16,7 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
 
   @override
   void initState() {
+    numOfLikes = widget.post.numOfLikes;
     super.initState();
   }
 
@@ -26,20 +27,18 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
     }
   }
 
-  void initPost(PostProvider postProvider) async {
-    postProvider.loadAll(widget.post);
-    final bool temp = await postProvider.hasLiked(widget.post);
+  void initPost() async {
+    //postProvider.loadAll(widget.post);
+    final bool temp = await PostProvider.hasLiked(widget.post);
     setState(() {
       hasLiked = temp;
-      numOfLikes = widget.post.numOfLikes;
     });
   }
 
   @override
   Widget build(BuildContext context) {
     PostProvider postProvider = Provider.of<PostProvider>(context);
-    initPost(postProvider);
-
+    initPost();
     return Container(
       child: Row(
         children: [
@@ -78,7 +77,7 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
                       hasLiked = true;
                       numOfLikes = numOfLikes + 1;
                     });
-                 },
+                  },
                 )
         ],
       ),
