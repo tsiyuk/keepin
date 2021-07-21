@@ -121,14 +121,16 @@ class PostProvider with ChangeNotifier {
   void like() async {
     ++_numOfLikes;
     notifyListeners();
-    await _firestoreService.updateLikes(postId, numOfLikes);
+    await _firestoreService.updateLikes(
+        postId, numOfLikes, currentUser.uid, currentUser.displayName!);
   }
 
   /// Add a like to the post
   /// Use it when the post provider has not been initialized
   void likeViaPost(Post post) async {
     ++post.numOfLikes;
-    await _firestoreService.updateLikes(post.postId!, post.numOfLikes);
+    await _firestoreService.updateLikes(post.postId!, post.numOfLikes,
+        currentUser.uid, currentUser.displayName!);
   }
 
   /// Reduce a like to the post
@@ -136,14 +138,20 @@ class PostProvider with ChangeNotifier {
   void unlike() async {
     --_numOfLikes;
     notifyListeners();
-    await _firestoreService.updateLikes(postId, numOfLikes);
+    await _firestoreService.updateLikes(
+        postId, numOfLikes, currentUser.uid, currentUser.displayName!);
   }
 
   /// Add a like to the post
   /// Use it when the post provider has not been initialized
   void unlikeViaPost(Post post) async {
     --post.numOfLikes;
-    await _firestoreService.updateLikes(post.postId!, post.numOfLikes);
+    await _firestoreService.updateLikes(post.postId!, post.numOfLikes,
+        currentUser.uid, currentUser.displayName!);
+  }
+
+  Future<bool> hasLiked(Post post) {
+    return _firestoreService.hasLiked(post.posterId, currentUser.uid);
   }
 
   /// upload images
@@ -275,11 +283,30 @@ class FirestoreService {
         .set(post.toMap(), setOption);
   }
 
-  Future<void> updateLikes(String postId, num newNum) {
+  Future<void> updateLikes(
+      String postId, num newNum, String userId, String userName) {
+    var futures = <Future>[];
+    futures.add(_firestore
+        .collection('posts')
+        .doc(postId)
+        .collection('likes')
+        .doc(userId)
+        .set({'userId': userId, 'userName': userName}));
+    futures.add(_firestore
+        .collection('posts')
+        .doc(postId)
+        .update({'numOfLikes': newNum}));
+    return Future.wait(futures);
+  }
+
+  Future<bool> hasLiked(String postId, String userId) {
     return _firestore
         .collection('posts')
         .doc(postId)
-        .update({'numOfLikes': newNum});
+        .collection('likes')
+        .doc(userId)
+        .get()
+        .then((value) => value.exists);
   }
 
   Future<void> updateImageLinks(String postId, List<String> imageLinks) {

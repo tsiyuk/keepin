@@ -338,31 +338,51 @@ class _RankState extends State<Rank> {
                 ),
               );
             } else {
-              return ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => UserProfileDisplay(
-                                snapshot.data![index].userId)));
-                      },
-                      child: ListTile(
-                        leading: snapshot.data![index].avatarURL != null
-                            ? ClipOval(
-                                child: Image.network(
-                                  snapshot.data![index].avatarURL!,
-                                  width: 40,
-                                  height: 40,
-                                  fit: BoxFit.cover,
-                                ),
-                              )
-                            : defaultAvatar(40),
-                        title: TextH3(snapshot.data![index].userName),
-                      ),
-                    );
-                  });
+              return Expanded(
+                child: SizedBox(
+                  height: 300,
+                  child: ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: snapshot.data!.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => UserProfileDisplay(
+                                    snapshot.data![index].userId)));
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child: TextH2((index + 1).toString()),
+                                  ),
+                                  snapshot.data![index].avatarURL != null
+                                      ? ClipOval(
+                                          child: Image.network(
+                                            snapshot.data![index].avatarURL!,
+                                            width: 40,
+                                            height: 40,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        )
+                                      : defaultAvatar(40),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10),
+                                    child:
+                                        TextH3(snapshot.data![index].userName),
+                                  ),
+                                ]),
+                          ),
+                        );
+                      }),
+                ),
+              );
             }
         }
       },
