@@ -8,6 +8,7 @@ import 'package:keepin/src/models/Post.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:keepin/src/services/PostProvider.dart';
+import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:provider/provider.dart';
 
 import '../TagSelector.dart';
@@ -161,7 +162,6 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                       StreamBuilder<List<Post>>(
                           stream: postProvider
                               .readPostsFromCircle(widget.circle.circleName),
-                          //stream: postProvider.posts,
                           builder: (context, snapshot) {
                             if (snapshot.data != null) {
                               return ListView.separated(
@@ -204,7 +204,9 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                               }
                             },
                           ),
-                          _buildRanks(context),
+                          Rank(
+                            circleName: circleProvider.circleName,
+                          ),
                         ]),
                       ),
                     ],
@@ -248,62 +250,6 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
           },
         )
       ],
-    );
-  }
-
-  Widget _buildRanks(BuildContext context) {
-    CircleProvider circleProvider = Provider.of<CircleProvider>(context);
-    return Expanded(
-      child: FutureBuilder<List<UserProfile>>(
-        future: circleProvider.readUserRank(),
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return Center(child: Loading(20.0));
-            default:
-              if (snapshot.hasError ||
-                  !snapshot.hasData ||
-                  snapshot.data!.length == 0) {
-                return Container(
-                  color: Theme.of(context).accentColor,
-                  alignment: Alignment.center,
-                  child: Text(
-                    'Error',
-                    style: TextStyle(fontSize: 28, color: Colors.white),
-                  ),
-                );
-              } else {
-                return ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      return GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => UserProfileDisplay(
-                                    snapshot.data![index].userId)));
-                          },
-                          child: Row(children: [
-                            TextH1(index.toString()),
-                            ListTile(
-                              leading: snapshot.data![index].avatarURL != null
-                                  ? ClipOval(
-                                      child: Image.network(
-                                        snapshot.data![index].avatarURL!,
-                                        width: 40,
-                                        height: 40,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
-                                  : defaultAvatar(40),
-                              title: TextH3(snapshot.data![index].userName),
-                            ),
-                          ]));
-                    });
-              }
-          }
-        },
-      ),
     );
   }
 }
@@ -351,5 +297,136 @@ class _DescriptionState extends State<Description> {
           ? "Please enter your $field."
           : null;
     };
+  }
+}
+
+class Rank extends StatefulWidget {
+  final String circleName;
+  const Rank({Key? key, required this.circleName}) : super(key: key);
+
+  @override
+  _RankState createState() => _RankState();
+}
+
+class _RankState extends State<Rank> {
+  late Future<List<UserProfile>> list;
+
+  @override
+  void initState() {
+    list = CircleProvider.readUserInfos(widget.circleName);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<List<UserProfile>>(
+      future: list,
+      builder: (context, snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.waiting:
+            return Center(child: Loading(20.0));
+          default:
+            if (snapshot.hasError ||
+                !snapshot.hasData ||
+                snapshot.data!.length == 0) {
+              return Container(
+                color: Theme.of(context).accentColor,
+                alignment: Alignment.center,
+                child: Text(
+                  'Error',
+                  style: TextStyle(fontSize: 28, color: Colors.white),
+                ),
+              );
+            } else {
+              return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => UserProfileDisplay(
+                                snapshot.data![index].userId)));
+                      },
+                      child: ListTile(
+                        leading: snapshot.data![index].avatarURL != null
+                            ? ClipOval(
+                                child: Image.network(
+                                  snapshot.data![index].avatarURL!,
+                                  width: 40,
+                                  height: 40,
+                                  fit: BoxFit.cover,
+                                ),
+                              )
+                            : defaultAvatar(40),
+                        title: TextH3(snapshot.data![index].userName),
+                      ),
+                    );
+                  });
+            }
+        }
+      },
+    );
+
+    /// Use a stream builder with a future builder nested will cause loop of loading
+
+    // return Expanded(
+    //   child: StreamBuilder<List<RankingInfo>>(
+    //     stream: circleProvider.readUserRank(),
+    //     builder: (context, snapshot) {
+    //       switch (snapshot.connectionState) {
+    //         case ConnectionState.waiting:
+    //           return Center(child: Loading(20.0));
+    //         default:
+    //           if (snapshot.hasError ||
+    //               !snapshot.hasData ||
+    //               snapshot.data!.length == 0) {
+    //             return Container(
+    //               color: Theme.of(context).primaryColor,
+    //               alignment: Alignment.center,
+    //               child: Text(
+    //                 'Error',
+    //                 style: TextStyle(fontSize: 28, color: Colors.white),
+    //               ),
+    //             );
+    //           } else {
+    //             return ListView.separated(
+    //                 separatorBuilder: (context, index) => Divider(
+    //                       thickness: 1,
+    //                       indent: 10,
+    //                       endIndent: 10,
+    //                     ),
+    //                 itemCount: snapshot.data!.length,
+    //                 itemBuilder: (context, index) {
+    //                   String uid = snapshot.data![index].userId;
+    //                   return FutureBuilder<UserProfile>(
+    //                       future: userProfileProvider.readUserProfile(uid),
+    //                       builder: (context, value) {
+    //                         return GestureDetector(
+    //                             onTap: () {
+    //                               Navigator.of(context).push(MaterialPageRoute(
+    //                                   builder: (context) => UserProfileDisplay(
+    //                                       value.data!.userId)));
+    //                             },
+    //                             child: ListTile(
+    //                               leading: value.data!.avatarURL != null
+    //                                   ? ClipOval(
+    //                                       child: Image.network(
+    //                                         value.data!.avatarURL!,
+    //                                         width: 40,
+    //                                         height: 40,
+    //                                         fit: BoxFit.cover,
+    //                                       ),
+    //                                     )
+    //                                   : defaultAvatar(40),
+    //                               title: TextH3(value.data!.userName),
+    //                             ));
+    //                       });
+    //                 });
+    //           }
+    //       }
+    //     },
+    //   ),
+    // );
   }
 }

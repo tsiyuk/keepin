@@ -77,8 +77,12 @@ class CircleProvider with ChangeNotifier {
   }
 
   /// Get the user ranking of the circle
-  Future<List<UserProfile>> readUserRank() {
-    return _firestoreService.getUsers(circleName);
+  Stream<List<RankingInfo>> readUserRank() {
+    return _firestoreService.getRankingInfo(circleName);
+  }
+
+  static Future<List<UserProfile>> readUserInfos(String name) {
+    return FirestoreService.getUsers(name);
   }
 
   // Checking
@@ -335,8 +339,8 @@ class FirestoreService {
     });
   }
 
-  Future<List<UserProfile>> getUsers(String circleName) async {
-    List<String> userIds = await _firebaseFirestore
+  static Future<List<UserProfile>> getUsers(String circleName) async {
+    List<String> userIds = await FirebaseFirestore.instance
         .collection('circles')
         .doc(circleName)
         .collection('userIds')
@@ -348,7 +352,7 @@ class FirestoreService {
             .toList());
     List<UserProfile> result = [];
     for (String userId in userIds) {
-      var r = await _firebaseFirestore
+      var r = await FirebaseFirestore.instance
           .collection('userProfiles')
           .doc(userId)
           .get()
@@ -356,6 +360,17 @@ class FirestoreService {
       result.add(r);
     }
     return result;
+  }
+
+  Stream<List<RankingInfo>> getRankingInfo(String circleName) {
+    return _firebaseFirestore
+        .collection('circles')
+        .doc(circleName)
+        .collection('userIds')
+        .orderBy('exp', descending: true)
+        .snapshots()
+        .map((event) =>
+            event.docs.map((doc) => RankingInfo.fromJson(doc.data())).toList());
   }
 
   Future<bool> isCircleExist(String name) {

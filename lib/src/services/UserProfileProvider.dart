@@ -258,7 +258,7 @@ class FirestoreService {
     return _firestore
         .collection('posts')
         .where('tags', arrayContainsAny: tags)
-        .orderBy('timestamp', descending: true)
+        //.orderBy('timestamp', descending: true)
         .snapshots()
         .map((snapshot) =>
             snapshot.docs.map((doc) => Post.fromJson(doc.data())).toList());

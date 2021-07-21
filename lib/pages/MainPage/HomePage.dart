@@ -223,7 +223,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
     initUser(context);
     return userProfileProvider.tags.isEmpty
         ? Container(
-            child: Text('No recommand posts.'),
+            child: Text('Please add your favourite tags in Discover'),
           )
         : StreamBuilder<List<Post>>(
             initialData: [],
