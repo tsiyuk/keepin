@@ -1,7 +1,7 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:keepin/pages/DiscoverPage.dart';
+import 'package:keepin/pages/MainPage/DiscoverPage.dart';
 import 'package:keepin/pages/MainPage/HomePage.dart';
 import 'package:keepin/pages/MainPage/MessagePage.dart';
 import 'package:keepin/pages/SearchDelegate.dart';
