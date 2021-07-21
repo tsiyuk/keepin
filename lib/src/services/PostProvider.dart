@@ -121,16 +121,24 @@ class PostProvider with ChangeNotifier {
   void like() async {
     ++_numOfLikes;
     notifyListeners();
-    await _firestoreService.updateLikes(
-        postId, numOfLikes, currentUser.uid, currentUser.displayName!);
+    var futures = <Future>[];
+    futures.add(_firestoreService.updateLikes(
+        postId, numOfLikes, currentUser.uid, currentUser.displayName!));
+    futures.add(_firestoreService.addLikeList(
+        postId, currentUser.uid, currentUser.displayName!));
+    await Future.wait(futures);
   }
 
   /// Add a like to the post
   /// Use it when the post provider has not been initialized
   void likeViaPost(Post post) async {
     ++post.numOfLikes;
-    await _firestoreService.updateLikes(post.postId!, post.numOfLikes,
-        currentUser.uid, currentUser.displayName!);
+    var futures = <Future>[];
+    futures.add(_firestoreService.updateLikes(post.postId!, post.numOfLikes,
+        currentUser.uid, currentUser.displayName!));
+    futures.add(_firestoreService.addLikeList(
+        post.postId!, currentUser.uid, currentUser.displayName!));
+    await Future.wait(futures);
   }
 
   /// Reduce a like to the post
@@ -138,16 +146,23 @@ class PostProvider with ChangeNotifier {
   void unlike() async {
     --_numOfLikes;
     notifyListeners();
-    await _firestoreService.updateLikes(
-        postId, numOfLikes, currentUser.uid, currentUser.displayName!);
+    var futures = <Future>[];
+    futures.add(_firestoreService.updateLikes(
+        postId, numOfLikes, currentUser.uid, currentUser.displayName!));
+    futures.add(_firestoreService.deleteLikeList(postId, currentUser.uid));
+    await Future.wait(futures);
   }
 
   /// Add a like to the post
   /// Use it when the post provider has not been initialized
   void unlikeViaPost(Post post) async {
     --post.numOfLikes;
-    await _firestoreService.updateLikes(post.postId!, post.numOfLikes,
-        currentUser.uid, currentUser.displayName!);
+    var futures = <Future>[];
+    futures.add(_firestoreService.updateLikes(post.postId!, post.numOfLikes,
+        currentUser.uid, currentUser.displayName!));
+    futures
+        .add(_firestoreService.deleteLikeList(post.postId!, currentUser.uid));
+    await Future.wait(futures);
   }
 
   Future<bool> hasLiked(Post post) {
@@ -285,18 +300,28 @@ class FirestoreService {
 
   Future<void> updateLikes(
       String postId, num newNum, String userId, String userName) {
-    var futures = <Future>[];
-    futures.add(_firestore
+    return _firestore
+        .collection('posts')
+        .doc(postId)
+        .update({'numOfLikes': newNum});
+  }
+
+  Future<void> addLikeList(String postId, String userId, String userName) {
+    return _firestore
         .collection('posts')
         .doc(postId)
         .collection('likes')
         .doc(userId)
-        .set({'userId': userId, 'userName': userName}));
-    futures.add(_firestore
+        .set({'userId': userId, 'userName': userName, 'postId': postId});
+  }
+
+  Future<void> deleteLikeList(String postId, String userId) {
+    return _firestore
         .collection('posts')
         .doc(postId)
-        .update({'numOfLikes': newNum}));
-    return Future.wait(futures);
+        .collection('likes')
+        .doc(userId)
+        .delete();
   }
 
   Future<bool> hasLiked(String postId, String userId) {
