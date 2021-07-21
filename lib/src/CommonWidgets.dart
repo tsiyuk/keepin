@@ -316,24 +316,36 @@ Widget postDetail(BuildContext context, Post post, {bool detail = true}) {
       Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(height: 10),
-          TextH2(post.title),
-          detail
-              ? Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 0.0),
-                  child: getTimeDisplay(post.timestamp.toString()),
-                )
-              : SizedBox(),
-          Container(
-            constraints: new BoxConstraints(
-              minHeight: 60.0,
-              maxWidth: MediaQuery.of(context).size.width - 100,
-              maxHeight: 200.0,
-            ),
-            child: SingleChildScrollView(
-              physics: BouncingScrollPhysics(),
-              scrollDirection: Axis.vertical,
-              child: Text(post.text),
+          GestureDetector(
+            behavior: HitTestBehavior.translucent,
+            onTap: () {
+              showSuccess(context, "hi");
+            },
+            child: SizedBox(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 10),
+                    TextH2(post.title),
+                    detail
+                        ? Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 0.0),
+                            child: getTimeDisplay(post.timestamp.toString()),
+                          )
+                        : SizedBox(),
+                    Container(
+                      constraints: new BoxConstraints(
+                        minHeight: 60.0,
+                        maxWidth: MediaQuery.of(context).size.width - 100,
+                        maxHeight: 200.0,
+                      ),
+                      child: SingleChildScrollView(
+                        physics: BouncingScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        child: Text(post.text),
+                      ),
+                    ),
+                  ]),
             ),
           ),
           detail ? LikeCommentShare(post: post) : SizedBox()

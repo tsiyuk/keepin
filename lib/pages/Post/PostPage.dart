@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/models/Post.dart';
 import 'package:keepin/src/services/PostProvider.dart';
 import 'package:provider/provider.dart';
@@ -40,56 +41,56 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
   Widget build(BuildContext context) {
     PostProvider postProvider = Provider.of<PostProvider>(context);
     initPost();
-    return Container(
-      child: Row(
-        children: [
-          TextButton(
-            style: TextButton.styleFrom(primary: Colors.grey),
-            child: Container(
-              child: Row(
-                children: [
-                  hasLiked
-                      ? Icon(Icons.favorite_rounded,
-                          color: Colors.red.shade200, size: iconSize)
-                      : Icon(Icons.favorite_border_rounded, size: iconSize),
-                  Text(" " + numOfLikes.toString())
-                ],
-              ),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        TextButton(
+          style: TextButton.styleFrom(primary: Colors.grey),
+          child: Container(
+            child: Row(
+              children: [
+                hasLiked
+                    ? Icon(Icons.favorite_rounded,
+                        color: Colors.red.shade200, size: iconSize)
+                    : Icon(Icons.favorite_border_rounded, size: iconSize),
+                Text(" " + numOfLikes.toString())
+              ],
             ),
-            onPressed: () {
-              if (hasLiked) {
-                postProvider.unlikeViaPost(widget.post);
-              } else {
-                postProvider.likeViaPost(widget.post);
-              }
-            },
           ),
-          TextButton(
-            style: TextButton.styleFrom(primary: Colors.grey),
-            child: Container(
-              child: Row(
-                children: [
-                  Icon(Icons.messenger_outline_rounded, size: iconSize),
-                  Text(" comment")
-                ],
-              ),
+          onPressed: () {
+            if (hasLiked) {
+              postProvider.unlikeViaPost(widget.post);
+            } else {
+              postProvider.likeViaPost(widget.post);
+            }
+          },
+        ),
+        TextButton(
+          style: TextButton.styleFrom(primary: Colors.grey),
+          child: Container(
+            child: Row(
+              children: [
+                Icon(Icons.messenger_outline_rounded, size: iconSize),
+                Text(" comment")
+              ],
             ),
-            onPressed: () {},
           ),
-          TextButton(
-            style: TextButton.styleFrom(primary: Colors.grey),
-            child: Container(
-              child: Row(
-                children: [
-                  Icon(Icons.share_outlined, size: iconSize),
-                  Text(" share")
-                ],
-              ),
+          onPressed: () {},
+        ),
+        TextButton(
+          style: TextButton.styleFrom(primary: Colors.grey),
+          child: Container(
+            child: Row(
+              children: [
+                Icon(Icons.share_outlined, size: iconSize),
+                Text(" share")
+              ],
             ),
-            onPressed: () {},
-          )
-        ],
-      ),
+          ),
+          onPressed: () {},
+        )
+      ],
     );
   }
 }
