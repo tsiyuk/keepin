@@ -90,12 +90,11 @@ class _MainPageState extends State<MainPage> {
       MessagePage(),
       // assume that the user has logged in
       UserProfilePage(UserState.user!),
-      // PrimaryButton(onPressed: userState.signOut, child: Text("Sign out")),
     ];
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Search Bar'),
+        //title: const Text('Search Bar'),
         actions: [
           IconButton(
               onPressed: () async {

@@ -162,6 +162,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 onPressed: () {
                   userState.signOut();
                   userProfileProvider.clear();
+                  dispose();
                 },
                 child: Text("Sign out"),
               ),

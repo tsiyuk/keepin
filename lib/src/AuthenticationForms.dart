@@ -41,8 +41,8 @@ class _EmailPasswordState extends State<EmailPasswordForm> {
       } on FirebaseAuthException catch (e) {
         setState(() {
           _errorMessage = e.code;
-          print(_errorMessage);
         });
+        showError(context, e.code);
       }
     }
   }
@@ -122,16 +122,15 @@ class _RegisterFormState extends State<RegisterForm> {
   void submit() async {
     if (validate()) {
       try {
-        // print("sign up start");
         final userState = Provider.of<UserState>(context, listen: false);
         //userState.verifyEmail(_emailController.text);
         await userState.registerAccount(_emailController.text,
             _userNameController.text, _passwordController.text);
-        // print("sign up success");
       } on FirebaseAuthException catch (e) {
         setState(() {
           _errorMessage = e.code;
         });
+        showError(context, e.code);
       }
     }
   }
@@ -232,8 +231,8 @@ class _ForgetPasswordFormState extends State<ForgetPasswordForm> {
       } on FirebaseAuthException catch (e) {
         setState(() {
           _errorMessage = e.code;
-          // print(_errorMessage);
         });
+        showError(context, e.code);
       }
     }
   }
@@ -321,7 +320,6 @@ class LogInMethods extends StatelessWidget {
                 showError(buildContext, e.code);
               }
             },
-            // color: Theme.of(buildContext).primaryColorLight,
             color: Colors.white,
             child: Image.asset("assets/images/google-logo.png", height: 40.0),
             padding: EdgeInsets.all(5.0),
