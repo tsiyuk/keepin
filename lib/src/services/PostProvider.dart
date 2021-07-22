@@ -244,7 +244,6 @@ class FirestoreService {
             snapshot.docs.map((doc) => Post.fromJson(doc.data())).toList());
   }
 
-  // TODO: maybe change to return a stream
   Future<List<Post>> getPostsFromCirclesJoined(String userId) async {
     List<String> circleNames = await _firestore
         .collection('userProfiles')

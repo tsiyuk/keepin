@@ -103,7 +103,7 @@ class UserProfileProvider with ChangeNotifier {
             .child('userAvatars')
             .child(userId)
             .child(fileName);
-        TaskSnapshot task = await firebaseStorageRef.putFile(image);
+        await firebaseStorageRef.putFile(image);
         _avatarURL = await firebaseStorageRef.getDownloadURL();
         notifyListeners();
       } else {

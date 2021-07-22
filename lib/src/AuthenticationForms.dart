@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
 import 'CommonWidgets.dart';
@@ -313,7 +314,13 @@ class LogInMethods extends StatelessWidget {
             child: Text("or log in with:"),
           ),
           MaterialButton(
-            onPressed: userState.signInWithGoogle,
+            onPressed: () async {
+              try {
+                await userState.signInWithGoogle();
+              } on PlatformException catch (e) {
+                showError(buildContext, e.code);
+              }
+            },
             // color: Theme.of(buildContext).primaryColorLight,
             color: Colors.white,
             child: Image.asset("assets/images/google-logo.png", height: 40.0),

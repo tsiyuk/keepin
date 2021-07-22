@@ -9,8 +9,11 @@ import 'package:keepin/src/models/ChatRoom.dart';
 import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/ChatRoomProvider.dart';
+import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:provider/provider.dart';
+
+import 'Circle/CirclePage.dart';
 
 // This widget is used to display other user's profile
 class UserProfileDisplay extends StatefulWidget {
@@ -72,6 +75,8 @@ class _HelperState extends State<Helper> {
   Widget build(BuildContext context) {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context, listen: false);
+    CircleProvider circleProvider =
+        Provider.of<CircleProvider>(context, listen: false);
     ChatRoomProvider chatRoomProvider = Provider.of<ChatRoomProvider>(context);
     return Scaffold(
       appBar: AppBar(),
@@ -123,10 +128,24 @@ class _HelperState extends State<Helper> {
                                   itemCount: snapshot.data!.length,
                                   itemBuilder: (context, index) {
                                     CircleInfo data = snapshot.data![index];
-                                    return CircleInfoBuilder.buildCircleInfo(
-                                        data.avatarURL,
-                                        data.circleName,
-                                        data.clockinCount);
+                                    return GestureDetector(
+                                      onTap: () async {
+                                        Circle circle = await circleProvider
+                                            .readCircleFromName(
+                                                data.circleName);
+                                        circleProvider.addCircleHistory(circle);
+                                        Navigator.of(context).push(
+                                            (MaterialPageRoute(
+                                                builder: (context) =>
+                                                    CirclePage(
+                                                        circle: circle,
+                                                        circleInfo: data))));
+                                      },
+                                      child: CircleInfoBuilder.buildCircleInfo(
+                                          data.avatarURL,
+                                          data.circleName,
+                                          data.clockinCount),
+                                    );
                                   },
                                   separatorBuilder: (c, i) => VerticalDivider(
                                     indent: 10,

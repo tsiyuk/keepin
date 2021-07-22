@@ -185,7 +185,6 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
   }
 
   Widget _buildFollowFeed(BuildContext context) {
-    // return Center(child: Text("follow feed"));
     PostProvider postProvider =
         Provider.of<PostProvider>(context, listen: false);
     UserProfileProvider userProfileProvider =
