@@ -84,26 +84,36 @@ class SecondaryButton extends StatelessWidget {
 
 class ImageButton extends StatelessWidget {
   const ImageButton(
-      {required this.image,
+      {this.imageLink,
+      this.image,
       this.oval = true,
+      this.fit = BoxFit.cover,
       this.onPressed,
       required this.size});
 
-  final Widget image;
+  final Widget? image;
+  final String? imageLink;
   final void Function()? onPressed;
   final bool oval;
+  final BoxFit fit;
   final double size;
 
   @override
-  Widget build(BuildContext context) => MaterialButton(
-      onPressed: onPressed == null ? _showImage(context, image) : onPressed,
+  Widget build(BuildContext context) {
+    Widget image = imageLink == null
+        ? this.image == null
+            ? defaultAvatar(size)
+            : this.image!
+        : Image.network(imageLink!, fit: fit);
+    return GestureDetector(
+      onTap: onPressed == null ? _showImage(context, image) : onPressed,
       child: Container(
         width: size,
         height: size,
         child: oval ? ClipOval(child: image) : image,
       ),
-      padding: const EdgeInsets.all(0.0),
-      shape: CircleBorder());
+    );
+  }
 
   static Null Function() _showImage(BuildContext context, Widget image) {
     return () {
@@ -111,17 +121,14 @@ class ImageButton extends StatelessWidget {
         context: context,
         builder: (context) {
           return AlertDialog(
-            insetPadding: const EdgeInsets.all(0),
-            contentPadding: const EdgeInsets.all(0),
-            content: ImageButton(
-              image: image,
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              oval: false,
-              size: MediaQuery.of(context).size.width,
-            ),
-          );
+              insetPadding: const EdgeInsets.all(0),
+              contentPadding: const EdgeInsets.all(0),
+              content: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: image,
+              ));
         },
       );
     };
@@ -300,16 +307,11 @@ Widget postDetail(BuildContext context, Post post, {bool detail = true}) {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => UserProfileDisplay(post.posterId)));
               },
-              image: Image.network(
-                post.posterAvatarLink!,
-                fit: BoxFit.cover,
-              ),
+              imageLink: post.posterAvatarLink!,
               size: 46,
             ),
-            SizedBox(
-              height: 10,
-            ),
-            TextH5(post.posterName)
+            SizedBox(height: 10),
+            TextH4(post.posterName)
           ],
         ),
       ),
@@ -328,21 +330,43 @@ Widget postDetail(BuildContext context, Post post, {bool detail = true}) {
                     SizedBox(height: 10),
                     TextH2(post.title),
                     detail
-                        ? Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 0.0),
-                            child: getTimeDisplay(post.timestamp.toString()),
-                          )
+                        ? getTimeDisplay(post.timestamp.toString())
                         : SizedBox(),
                     Container(
+                      margin: const EdgeInsets.symmetric(vertical: 8.0),
                       constraints: new BoxConstraints(
-                        minHeight: 60.0,
+                        minHeight: 40.0,
                         maxWidth: MediaQuery.of(context).size.width - 100,
                         maxHeight: 200.0,
                       ),
                       child: SingleChildScrollView(
                         physics: BouncingScrollPhysics(),
                         scrollDirection: Axis.vertical,
-                        child: Text(post.text),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              post.text,
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            post.imageLinks.isNotEmpty
+                                ? Container(
+                                    margin: const EdgeInsets.only(top: 12),
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: Colors.teal.withOpacity(0.1),
+                                      borderRadius: BorderRadius.circular(4),
+                                    ),
+                                    child: TextH5("click to view " +
+                                        post.imageLinks.length.toString() +
+                                        " images"))
+                                : SizedBox()
+                          ],
+                        ),
                       ),
                     ),
                   ]),

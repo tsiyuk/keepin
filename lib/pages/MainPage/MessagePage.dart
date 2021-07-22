@@ -88,53 +88,53 @@ class _MessagePageState extends State<MessagePage>
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context);
 
-    return StreamBuilder<List<ChatRoom>>(
-        stream: chatRoomProvider.chatRooms,
-        builder: (context, snapshot) {
-          switch (snapshot.connectionState) {
-            case ConnectionState.waiting:
-              return Loading(50);
-            default:
-              if (snapshot.hasError) {
-                showError(context, snapshot.error.toString());
-                return Center(child: Text("Error"));
-              } else {
-                var chatRooms = snapshot.data!;
-                if (chatRooms.isEmpty) {
-                  return Center(child: Text("Start a conversation"));
+    return Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: StreamBuilder<List<ChatRoom>>(
+          stream: chatRoomProvider.chatRooms,
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.waiting:
+                return Loading(50);
+              default:
+                if (snapshot.hasError) {
+                  showError(context, snapshot.error.toString());
+                  return Center(child: Text("Error"));
                 } else {
-                  return ListView.separated(
-                    itemCount: chatRooms.length,
-                    separatorBuilder: (context, index) => Divider(
-                      thickness: 1,
-                      indent: 20,
-                      endIndent: 20,
-                    ),
-                    itemBuilder: (context, index) {
-                      String otherId =
-                          chatRoomProvider.getOtherUserId(chatRooms[index]);
-                      bool unRead = chatRoomProvider.isUnRead(chatRooms[index]);
-                      return FutureBuilder<UserProfile>(
-                          future: userProfileProvider.readUserProfile(otherId),
-                          builder: (context, snapshot) {
-                            if (snapshot.data != null) {
-                              return GestureDetector(
-                                behavior: HitTestBehavior.translucent,
-                                onTap: () => Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                        builder: (context) => ChatRoomPage(
-                                            chatRoom: chatRooms[index]))),
-                                child: Container(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 8.0),
+                  var chatRooms = snapshot.data!;
+                  if (chatRooms.isEmpty) {
+                    return Center(child: Text("Start a conversation"));
+                  } else {
+                    return ListView.separated(
+                      itemCount: chatRooms.length,
+                      separatorBuilder: (context, index) =>
+                          Divider(thickness: 1),
+                      itemBuilder: (context, index) {
+                        String otherId =
+                            chatRoomProvider.getOtherUserId(chatRooms[index]);
+                        bool unRead =
+                            chatRoomProvider.isUnRead(chatRooms[index]);
+                        return FutureBuilder<UserProfile>(
+                            future:
+                                userProfileProvider.readUserProfile(otherId),
+                            builder: (context, snapshot) {
+                              if (snapshot.data != null) {
+                                return GestureDetector(
+                                  behavior: HitTestBehavior.translucent,
+                                  onTap: () => Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (context) => ChatRoomPage(
+                                              chatRoom: chatRooms[index]))),
                                   child: Row(
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
-                                      ImageButton(
-                                        image: Image.network(
-                                            snapshot.data!.avatarURL!,
-                                            fit: BoxFit.cover),
-                                        size: 50,
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 2, horizontal: 12.0),
+                                        child: ImageButton(
+                                          imageLink: snapshot.data!.avatarURL!,
+                                          size: 50,
+                                        ),
                                       ),
                                       Column(
                                         crossAxisAlignment:
@@ -149,18 +149,18 @@ class _MessagePageState extends State<MessagePage>
                                       ),
                                     ],
                                   ),
-                                ),
-                              );
-                            } else {
-                              return SizedBox();
-                            }
-                          });
-                    },
-                  );
+                                );
+                              } else {
+                                return SizedBox();
+                              }
+                            });
+                      },
+                    );
+                  }
                 }
-              }
-          }
-        });
+            }
+          }),
+    );
   }
 
   Widget _buildComments(BuildContext context) {

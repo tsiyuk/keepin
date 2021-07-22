@@ -18,6 +18,7 @@ class PostPage extends StatefulWidget {
 }
 
 class _PostPageState extends State<PostPage> {
+  static const double safePadding = 14;
   Widget title = Text("Post Detail");
   @override
   Widget build(BuildContext context) {
@@ -27,17 +28,16 @@ class _PostPageState extends State<PostPage> {
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
-        child: Column(
-          children: [
-            _buildPoster(context, widget.post),
-            _buildPost(context),
-            _buildImages(context, widget.post),
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0),
-              child: LikeCommentShare(post: widget.post),
-            )
-          ],
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: safePadding),
+          child: Column(
+            children: [
+              _buildPoster(context, widget.post),
+              _buildPost(context),
+              _buildImages(context, widget.post),
+              LikeCommentShare(post: widget.post)
+            ],
+          ),
         ),
       ),
     );
@@ -57,12 +57,7 @@ class _PostPageState extends State<PostPage> {
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 ImageButton(
-                  image: post.posterAvatarLink == null
-                      ? defaultAvatar(50)
-                      : Image.network(
-                          post.posterAvatarLink!,
-                          fit: BoxFit.cover,
-                        ),
+                  imageLink: post.posterAvatarLink!,
                   size: 50,
                   onPressed: () {
                     Navigator.of(context).push(MaterialPageRoute(
@@ -70,13 +65,11 @@ class _PostPageState extends State<PostPage> {
                             UserProfileDisplay(post.posterId)));
                   },
                 ),
+                SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    TextH3(
-                      post.posterName,
-                      size: 20,
-                    ),
+                    TextH3(post.posterName, size: 22),
                     TextH4(snapshot.data!.bio ?? "")
                   ],
                 ),
@@ -91,30 +84,37 @@ class _PostPageState extends State<PostPage> {
   }
 
   Widget _buildPost(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 14),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).primaryColorLight.withOpacity(0.3),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        padding: const EdgeInsets.all(16),
-        child: Text(
-          widget.post.text,
-          style: TextStyle(
-            fontSize: 16.0,
-            fontWeight: FontWeight.w400,
-            color: Colors.black87,
-          ),
+    return Container(
+      width: MediaQuery.of(context).size.width - safePadding * 2,
+      decoration: BoxDecoration(
+        color: Theme.of(context).primaryColorLight.withOpacity(0.3),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: 12),
+      child: Text(
+        widget.post.text,
+        style: TextStyle(
+          fontSize: 16.0,
+          fontWeight: FontWeight.w400,
+          color: Colors.black87,
         ),
       ),
     );
   }
 
   Widget _buildImages(BuildContext context, Post post) {
+    double spacing = 10;
+    double imageSize =
+        (MediaQuery.of(context).size.width - safePadding * 2) / 3 - spacing;
     return Wrap(
+      spacing: spacing,
       children: post.imageLinks.map((element) {
-        return ImageButton(image: Image.network(element), size: 60);
+        return ImageButton(
+          imageLink: element,
+          size: imageSize,
+          oval: false,
+        );
       }).toList(),
     );
   }
