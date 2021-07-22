@@ -8,6 +8,7 @@ import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/Comment.dart';
 import 'package:keepin/src/models/Post.dart';
 import 'package:keepin/src/models/UserProfile.dart';
+import 'package:keepin/src/models/Utils.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class PostProvider with ChangeNotifier {
@@ -173,13 +174,14 @@ class PostProvider with ChangeNotifier {
   }
 
   /// upload images
-  Future uploadAssets(BuildContext context) async {
+  Future<List<File>> uploadAssets(BuildContext context) async {
     final List<AssetEntity>? assets =
         await AssetPicker.pickAssets(context, maxAssets: 3);
+    List<File> result = [];
     if (assets != null) {
       for (AssetEntity asset in assets) {
         if (await asset.exists) {
-          File? file = await asset.file;
+          File? file = await Utils.compress(await asset.file);
           if (file != null) {
             String fileName = file.path;
             Reference firebaseStorageRef = FirebaseStorage.instance
@@ -190,11 +192,13 @@ class PostProvider with ChangeNotifier {
             await firebaseStorageRef.putFile(file);
             String imageLink = await firebaseStorageRef.getDownloadURL();
             _imageLinks.add(imageLink);
+            result.add(file);
           }
         }
       }
     }
     notifyListeners();
+    return result;
   }
 
   void addComments(
