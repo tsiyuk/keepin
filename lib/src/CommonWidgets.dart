@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:keepin/pages/Post/LikeCommentShare.dart';
 import 'package:keepin/pages/Post/PostPage.dart';
 import 'package:keepin/pages/UserProfileDisplay.dart';
 import 'package:keepin/src/models/Post.dart';
@@ -318,9 +319,8 @@ Widget postDetail(BuildContext context, Post post, {bool detail = true}) {
         children: [
           GestureDetector(
             behavior: HitTestBehavior.translucent,
-            onTap: () {
-              showSuccess(context, "hi");
-            },
+            onTap: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => PostPage(post: post))),
             child: SizedBox(
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
