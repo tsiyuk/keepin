@@ -4,7 +4,8 @@ import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/models/Message.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 
-class MessageWidget extends StatefulWidget {
+class MessageWidget extends StatelessWidget {
+  static Map<String, Image> map = Map<String, Image>();
   final Message message;
   final UserProfile userProfile;
   final bool isMe;
@@ -15,12 +16,7 @@ class MessageWidget extends StatefulWidget {
     required this.isMe,
   }) : super(key: key);
 
-  @override
-  _MessageWidgetState createState() => _MessageWidgetState();
-}
 
-class _MessageWidgetState extends State<MessageWidget> {
-  Map<String, Image> map = Map<String, Image>();
 
   @override
   Widget build(BuildContext context) {
@@ -29,21 +25,21 @@ class _MessageWidgetState extends State<MessageWidget> {
 
     return Row(
       mainAxisSize: MainAxisSize.min,
-      textDirection: widget.isMe ? TextDirection.rtl : TextDirection.ltr,
+      textDirection: isMe ? TextDirection.rtl : TextDirection.ltr,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        widget.isMe
+        isMe
             ? buildAvatar(FirebaseAuth.instance.currentUser!.photoURL)
-            : buildAvatar(widget.userProfile.avatarURL),
+            : buildAvatar(userProfile.avatarURL),
         Container(
           padding: EdgeInsets.all(12),
           margin: EdgeInsets.symmetric(vertical: 6),
           constraints: BoxConstraints(maxWidth: 140),
           decoration: BoxDecoration(
-            color: widget.isMe
+            color: isMe
                 ? Colors.grey[100]
                 : Theme.of(context).primaryColorLight,
-            borderRadius: widget.isMe
+            borderRadius: isMe
                 ? borderRadius.subtract(BorderRadius.only(bottomRight: radius))
                 : borderRadius.subtract(BorderRadius.only(bottomLeft: radius)),
           ),
@@ -54,9 +50,9 @@ class _MessageWidgetState extends State<MessageWidget> {
   }
 
   Widget buildMessage() => Text(
-        widget.message.text,
-        style: TextStyle(color: widget.isMe ? Colors.black : Colors.white),
-      );
+    message.text,
+    style: TextStyle(color: isMe ? Colors.black : Colors.white),
+  );
 
   Widget buildAvatar(String? url) {
     if (url == null) {
@@ -74,6 +70,7 @@ class _MessageWidgetState extends State<MessageWidget> {
       }
       return Container(
         width: 60,
+        padding: const EdgeInsets.symmetric(horizontal: 10),
         child: ImageButton(
           image: map[url]!,
           size: 40,

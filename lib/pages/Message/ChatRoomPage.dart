@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:keepin/pages/Message/widget/Messages.dart';
 import 'package:keepin/pages/Message/widget/NewMessage.dart';
 import 'package:keepin/pages/Message/widget/ProfileHeader.dart';
+import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/ChatRoom.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/ChatRoomProvider.dart';
@@ -41,7 +42,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.waiting:
-                return Text("yo");
+                return Loading(50);
               default:
                 if (snapshot.hasError) {
                   return Text('Something Went Wrong Try later');
