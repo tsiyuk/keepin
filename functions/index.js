@@ -118,3 +118,56 @@ exports.sendNotification = functions.firestore
     return null
     }
   )
+
+  exports.sendCommentNotification = functions.firestore.document('posts/{postId}/comments/{commentId}').onCreate(
+    (snap) => {
+      console.log('----------------start comment notification--------------------')
+      const doc = snap.data()
+      const idFrom = doc['commenterId']
+      const nameFrom = doc['commenterName']
+      const postId = doc['postId']
+      const text = doc['text']
+
+      admin
+      .firestore()
+      .collection('posts')
+      .doc(postId)
+      .get()
+      .then(post => {
+          console.log(`Found poster: ${post.data()['posterId']}`)
+          const idTo = post.data()['posterId']
+            // Get info user from (sent)
+            admin
+              .firestore()
+              .collection('userProfiles')
+              .doc(idTo)
+              .get()
+              .then(userTo => {
+                console.log(`Found user to: ${userTo.data()['userName']}`)
+                if (userTo.data()['notificationToken']) {
+                  const payload = {
+                    notification: {
+                      title: `Your post: "${post.data()['title']}" has a new comment`,
+                      body: `${nameFrom} : ${text}`,
+                      badge: '1',
+                      sound: 'default'
+                    }
+                  }
+                  // Let push to the target device
+                  admin
+                    .messaging()
+                    .sendToDevice(userTo.data()['notificationToken'], payload)
+                    .then(response => {
+                      console.log('Successfully sent message:', response)
+                    })
+                    .catch(error => {
+                      console.log('Error sending message:', error)
+                    })
+                } else {
+                  console.log('Can not find pushToken target user')
+                }
+              })
+        })
+    return null
+    }
+  )

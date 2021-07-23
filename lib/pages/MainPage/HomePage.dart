@@ -166,14 +166,12 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
   }
 
   Widget _buildFollowFeed(BuildContext context) {
-    PostProvider postProvider =
-        Provider.of<PostProvider>(context, listen: false);
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context, listen: false);
     return FutureBuilder<List<Post>>(
         initialData: [],
-        future: postProvider
-            .readFollowPosts(FirebaseAuth.instance.currentUser!.uid),
+        future: PostProvider.readFollowPosts(
+            FirebaseAuth.instance.currentUser!.uid),
         builder: (context, snapshot) {
           if (snapshot.data == [] ||
               snapshot.connectionState == ConnectionState.waiting) {

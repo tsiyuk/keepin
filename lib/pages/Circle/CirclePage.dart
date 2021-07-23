@@ -54,7 +54,6 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    PostProvider postProvider = Provider.of<PostProvider>(context);
     CircleProvider circleProvider = Provider.of<CircleProvider>(context);
     initCircleInfo(circleProvider);
     Widget _profileSection = Container(
@@ -88,18 +87,98 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
       ),
     );
 
+    Widget _buildMenu() {
+      return Column(
+        children: [
+          circleProvider.isAdmin(user.uid)
+              ? ListTile(
+                  leading: Icon(Icons.edit),
+                  title: TextH3('Edit Description'),
+                  onTap: () async {
+                    return await showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            contentPadding: const EdgeInsets.all(20.0),
+                            actionsPadding: const EdgeInsets.symmetric(
+                                vertical: 6.0, horizontal: 16.0),
+                            content: Description(
+                                initDescription: circleProvider.description),
+                          );
+                        });
+                  },
+                )
+              : SizedBox(),
+          circleProvider.isAdmin(user.uid)
+              ? ListTile(
+                  leading: Icon(Icons.edit),
+                  title: TextH3('Edit Tags'),
+                  onTap: () async {
+                    return await showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            contentPadding: const EdgeInsets.all(20.0),
+                            actionsPadding: const EdgeInsets.symmetric(
+                                vertical: 6.0, horizontal: 16.0),
+                            content: _buildTags(context, circleProvider.tags),
+                          );
+                        });
+                  },
+                )
+              : SizedBox(),
+          !isMember
+              ? ListTile(
+                  leading: Icon(Icons.add),
+                  title: TextH3('Join Circle'),
+                  onTap: () {
+                    circleProvider.joinCircle();
+                    setState(() {
+                      isMember = true;
+                    });
+                  },
+                )
+              : ListTile(
+                  leading: Icon(Icons.exit_to_app),
+                  title: TextH3('Quit Circle'),
+                  onTap: () async {
+                    try {
+                      await circleProvider.quitCircle();
+                    } on FirebaseException catch (e) {
+                      showError(context, e.code);
+                    }
+                    setState(() {
+                      isMember = false;
+                    });
+                  },
+                )
+        ],
+      );
+    }
+
     BottomAppBar bottomBar = BottomAppBar(
       shape: CircularNotchedRectangle(),
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
         IconButton(
-          onPressed: () {},
+          tooltip: 'Menu',
+          onPressed: () {
+            showModalBottomSheet(
+                context: context, builder: (context) => _buildMenu());
+          },
           iconSize: 30,
           icon: Icon(Icons.menu),
         ),
         IconButton(
-          onPressed: () {},
+          tooltip: 'Clock in',
+          onPressed: () async {
+            try {
+              await circleProvider.clockin();
+            } on FirebaseException catch (e) {
+              showError(context, e.code);
+            }
+          },
           iconSize: 30,
-          icon: Icon(Icons.fireplace_outlined),
+          icon: Icon(Icons.lock_clock),
         ),
         // BottomBarItem(icon: Icon(Icons.menu), label: 'Menu'),
         // BottomNavigationBarItem(
@@ -139,85 +218,47 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                   ),
                 ),
                 Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      Column(
-                        children: [
-                          Center(
-                              child: circleProvider.description != null
-                                  ? Text(circleProvider.description!)
-                                  : Text("No Description")),
-                          circleProvider.isAdmin(user.uid)
-                              ? _buildTags(context, circleProvider.tags)
-                              : Container(),
-                          circleProvider.isAdmin(user.uid)
-                              ? Description(
-                                  initDescription: circleProvider.description,
-                                )
-                              : Container(),
-                        ],
-                      ),
-                      StreamBuilder<List<Post>>(
-                          stream: postProvider
-                              .readPostsFromCircle(widget.circle.circleName),
-                          builder: (context, snapshot) {
-                            if (snapshot.data != null) {
-                              return ListView.separated(
-                                itemCount: snapshot.data!.length,
-                                itemBuilder: (context, index) {
-                                  Post post = snapshot.data![index];
-                                  return postDetail(context, post);
-                                },
-                                separatorBuilder: (c, i) => Container(
-                                  height: 10,
-                                  color: Colors.blueGrey.shade100,
-                                ),
-                              );
-                            } else {
-                              return Text('null');
-                            }
-                          }),
-                      Center(
-                        child: Column(children: [
-                          isMember
-                              ? PrimaryButton(
-                                  child: Text('Quit Circle'),
-                                  onPressed: () async {
-                                    try {
-                                      await circleProvider.quitCircle();
-                                    } on FirebaseException catch (e) {
-                                      showError(context, e.code);
-                                    }
-                                    setState(() {
-                                      isMember = false;
-                                    });
-                                  })
-                              : PrimaryButton(
-                                  child: Text('Join Circle'),
-                                  onPressed: () {
-                                    circleProvider.joinCircle();
-                                    setState(() {
-                                      isMember = true;
-                                    });
-                                  }),
-                          PrimaryButton(
-                            child: Text('Clock in'),
-                            onPressed: () async {
-                              try {
-                                await circleProvider.clockin();
-                              } on FirebaseException catch (e) {
-                                showError(context, e.code);
-                              }
-                            },
-                          ),
-                          Rank(
-                            circleName: circleProvider.circleName,
-                          ),
-                        ]),
-                      ),
-                    ],
-                  ),
+                  child: TabBarView(controller: _tabController, children: [
+                    Column(
+                      children: [
+                        Center(
+                            child: circleProvider.description != null
+                                ? Text(circleProvider.description!)
+                                : Text("No Description")),
+                        circleProvider.isAdmin(user.uid)
+                            ? _buildTags(context, circleProvider.tags)
+                            : Container(),
+                        circleProvider.isAdmin(user.uid)
+                            ? Description(
+                                initDescription: circleProvider.description,
+                              )
+                            : Container(),
+                      ],
+                    ),
+                    StreamBuilder<List<Post>>(
+                        stream: PostProvider.readPostsFromCircle(
+                            widget.circle.circleName),
+                        builder: (context, snapshot) {
+                          if (snapshot.data != null) {
+                            return ListView.separated(
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (context, index) {
+                                Post post = snapshot.data![index];
+                                return postDetail(context, post);
+                              },
+                              separatorBuilder: (c, i) => Container(
+                                height: 10,
+                                color: Colors.blueGrey.shade100,
+                              ),
+                            );
+                          } else {
+                            return Text('null');
+                          }
+                        }),
+                    Rank(
+                      circleName: circleProvider.circleName,
+                    ),
+                  ]),
                 ),
               ],
             ),
@@ -394,66 +435,5 @@ class _RankState extends State<Rank> {
         }
       },
     );
-
-    /// Use a stream builder with a future builder nested will cause loop of loading
-
-    // return Expanded(
-    //   child: StreamBuilder<List<RankingInfo>>(
-    //     stream: circleProvider.readUserRank(),
-    //     builder: (context, snapshot) {
-    //       switch (snapshot.connectionState) {
-    //         case ConnectionState.waiting:
-    //           return Center(child: Loading(20.0));
-    //         default:
-    //           if (snapshot.hasError ||
-    //               !snapshot.hasData ||
-    //               snapshot.data!.length == 0) {
-    //             return Container(
-    //               color: Theme.of(context).primaryColor,
-    //               alignment: Alignment.center,
-    //               child: Text(
-    //                 'Error',
-    //                 style: TextStyle(fontSize: 28, color: Colors.white),
-    //               ),
-    //             );
-    //           } else {
-    //             return ListView.separated(
-    //                 separatorBuilder: (context, index) => Divider(
-    //                       thickness: 1,
-    //                       indent: 10,
-    //                       endIndent: 10,
-    //                     ),
-    //                 itemCount: snapshot.data!.length,
-    //                 itemBuilder: (context, index) {
-    //                   String uid = snapshot.data![index].userId;
-    //                   return FutureBuilder<UserProfile>(
-    //                       future: userProfileProvider.readUserProfile(uid),
-    //                       builder: (context, value) {
-    //                         return GestureDetector(
-    //                             onTap: () {
-    //                               Navigator.of(context).push(MaterialPageRoute(
-    //                                   builder: (context) => UserProfileDisplay(
-    //                                       value.data!.userId)));
-    //                             },
-    //                             child: ListTile(
-    //                               leading: value.data!.avatarURL != null
-    //                                   ? ClipOval(
-    //                                       child: Image.network(
-    //                                         value.data!.avatarURL!,
-    //                                         width: 40,
-    //                                         height: 40,
-    //                                         fit: BoxFit.cover,
-    //                                       ),
-    //                                     )
-    //                                   : defaultAvatar(40),
-    //                               title: TextH3(value.data!.userName),
-    //                             ));
-    //                       });
-    //                 });
-    //           }
-    //       }
-    //     },
-    //   ),
-    // );
   }
 }

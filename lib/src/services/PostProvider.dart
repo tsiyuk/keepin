@@ -41,8 +41,8 @@ class PostProvider with ChangeNotifier {
   Future<List<UserProfile>> get likedList =>
       _firestoreService.getLikedList(postId);
 
-  Stream<List<Comment>> getComments(String postId) {
-    return _firestoreService.getComments(postId);
+  static Stream<List<Comment>> getComments(String postId) {
+    return FirestoreService.getComments(postId);
   }
 
   // Setters
@@ -51,16 +51,16 @@ class PostProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Stream<List<Post>> readPostsFromCircle(String circleName) {
-    return _firestoreService.getPostsFromCircle(circleName);
+  static Stream<List<Post>> readPostsFromCircle(String circleName) {
+    return FirestoreService.getPostsFromCircle(circleName);
   }
 
-  Stream<List<Post>> readPostsFromUser(String userId) {
-    return _firestoreService.getPostsFromUser(userId);
+  static Stream<List<Post>> readPostsFromUser(String userId) {
+    return FirestoreService.getPostsFromUser(userId);
   }
 
-  Future<List<Post>> readFollowPosts(String userId) {
-    return _firestoreService.getPostsFromCirclesJoined(userId);
+  static Future<List<Post>> readFollowPosts(String userId) {
+    return FirestoreService.getPostsFromCirclesJoined(userId);
   }
 
   /// Initialize the provider
@@ -232,7 +232,7 @@ class FirestoreService {
         snapshot.docs.map((doc) => Post.fromJson(doc.data())).toList());
   }
 
-  Stream<List<Post>> getPostsFromCircle(String circleName) {
+  static Stream<List<Post>> getPostsFromCircle(String circleName) {
     return _firestore
         .collection('posts')
         .where('circleName', isEqualTo: circleName)
@@ -242,7 +242,7 @@ class FirestoreService {
             snapshot.docs.map((doc) => Post.fromJson(doc.data())).toList());
   }
 
-  Stream<List<Post>> getPostsFromUser(String userId) {
+  static Stream<List<Post>> getPostsFromUser(String userId) {
     return _firestore
         .collection('posts')
         .where('posterId', isEqualTo: userId)
@@ -252,7 +252,7 @@ class FirestoreService {
             snapshot.docs.map((doc) => Post.fromJson(doc.data())).toList());
   }
 
-  Future<List<Post>> getPostsFromCirclesJoined(String userId) async {
+  static Future<List<Post>> getPostsFromCirclesJoined(String userId) async {
     List<String> circleNames = await _firestore
         .collection('userProfiles')
         .doc(userId)
@@ -283,7 +283,7 @@ class FirestoreService {
   }
 
   /// Read comments from the post specified by the postId
-  Stream<List<Comment>> getComments(String postId) {
+  static Stream<List<Comment>> getComments(String postId) {
     return _firestore
         .collection('posts')
         .doc(postId)

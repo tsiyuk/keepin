@@ -81,14 +81,18 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
                       comments = _buildComment(context, postProvider);
                     }
                     showComment = !showComment;
-
                   });
                 }),
             StyledButton(
                 icon: Icons.share_outlined, text: " share", onPressed: () {})
           ],
         ),
-        AnimatedSwitcher(duration: Duration(milliseconds: 200), child: comments, transitionBuilder: (Widget child, Animation<double> animation) => ScaleTransition(child: child, scale: animation),)
+        AnimatedSwitcher(
+          duration: Duration(milliseconds: 200),
+          child: comments,
+          transitionBuilder: (Widget child, Animation<double> animation) =>
+              ScaleTransition(child: child, scale: animation),
+        )
       ],
     );
   }
@@ -104,11 +108,14 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          StyledButton(icon: Icons.add_rounded, text: " add comment", onPressed: () {
-            showSuccess(context, "hi");
-          }),
+          StyledButton(
+              icon: Icons.add_rounded,
+              text: " add comment",
+              onPressed: () {
+                showSuccess(context, "hi");
+              }),
           StreamBuilder<List<Comment>>(
-            stream: postProvider.getComments(widget.post.postId!),
+            stream: PostProvider.getComments(widget.post.postId!),
             initialData: [],
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
@@ -120,14 +127,17 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
                     return Center(child: Text("Error"));
                   } else {
                     return ListView.builder(
-                      itemCount: snapshot.data!.length,
+                        itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
                           Comment comment = snapshot.data![index];
                           return Text.rich(
                             TextSpan(
                               text: comment.commenterName,
-                              style: TextStyle(fontSize: 16, decoration: TextDecoration.underline,
-                                color: Colors.blue,),
+                              style: TextStyle(
+                                fontSize: 16,
+                                decoration: TextDecoration.underline,
+                                color: Colors.blue,
+                              ),
                               children: <TextSpan>[
                                 TextSpan(
                                     text: comment.text,
@@ -138,8 +148,7 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
                               ],
                             ),
                           );
-                        }
-                    );
+                        });
                   }
               }
             },
