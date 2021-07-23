@@ -6,11 +6,14 @@ import 'package:keepin/pages/Circle/CirclePage.dart';
 import 'package:keepin/pages/UserProfileDisplay.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/models/Circle.dart';
+import 'package:keepin/src/models/Tag.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
+
+import '../TagSelector.dart';
 
 class UserProfilePage extends StatefulWidget {
   final User user;
@@ -54,7 +57,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget build(BuildContext context) {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context);
-    UserState userState = Provider.of<UserState>(context, listen: false);
+    UserState userState = Provider.of<UserState>(context);
     CircleProvider circleProvider =
         Provider.of<CircleProvider>(context, listen: false);
     initUser(userProfileProvider);
@@ -158,6 +161,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ],
                 ),
               ),
+              //_buildTag(context),
               SecondaryButton(
                 onPressed: () {
                   userState.signOut();
@@ -170,6 +174,23 @@ class _UserProfilePageState extends State<UserProfilePage> {
           );
   }
 
+  // Widget _buildTag(BuildContext context, List<String> tempTag) {
+  //   UserProfileProvider userProfileProvider =
+  //       Provider.of<UserProfileProvider>(context);
+  //   List<String> temp = userProfileProvider.tags;
+  //   return Column(
+  //     children: [
+  //       TagSelector(texts: temp),
+  //       PrimaryButton(
+  //         child: Text('Update Tags'),
+  //         onPressed: () {
+  //           userProfileProvider.changeTags(temp);
+  //         },
+  //       )
+  //     ],
+  //   );
+  // }
+
   Future<void> _showEditForm(BuildContext context, userProfileProvider,
       String initialUserName, String initialBio) async {
     return await showDialog(
@@ -179,32 +200,39 @@ class _UserProfilePageState extends State<UserProfilePage> {
         final bioController = TextEditingController();
         userNameController.text = initialUserName;
         bioController.text = initialBio;
+        List<String> tempTags = userProfileProvider.tags;
         return AlertDialog(
           contentPadding: const EdgeInsets.all(20.0),
           actionsPadding:
               const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
-          content: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: userNameController,
-                  validator: validator("User Name"),
-                  decoration: InputDecoration(
-                    labelText: 'User Name',
+          content: Column(children: [
+            Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: userNameController,
+                    validator: validator("User Name"),
+                    decoration: InputDecoration(
+                      labelText: 'User Name',
+                    ),
                   ),
-                ),
-                TextFormField(
-                  controller: bioController,
-                  validator: validator("Bio"),
-                  decoration: InputDecoration(
-                    labelText: 'Bio',
+                  TextFormField(
+                    controller: bioController,
+                    validator: validator("Bio"),
+                    decoration: InputDecoration(
+                      labelText: 'Bio',
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
+            SizedBox(
+              height: 20,
+            ),
+            TagSelector(texts: tempTags),
+          ]),
           actions: [
             SecondaryButton(
                 child: Text("cancel"), onPressed: Navigator.of(context).pop),
@@ -215,6 +243,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   if (_formKey.currentState!.validate()) {
                     userProfileProvider.changeUserName(userNameController.text);
                     userProfileProvider.changeBio(bioController.text);
+                    userProfileProvider.changeTags(tempTags);
                     userProfileProvider.saveChanges();
                     Navigator.of(context).pop();
                   }

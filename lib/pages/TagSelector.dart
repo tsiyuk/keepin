@@ -59,17 +59,6 @@ class _TagSelectorState extends State<TagSelector> {
             fontSize: _fontSize,
           ),
           combine: ItemTagsCombine.withTextBefore,
-          removeButton: ItemTagsRemoveButton(
-            onRemoved: () {
-              // Remove the item from the data source.
-              setState(() {
-                // required
-                _items.removeAt(index);
-              });
-              //required
-              return true;
-            },
-          ), // OR null,
           onPressed: (item) {
             setState(() {
               if (item.active!) {

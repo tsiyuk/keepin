@@ -378,3 +378,44 @@ Widget postDetail(BuildContext context, Post post, {bool detail = true}) {
     ],
   );
 }
+
+class CircleInfoBuilder {
+  static Widget buildCircleInfo(String url, String name, num count) {
+    return Container(
+      width: 130,
+      height: 50,
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Image.network(
+              url,
+              width: 40,
+              height: 40,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(width: 4),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 80,
+                child: Text(
+                  name,
+                  style: TextStyle(fontSize: 18),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                'keepin for: $count',
+                style: TextStyle(fontSize: 12),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
+}
