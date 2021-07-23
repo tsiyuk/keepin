@@ -86,6 +86,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                   ? TextH4(
                       'Join the ${widget.circle.circleName} and clock in every day')
                   : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         TextH5('Clock in days: ${circleProvider.clockinCount}'),
                         TextH5('Exp: ${circleProvider.exp}'),
@@ -117,7 +118,8 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                                 actionsPadding: const EdgeInsets.symmetric(
                                     vertical: 6.0, horizontal: 16.0),
                                 content: Description(
-                                    initDescription: circleProvider.description),
+                                    initDescription:
+                                        circleProvider.description),
                               );
                             });
                       },
@@ -132,7 +134,8 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                             context: context,
                             builder: (context) {
                               return AlertDialog(
-                                content: _buildTags(context, circleProvider.tags),
+                                content:
+                                    _buildTags(context, circleProvider.tags),
                               );
                             });
                       },
@@ -177,7 +180,8 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
           onPressed: () {
             showModalBottomSheet(
                 isScrollControlled: true,
-                context: context, builder: (context) => _buildMenu());
+                context: context,
+                builder: (context) => _buildMenu());
           },
           iconSize: 30,
           icon: Icon(Icons.menu),

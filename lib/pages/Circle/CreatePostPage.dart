@@ -24,6 +24,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
   TextEditingController _titleController = TextEditingController();
   List<File> imageFiles = [];
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  static const double safePadding = 20.0;
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +36,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
         widget.user, widget.circleName, circleProvider.tags);
     return Scaffold(
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(safePadding),
         child: Form(
           key: _formKey,
           child: Column(
@@ -67,7 +68,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   postProvider.changeText(_textController.text);
                 },
               ),
-              Wrap(),
+              _buildImages(context),
               IconButton(
                 iconSize: 60,
                 icon: Icon(Icons.camera_rounded),
@@ -79,7 +80,9 @@ class _CreatePostPageState extends State<CreatePostPage> {
                       if (await asset.exists) {
                         File? file = await Utils.compress(await asset.file);
                         if (file != null && imageFiles.length < 10) {
-                          imageFiles.add(file);
+                          setState(() {
+                            imageFiles.add(file);
+                          });
                         }
                       }
                     }
@@ -104,6 +107,36 @@ class _CreatePostPageState extends State<CreatePostPage> {
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildImages(
+    BuildContext context,
+  ) {
+    double spacing = 10;
+    double imageSize = (MediaQuery.of(context).size.width -
+            safePadding * 2 -
+            8 * 2 -
+            spacing * 2) /
+        3;
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 16.0),
+      padding: const EdgeInsets.all(8.0),
+      decoration: BoxDecoration(
+        color: Colors.blueGrey.withAlpha(0x30),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Wrap(
+        spacing: spacing,
+        runSpacing: spacing,
+        children: imageFiles.map((element) {
+          return ImageButton(
+            imageFile: element,
+            size: imageSize,
+            oval: false,
+          );
+        }).toList(),
       ),
     );
   }

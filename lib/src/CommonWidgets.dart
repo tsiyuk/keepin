@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/Post/LikeCommentShare.dart';
 import 'package:keepin/pages/Post/PostPage.dart';
@@ -82,6 +84,7 @@ class SecondaryButton extends StatelessWidget {
 class ImageButton extends StatelessWidget {
   const ImageButton(
       {this.imageLink,
+      this.imageFile,
       this.image,
       this.oval = true,
       this.fit = BoxFit.cover,
@@ -90,6 +93,7 @@ class ImageButton extends StatelessWidget {
 
   final Widget? image;
   final String? imageLink;
+  final File? imageFile;
   final void Function()? onPressed;
   final bool oval;
   final BoxFit fit;
@@ -98,9 +102,11 @@ class ImageButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget image = imageLink == null
-        ? this.image == null
-            ? defaultAvatar(size)
-            : this.image!
+        ? this.imageFile == null
+            ? this.image == null
+                ? defaultAvatar(size)
+                : this.image!
+            : Image.file(imageFile!, fit: fit)
         : Image.network(imageLink!, fit: fit);
     return GestureDetector(
       onTap: onPressed == null ? _showImage(context, image) : onPressed,
