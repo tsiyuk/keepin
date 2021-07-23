@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/Post/LikeCommentShare.dart';
@@ -35,7 +36,8 @@ class _PostPageState extends State<PostPage> {
               _buildPoster(context, widget.post),
               _buildPost(context),
               _buildImages(context, widget.post),
-              LikeCommentShare(post: widget.post)
+              LikeCommentShare(post: widget.post),
+              _buildDeleteButton(context, widget.post),
             ],
           ),
         ),
@@ -117,5 +119,17 @@ class _PostPageState extends State<PostPage> {
         );
       }).toList(),
     );
+  }
+
+  Widget _buildDeleteButton(BuildContext context, Post post) {
+    return FirebaseAuth.instance.currentUser!.uid == post.posterId
+        ? IconButton(
+            onPressed: () {
+              PostProvider.deletePost(post.postId!);
+              Navigator.pop(context);
+              showSuccess(context, 'Post has been deleted');
+            },
+            icon: Icon(Icons.delete))
+        : SizedBox();
   }
 }

@@ -218,6 +218,10 @@ class PostProvider with ChangeNotifier {
     await _firestoreService.updatePostHistory(
         currentUser.uid, post.posterId, post.tags);
   }
+
+  static void deletePost(String postId) async {
+    await FirestoreService.removePost(postId);
+  }
 }
 
 class FirestoreService {
@@ -389,7 +393,7 @@ class FirestoreService {
     });
   }
 
-  Future<void> removePost(String postId) {
+  static Future<void> removePost(String postId) {
     return _firestore.collection('posts').doc(postId).delete();
   }
 }

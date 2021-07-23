@@ -194,7 +194,8 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
         future: postProvider
             .readFollowPosts(FirebaseAuth.instance.currentUser!.uid),
         builder: (context, snapshot) {
-          if (snapshot.data == []) {
+          if (snapshot.data == [] ||
+              snapshot.connectionState == ConnectionState.waiting) {
             return Loading(40);
           }
           if (snapshot.data != null) {
@@ -228,7 +229,8 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
             initialData: [],
             stream: userProfileProvider.recommandPost,
             builder: (context, snapshot) {
-              if (snapshot.data == []) {
+              if (snapshot.data == [] ||
+                  snapshot.connectionState == ConnectionState.waiting) {
                 return Loading(40);
               }
               if (snapshot.data != null) {

@@ -3,9 +3,6 @@ import 'package:keepin/pages/Post/LikeCommentShare.dart';
 import 'package:keepin/pages/Post/PostPage.dart';
 import 'package:keepin/pages/UserProfileDisplay.dart';
 import 'package:keepin/src/models/Post.dart';
-import 'package:keepin/src/services/PostProvider.dart';
-import 'package:keepin/src/services/UserProfileProvider.dart';
-import 'package:provider/provider.dart';
 
 class Header extends StatelessWidget {
   const Header(this.heading);
