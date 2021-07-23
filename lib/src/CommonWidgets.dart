@@ -353,8 +353,9 @@ Widget postDetail(BuildContext context, Post post, {bool detail = true}) {
                             ),
                             detail && post.imageLinks.isNotEmpty
                                 ? Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
-                                  child: Text(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Text(
                                       "click to view " +
                                           post.imageLinks.length.toString() +
                                           " images",
@@ -366,7 +367,7 @@ Widget postDetail(BuildContext context, Post post, {bool detail = true}) {
                                         color: Colors.blue.shade800,
                                       ),
                                     ),
-                                )
+                                  )
                                 : SizedBox()
                           ],
                         ),

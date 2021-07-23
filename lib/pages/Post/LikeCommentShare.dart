@@ -15,14 +15,17 @@ class LikeCommentShare extends StatefulWidget {
 }
 
 class _LikeCommentShareState extends State<LikeCommentShare> {
+  late final commentStream;
   bool hasLiked = false;
   num numOfLikes = 0;
   bool showComment = false;
   Widget comments = SizedBox();
+  GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   @override
   void initState() {
     super.initState();
+    commentStream = PostProvider.getComments(widget.post.postId!);
     setState(() {
       showComment = widget.showComment;
     });
@@ -35,14 +38,14 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
     }
   }
 
-  void initPost(PostProvider postProvider) async {
+  void initPost() async {
     //postProvider.loadAll(widget.post);
     final bool temp = await PostProvider.hasLiked(widget.post);
     setState(() {
       hasLiked = temp;
       numOfLikes = widget.post.numOfLikes;
       if (showComment) {
-        comments = _buildComment(context, postProvider);
+        comments = _buildComment(context, commentStream);
       }
     });
   }
@@ -50,7 +53,7 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
   @override
   Widget build(BuildContext context) {
     PostProvider postProvider = Provider.of<PostProvider>(context);
-    initPost(postProvider);
+    initPost();
     return Column(
       children: [
         Row(
@@ -78,7 +81,7 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
                     if (showComment) {
                       comments = SizedBox();
                     } else {
-                      comments = _buildComment(context, postProvider);
+                      comments = _buildComment(context, commentStream);
                     }
                     showComment = !showComment;
                   });
@@ -91,16 +94,27 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
           duration: Duration(milliseconds: 200),
           child: comments,
           transitionBuilder: (Widget child, Animation<double> animation) =>
-              ScaleTransition(child: child, scale: animation),
+              ScaleTransition(
+                  child: child, scale: animation, alignment: Alignment(0, -1)),
         )
       ],
     );
   }
 
-  Widget _buildComment(BuildContext context, PostProvider postProvider) {
+  Widget _buildComment(BuildContext context, Stream<List<Comment>> stream) {
+    TextStyle userNameStyle = TextStyle(
+      fontSize: 14,
+      decoration: TextDecoration.underline,
+      color: Colors.blue,
+    );
+    TextStyle textStyle = TextStyle(
+      fontSize: 14,
+      decoration: TextDecoration.none,
+      color: Colors.black54,
+    );
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.only(top: 0, left: 12, right: 12, bottom: 16),
       decoration: BoxDecoration(
         color: Colors.brown.shade50,
         borderRadius: BorderRadius.circular(4),
@@ -113,9 +127,10 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
               text: " add comment",
               onPressed: () {
                 showSuccess(context, "hi");
+                _addCommentForm(context);
               }),
           StreamBuilder<List<Comment>>(
-            stream: PostProvider.getComments(widget.post.postId!),
+            stream: stream,
             initialData: [],
             builder: (context, snapshot) {
               switch (snapshot.connectionState) {
@@ -127,25 +142,41 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
                     return Center(child: Text("Error"));
                   } else {
                     return ListView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
                           Comment comment = snapshot.data![index];
-                          return Text.rich(
-                            TextSpan(
-                              text: comment.commenterName,
-                              style: TextStyle(
-                                fontSize: 16,
-                                decoration: TextDecoration.underline,
-                                color: Colors.blue,
-                              ),
-                              children: <TextSpan>[
+                          return GestureDetector(
+                            onTap: () {
+                              _addCommentForm(context, comment.commenterName,
+                                  comment.commenterId);
+                            },
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(vertical: 4.0),
+                              child: Text.rich(
                                 TextSpan(
-                                    text: comment.text,
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                    )),
-                                // can add more TextSpans here...
-                              ],
+                                  text: comment.commenterName + ":",
+                                  style: userNameStyle,
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      text: comment.replyTo != null
+                                          ? " reply to "
+                                          : "",
+                                      style: textStyle,
+                                    ),
+                                    TextSpan(
+                                      text: comment.replyTo,
+                                      style: userNameStyle,
+                                    ),
+                                    TextSpan(
+                                      text: " " + comment.text,
+                                      style: textStyle,
+                                    ),
+                                  ],
+                                ),
+                              ),
                             ),
                           );
                         });
@@ -156,6 +187,63 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
         ],
       ),
     );
+  }
+
+  Future<void> _addCommentForm(BuildContext context,
+      [replyTo, replyToId]) async {
+    return await showDialog(
+      context: context,
+      builder: (context) {
+        final commentController = TextEditingController();
+        return AlertDialog(
+          insetPadding: const EdgeInsets.all(20),
+          contentPadding: const EdgeInsets.all(16.0),
+          content: Container(
+            width: 1000,
+            child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextH2(replyTo != null ? "Reply to " + replyTo : "Comment"),
+                  Form(
+                    key: _formKey,
+                    child: TextFormField(
+                      maxLines: 3,
+                      controller: commentController,
+                      validator: validator("Comment"),
+                      decoration: InputDecoration(
+                        focusColor: Theme.of(context).primaryColorLight,
+                        hintText: 'comment now!',
+                        filled: true,
+                        fillColor: Colors.grey.shade50,
+                      ),
+                    ),
+                  ),
+                ]),
+          ),
+          actions: [
+            SecondaryButton(
+                child: Text("cancel"), onPressed: Navigator.of(context).pop),
+            PrimaryButton(
+                child: Text("Save"),
+                onPressed: () {
+                  _formKey.currentState!.save();
+                  if (_formKey.currentState!.validate()) {
+                    PostProvider.addComments(widget.post.postId!,
+                        commentController.text, replyTo, replyToId);
+                    Navigator.of(context).pop();
+                  }
+                })
+          ],
+        );
+      },
+    );
+  }
+
+  String? Function(String?) validator(String field) {
+    return (String? value) {
+      return value == null || value.isEmpty ? "$field cannot be empty" : null;
+    };
   }
 }
 

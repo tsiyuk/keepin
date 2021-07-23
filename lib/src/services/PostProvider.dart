@@ -24,7 +24,7 @@ class PostProvider with ChangeNotifier {
   num _numOfLikes = 0;
   static User currentUser = FirebaseAuth.instance.currentUser!;
 
-  FirestoreService _firestoreService = FirestoreService();
+  static FirestoreService _firestoreService = FirestoreService();
 
   // Getters
   String get postId => _postId;
@@ -201,7 +201,7 @@ class PostProvider with ChangeNotifier {
     return result;
   }
 
-  void addComments(
+  static void addComments(
       String postId, String text, String? replyTo, String? replyToId) async {
     await _firestoreService.addComment(Comment(
       postId: postId,
