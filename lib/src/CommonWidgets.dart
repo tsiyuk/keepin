@@ -355,18 +355,21 @@ Widget postDetail(BuildContext context, Post post, {bool detail = true}) {
                               ),
                             ),
                             detail && post.imageLinks.isNotEmpty
-                                ? Text(
-                                    "click to view " +
-                                        post.imageLinks.length.toString() +
-                                        " images",
-                                    style: TextStyle(
-                                      fontSize: 14.0,
-                                      fontWeight: FontWeight.w400,
-                                      fontStyle: FontStyle.italic,
-                                      decoration: TextDecoration.underline,
-                                      color: Colors.blue.shade800,
+                                ? Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Text(
+                                      "click to view " +
+                                          post.imageLinks.length.toString() +
+                                          " images",
+                                      style: TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w400,
+                                        fontStyle: FontStyle.italic,
+                                        decoration: TextDecoration.underline,
+                                        color: Colors.blue.shade800,
+                                      ),
                                     ),
-                                  )
+                                )
                                 : SizedBox()
                           ],
                         ),

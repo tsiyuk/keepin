@@ -35,7 +35,8 @@ class _PostPageState extends State<PostPage> {
               _buildPoster(context, widget.post),
               _buildPost(context),
               _buildImages(context, widget.post),
-              LikeCommentShare(post: widget.post)
+              LikeCommentShare(post: widget.post, showComment: true),
+              SizedBox(height: 40)
             ],
           ),
         ),
