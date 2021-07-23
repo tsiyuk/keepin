@@ -293,6 +293,7 @@ TextH5 getTimeDisplay(String str) {
 
 Widget postDetail(BuildContext context, Post post, {bool detail = true}) {
   return Row(
+    mainAxisSize: MainAxisSize.max,
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Container(
@@ -316,14 +317,15 @@ Widget postDetail(BuildContext context, Post post, {bool detail = true}) {
         ),
       ),
       SizedBox(width: 10),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          GestureDetector(
-            behavior: HitTestBehavior.translucent,
-            onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (context) => PostPage(post: post))),
-            child: SizedBox(
+      Container(
+        width: MediaQuery.of(context).size.width - 100,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => PostPage(post: post))),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -336,8 +338,7 @@ Widget postDetail(BuildContext context, Post post, {bool detail = true}) {
                       margin: const EdgeInsets.symmetric(vertical: 8.0),
                       constraints: new BoxConstraints(
                         minHeight: 40.0,
-                        maxWidth: MediaQuery.of(context).size.width - 100,
-                        maxHeight: 200.0,
+                        maxHeight: 300.0,
                       ),
                       child: SingleChildScrollView(
                         physics: BouncingScrollPhysics(),
@@ -353,17 +354,19 @@ Widget postDetail(BuildContext context, Post post, {bool detail = true}) {
                                 color: Colors.black87,
                               ),
                             ),
-                            post.imageLinks.isNotEmpty
-                                ? Container(
-                                    margin: const EdgeInsets.only(top: 12),
-                                    padding: const EdgeInsets.all(6),
-                                    decoration: BoxDecoration(
-                                      color: Colors.teal.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: TextH5("click to view " +
+                            detail && post.imageLinks.isNotEmpty
+                                ? Text(
+                                    "click to view " +
                                         post.imageLinks.length.toString() +
-                                        " images"))
+                                        " images",
+                                    style: TextStyle(
+                                      fontSize: 14.0,
+                                      fontWeight: FontWeight.w400,
+                                      fontStyle: FontStyle.italic,
+                                      decoration: TextDecoration.underline,
+                                      color: Colors.blue.shade800,
+                                    ),
+                                  )
                                 : SizedBox()
                           ],
                         ),
@@ -371,9 +374,9 @@ Widget postDetail(BuildContext context, Post post, {bool detail = true}) {
                     ),
                   ]),
             ),
-          ),
-          detail ? LikeCommentShare(post: post) : SizedBox()
-        ],
+            detail ? LikeCommentShare(post: post) : SizedBox()
+          ],
+        ),
       )
     ],
   );

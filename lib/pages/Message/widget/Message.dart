@@ -16,8 +16,6 @@ class MessageWidget extends StatelessWidget {
     required this.isMe,
   }) : super(key: key);
 
-
-
   @override
   Widget build(BuildContext context) {
     final radius = Radius.circular(12);
@@ -36,9 +34,8 @@ class MessageWidget extends StatelessWidget {
           margin: EdgeInsets.symmetric(vertical: 6),
           constraints: BoxConstraints(maxWidth: 140),
           decoration: BoxDecoration(
-            color: isMe
-                ? Colors.grey[100]
-                : Theme.of(context).primaryColorLight,
+            color:
+                isMe ? Colors.grey[100] : Theme.of(context).primaryColorLight,
             borderRadius: isMe
                 ? borderRadius.subtract(BorderRadius.only(bottomRight: radius))
                 : borderRadius.subtract(BorderRadius.only(bottomLeft: radius)),
@@ -50,9 +47,9 @@ class MessageWidget extends StatelessWidget {
   }
 
   Widget buildMessage() => Text(
-    message.text,
-    style: TextStyle(color: isMe ? Colors.black : Colors.white),
-  );
+        message.text,
+        style: TextStyle(color: isMe ? Colors.black : Colors.white),
+      );
 
   Widget buildAvatar(String? url) {
     if (url == null) {

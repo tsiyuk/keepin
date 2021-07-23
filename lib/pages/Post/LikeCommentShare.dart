@@ -12,9 +12,9 @@ class LikeCommentShare extends StatefulWidget {
 }
 
 class _LikeCommentShareState extends State<LikeCommentShare> {
-  final double iconSize = 20;
   bool hasLiked = false;
   num numOfLikes = 0;
+  bool showComment = false;
 
   @override
   void initState() {
@@ -41,56 +41,85 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
   Widget build(BuildContext context) {
     PostProvider postProvider = Provider.of<PostProvider>(context);
     initPost();
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      mainAxisSize: MainAxisSize.max,
+    return Column(
       children: [
-        TextButton(
-          style: TextButton.styleFrom(primary: Colors.grey),
-          child: Container(
-            child: Row(
-              children: [
-                hasLiked
-                    ? Icon(Icons.favorite_rounded,
-                        color: Colors.red.shade200, size: iconSize)
-                    : Icon(Icons.favorite_border_rounded, size: iconSize),
-                Text(" " + numOfLikes.toString())
-              ],
-            ),
-          ),
-          onPressed: () {
-            if (hasLiked) {
-              postProvider.unlikeViaPost(widget.post);
-            } else {
-              postProvider.likeViaPost(widget.post);
-            }
-          },
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisSize: MainAxisSize.max,
+          children: [
+            StyledButton(
+                icon: hasLiked
+                    ? Icons.favorite_rounded
+                    : Icons.favorite_border_rounded,
+                text: " " + numOfLikes.toString(),
+                onPressed: () {
+                  if (hasLiked) {
+                    postProvider.unlikeViaPost(widget.post);
+                  } else {
+                    postProvider.likeViaPost(widget.post);
+                  }
+                },
+                red: hasLiked),
+            StyledButton(
+                icon: Icons.messenger_outline_rounded,
+                text: " comment",
+                onPressed: () {
+                  setState(() {
+                    showComment = !showComment;
+                  });
+                }),
+            StyledButton(
+                icon: Icons.share_outlined, text: " share", onPressed: () {})
+          ],
         ),
-        TextButton(
-          style: TextButton.styleFrom(primary: Colors.grey),
-          child: Container(
-            child: Row(
-              children: [
-                Icon(Icons.messenger_outline_rounded, size: iconSize),
-                Text(" comment")
-              ],
-            ),
-          ),
-          onPressed: () {},
-        ),
-        TextButton(
-          style: TextButton.styleFrom(primary: Colors.grey),
-          child: Container(
-            child: Row(
-              children: [
-                Icon(Icons.share_outlined, size: iconSize),
-                Text(" share")
-              ],
-            ),
-          ),
-          onPressed: () {},
-        )
+        showComment ? _buildComment() : SizedBox()
       ],
+    );
+  }
+
+  Widget _buildComment() {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.brown.shade50,
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.max,
+        children: [Text("comment")],
+      ),
+    );
+  }
+}
+
+class StyledButton extends StatelessWidget {
+  const StyledButton(
+      {required this.icon,
+      required this.text,
+      required this.onPressed,
+      this.red = false});
+
+  final IconData icon;
+  final String text;
+  final onPressed;
+  final bool red;
+  final double iconSize = 20;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+      style: TextButton.styleFrom(primary: Colors.grey),
+      child: Container(
+        child: Row(
+          children: [
+            Icon(icon,
+                color: red ? Colors.red.shade200 : Colors.grey, size: iconSize),
+            Text(text)
+          ],
+        ),
+      ),
+      onPressed: onPressed,
     );
   }
 }
