@@ -88,71 +88,74 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
     );
 
     Widget _buildMenu() {
-      return Column(
-        children: [
-          circleProvider.isAdmin(user.uid)
-              ? ListTile(
-                  leading: Icon(Icons.edit),
-                  title: TextH3('Edit Description'),
-                  onTap: () async {
-                    return await showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            contentPadding: const EdgeInsets.all(20.0),
-                            actionsPadding: const EdgeInsets.symmetric(
-                                vertical: 6.0, horizontal: 16.0),
-                            content: Description(
-                                initDescription: circleProvider.description),
-                          );
+      return Container(
+        height: MediaQuery.of(context).size.height * 0.4,
+        child: Scaffold(
+          body: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              circleProvider.isAdmin(user.uid)
+                  ? ListTile(
+                      leading: Icon(Icons.edit),
+                      title: TextH3('Edit Description'),
+                      onTap: () async {
+                        return await showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                contentPadding: const EdgeInsets.all(20.0),
+                                actionsPadding: const EdgeInsets.symmetric(
+                                    vertical: 6.0, horizontal: 16.0),
+                                content: Description(
+                                    initDescription: circleProvider.description),
+                              );
+                            });
+                      },
+                    )
+                  : SizedBox(),
+              circleProvider.isAdmin(user.uid)
+                  ? ListTile(
+                      leading: Icon(Icons.edit),
+                      title: TextH3('Edit Tags'),
+                      onTap: () async {
+                        return await showDialog(
+                            context: context,
+                            builder: (context) {
+                              return AlertDialog(
+                                content: _buildTags(context, circleProvider.tags),
+                              );
+                            });
+                      },
+                    )
+                  : SizedBox(),
+              !isMember
+                  ? ListTile(
+                      leading: Icon(Icons.add),
+                      title: TextH3('Join Circle'),
+                      onTap: () {
+                        circleProvider.joinCircle();
+                        setState(() {
+                          isMember = true;
                         });
-                  },
-                )
-              : SizedBox(),
-          circleProvider.isAdmin(user.uid)
-              ? ListTile(
-                  leading: Icon(Icons.edit),
-                  title: TextH3('Edit Tags'),
-                  onTap: () async {
-                    return await showDialog(
-                        context: context,
-                        builder: (context) {
-                          return AlertDialog(
-                            contentPadding: const EdgeInsets.all(20.0),
-                            actionsPadding: const EdgeInsets.symmetric(
-                                vertical: 6.0, horizontal: 16.0),
-                            content: _buildTags(context, circleProvider.tags),
-                          );
+                      },
+                    )
+                  : ListTile(
+                      leading: Icon(Icons.exit_to_app),
+                      title: TextH3('Quit Circle'),
+                      onTap: () async {
+                        try {
+                          await circleProvider.quitCircle();
+                        } on FirebaseException catch (e) {
+                          showError(context, e.code);
+                        }
+                        setState(() {
+                          isMember = false;
                         });
-                  },
-                )
-              : SizedBox(),
-          !isMember
-              ? ListTile(
-                  leading: Icon(Icons.add),
-                  title: TextH3('Join Circle'),
-                  onTap: () {
-                    circleProvider.joinCircle();
-                    setState(() {
-                      isMember = true;
-                    });
-                  },
-                )
-              : ListTile(
-                  leading: Icon(Icons.exit_to_app),
-                  title: TextH3('Quit Circle'),
-                  onTap: () async {
-                    try {
-                      await circleProvider.quitCircle();
-                    } on FirebaseException catch (e) {
-                      showError(context, e.code);
-                    }
-                    setState(() {
-                      isMember = false;
-                    });
-                  },
-                )
-        ],
+                      },
+                    )
+            ],
+          ),
+        ),
       );
     }
 
@@ -163,6 +166,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
           tooltip: 'Menu',
           onPressed: () {
             showModalBottomSheet(
+                isScrollControlled: true,
                 context: context, builder: (context) => _buildMenu());
           },
           iconSize: 30,
@@ -174,7 +178,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
             try {
               await circleProvider.clockin();
             } on FirebaseException catch (e) {
-              showError(context, e.code);
+              showWarning(context, e.code);
             }
           },
           iconSize: 30,
@@ -289,6 +293,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
         Provider.of<CircleProvider>(context, listen: false);
     List<String> temp = circleProvider.tags;
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         TagSelector(texts: temp),
         PrimaryButton(
@@ -324,6 +329,7 @@ class _DescriptionState extends State<Description> {
   Widget build(BuildContext context) {
     CircleProvider circleProvider = Provider.of<CircleProvider>(context);
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         TextFormField(
           controller: descriptionController,

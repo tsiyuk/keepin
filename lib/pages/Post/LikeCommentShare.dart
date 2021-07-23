@@ -153,8 +153,7 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
                                   comment.commenterId);
                             },
                             child: Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 4.0),
+                              padding: const EdgeInsets.only(bottom: 6),
                               child: Text.rich(
                                 TextSpan(
                                   text: comment.commenterName + ":",

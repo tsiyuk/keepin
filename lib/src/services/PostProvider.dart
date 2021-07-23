@@ -174,31 +174,19 @@ class PostProvider with ChangeNotifier {
   }
 
   /// upload images
-  Future<List<File>> uploadAssets(BuildContext context) async {
-    final List<AssetEntity>? assets =
-        await AssetPicker.pickAssets(context, maxAssets: 3);
-    List<File> result = [];
-    if (assets != null) {
-      for (AssetEntity asset in assets) {
-        if (await asset.exists) {
-          File? file = await Utils.compress(await asset.file);
-          if (file != null) {
-            String fileName = file.path;
-            Reference firebaseStorageRef = FirebaseStorage.instance
-                .ref()
-                .child('postAssets')
-                .child(posterId)
-                .child(fileName);
-            await firebaseStorageRef.putFile(file);
-            String imageLink = await firebaseStorageRef.getDownloadURL();
-            _imageLinks.add(imageLink);
-            result.add(file);
-          }
-        }
-      }
+  Future<void> uploadAssets(List<File> files) async {
+    for (File file in files) {
+      String fileName = file.path;
+      Reference firebaseStorageRef = FirebaseStorage.instance
+          .ref()
+          .child('postAssets')
+          .child(posterId)
+          .child(fileName);
+      await firebaseStorageRef.putFile(file);
+      String imageLink = await firebaseStorageRef.getDownloadURL();
+      _imageLinks.add(imageLink);
     }
     notifyListeners();
-    return result;
   }
 
   static void addComments(

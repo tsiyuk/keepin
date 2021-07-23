@@ -118,7 +118,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     TextH3("Circles Joined: "),
                     StreamBuilder<List<CircleInfo>>(
                       stream: userProfileProvider.circlesJoined,
-                      //stream: postProvider.posts,
                       builder: (context, snapshot) {
                         if (snapshot.data != null &&
                             snapshot.data!.isNotEmpty) {

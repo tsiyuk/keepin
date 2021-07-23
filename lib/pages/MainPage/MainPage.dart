@@ -94,13 +94,16 @@ class _MainPageState extends State<MainPage> {
 
     return Scaffold(
       appBar: AppBar(
-        //title: const Text('Search Bar'),
+        title: const Text(' Keepin'),
         actions: [
           IconButton(
               onPressed: () async {
                 await showSearch(context: context, delegate: SearchData());
               },
               icon: Icon(Icons.search)),
+          // IconButton(onPressed: () {
+          //   showMenu(context: context, items: [PopupMenuItem(child: TextButton(child: Text("Edit Tags")))], position: );
+          // }, icon: Icon(Icons.more_vert))
         ],
       ),
       body: Center(

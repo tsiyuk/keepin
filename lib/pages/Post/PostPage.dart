@@ -26,6 +26,9 @@ class _PostPageState extends State<PostPage> {
     return Scaffold(
       appBar: AppBar(
         title: title,
+        actions: [
+          _buildDeleteButton(context, widget.post),
+        ],
       ),
       body: SingleChildScrollView(
         physics: BouncingScrollPhysics(),
@@ -38,7 +41,6 @@ class _PostPageState extends State<PostPage> {
               _buildImages(context, widget.post),
               LikeCommentShare(post: widget.post, showComment: true),
               SizedBox(height: 40),
-              _buildDeleteButton(context, widget.post),
             ],
           ),
         ),
@@ -122,13 +124,31 @@ class _PostPageState extends State<PostPage> {
     );
   }
 
-  Widget _buildDeleteButton(BuildContext context, Post post) {
+  Widget _buildDeleteButton(BuildContext buildContext, Post post) {
     return FirebaseAuth.instance.currentUser!.uid == post.posterId
         ? IconButton(
-            onPressed: () {
-              PostProvider.deletePost(post.postId!);
-              Navigator.pop(context);
-              showSuccess(context, 'Post has been deleted');
+            onPressed: () async {
+              await showDialog<bool>(
+                  context: buildContext,
+                  builder: (context) {
+                    return AlertDialog(
+                      content: Text(
+                          "Are you sure that you want to delete the post?"),
+                      actions: [
+                        SecondaryButton(
+                            child: Text("cancel"),
+                            onPressed: Navigator.of(context).pop),
+                        PrimaryButton(
+                            child: Text("Save"),
+                            onPressed: () {
+                              PostProvider.deletePost(post.postId!);
+                              Navigator.of(context).pop();
+                              Navigator.of(buildContext).pop();
+                              showSuccess(context, 'Post has been deleted');
+                            })
+                      ],
+                    );
+                  });
             },
             icon: Icon(Icons.delete))
         : SizedBox();
