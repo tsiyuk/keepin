@@ -96,8 +96,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         title: TextH2(initialUserName),
                         subtitle: TextH4(initialBio),
                         trailing: IconButton(
-                          visualDensity:
-                              VisualDensity(horizontal: -4.0, vertical: -4.0),
+                          // visualDensity:
+                          //     VisualDensity(horizontal: -4.0, vertical: -4.0),
                           onPressed: () {
                             _showEditForm(context, userProfileProvider,
                                 initialUserName, initialBio);

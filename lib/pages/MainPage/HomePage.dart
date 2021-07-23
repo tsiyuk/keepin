@@ -89,24 +89,6 @@ class HomePage extends StatelessWidget {
               },
             ),
           ),
-          // MaterialButton(
-          //   onPressed: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(builder: (context) => CirclePage()),
-          //     );
-          //   },
-          //   color: Colors.white,
-          //   child: ClipRRect(
-          //     borderRadius: BorderRadius.circular(8),
-          //     child: Image.asset('assets/images/nus.png',
-          //         width: 50, height: 50, fit: BoxFit.cover),
-          //   ),
-          //   padding: EdgeInsets.all(6),
-          //   shape: ContinuousRectangleBorder(
-          //       borderRadius: BorderRadius.circular(16)),
-          //   minWidth: 50,
-          // ),
         ],
       ),
     );
@@ -138,7 +120,6 @@ class HomePage extends StatelessWidget {
     return Column(
       children: [
         _buildCircleList(context),
-        Divider(),
         Expanded(child: Feed()),
       ],
     );
@@ -167,7 +148,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
         TabBar(
           labelColor: Theme.of(context).primaryColorDark,
           indicatorColor: Theme.of(context).primaryColor,
-          labelPadding: EdgeInsets.all(12.0),
+          labelPadding: EdgeInsets.all(8.0),
           controller: _tabController,
           tabs: <Widget>[Text("Follow"), Text("Recommendation")],
         ),
