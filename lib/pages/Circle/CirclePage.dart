@@ -16,20 +16,28 @@ import '../UserProfileDisplay.dart';
 class CirclePage extends StatefulWidget {
   final CircleInfo? circleInfo;
   final Circle circle;
+  // final bool isMember;
   CirclePage({required this.circle, this.circleInfo});
   @override
   _CirclePageState createState() => _CirclePageState();
 }
 
+/// The circle page use rebuild to query circle and circle info, which may cause a lot of read
 class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
   User user = FirebaseAuth.instance.currentUser!;
   bool isMember = false;
   bool loading = true;
   late TabController _tabController;
+  // late num clockInCount;
+  // late num exp;
   @override
   void initState() {
     super.initState();
+    //isMember = widget.isMember;
     _tabController = TabController(length: 3, vsync: this, initialIndex: 1);
+    // clockInCount =
+    //     widget.circleInfo != null ? widget.circleInfo!.clockinCount : 0;
+    // exp = widget.circleInfo != null ? widget.circleInfo!.exp : 0;
   }
 
   @override
@@ -40,15 +48,17 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
   }
 
   void initCircleInfo(CircleProvider cp) async {
-    cp.loadAll(widget.circle, widget.circleInfo);
-    bool temp = await cp.isMember(user.uid);
-    if (temp && widget.circleInfo == null) {
+    Circle circle = await cp.readCircleFromName(widget.circle.circleName);
+    bool temp =
+        await CircleProvider.isCurrentUserMember(widget.circle.circleName);
+    cp.loadAll(circle);
+    if (temp) {
       CircleInfo circleInfo = await cp.readCircleInfoFromUser();
-      cp.loadAll(widget.circle, circleInfo);
+      cp.loadInfo(circleInfo);
     }
     setState(() {
-      isMember = temp;
       loading = false;
+      isMember = temp;
     });
   }
 
@@ -173,6 +183,10 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
           onPressed: () async {
             try {
               await circleProvider.clockin();
+              // setState(() {
+              //   exp += circleProvider.CLOCK_IN_EXP;
+              //   clockInCount += 1;
+              // });
             } on FirebaseException catch (e) {
               showError(context, e.code);
             }
