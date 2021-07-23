@@ -68,7 +68,7 @@ class CircleProvider with ChangeNotifier {
   /// Get the circle info from the current user
   /// Call this function after using isMember to check whether the current user has joined the circle.
   Future<CircleInfo> readCircleInfoFromUser() async {
-    if (await isMember(_user.uid)) {
+    if (await isMember()) {
       return await _firestoreService.getCircleInfoFromUser(
           user.uid, circleName);
     } else {
@@ -90,12 +90,17 @@ class CircleProvider with ChangeNotifier {
     return userId == _adminUserId;
   }
 
-  Future<bool> isMember(String userId) async {
-    return await _firestoreService.isMemberExist(circleName, user.uid);
+  Future<bool> isMember() {
+    return FirestoreService.isMemberExist(circleName, user.uid);
+  }
+
+  static Future<bool> isCurrentUserMember(String circleName) {
+    return FirestoreService.isMemberExist(
+        circleName, FirebaseAuth.instance.currentUser!.uid);
   }
 
   // Setters
-  void loadAll(Circle circle, CircleInfo? circleInfo) {
+  void loadAll(Circle circle) {
     _circleName = circle.circleName;
     _circleAvatarURL = circle.avatarURL;
     _adminUserId = circle.adminUserId;
@@ -104,11 +109,12 @@ class CircleProvider with ChangeNotifier {
     _isPublic = circle.isPublic;
     _description = circle.description;
     _descriptionImageURLs = circle.descriptionImageURLs;
-    if (circleInfo != null) {
-      _clockinCount = circleInfo.clockinCount;
-      _lateClockinTime = circleInfo.lastClockinTime;
-      _exp = circleInfo.exp;
-    }
+  }
+
+  void loadInfo(CircleInfo circleInfo) {
+    _clockinCount = circleInfo.clockinCount;
+    _lateClockinTime = circleInfo.lastClockinTime;
+    _exp = circleInfo.exp;
   }
 
   /// call upload avatar before create a circle
@@ -198,7 +204,7 @@ class CircleProvider with ChangeNotifier {
   }
 
   Future<void> clockin() async {
-    if (await isMember(user.uid)) {
+    if (await isMember()) {
       DateTime last = lastClockinTime;
       DateTime now = DateTime.now();
       if (now.day != last.day ||
@@ -283,7 +289,7 @@ class CircleProvider with ChangeNotifier {
 }
 
 class FirestoreService {
-  FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  static FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
   // Read
   Stream<List<Circle>> getCircles() {
@@ -389,7 +395,7 @@ class FirestoreService {
         .then((value) => value.exists);
   }
 
-  Future<bool> isMemberExist(String circleName, String userId) {
+  static Future<bool> isMemberExist(String circleName, String userId) {
     return _firebaseFirestore
         .collection('circles')
         .doc(circleName)
