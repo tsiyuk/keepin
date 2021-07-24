@@ -174,39 +174,62 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
     BottomAppBar bottomBar = BottomAppBar(
       shape: CircularNotchedRectangle(),
       child: Row(mainAxisAlignment: MainAxisAlignment.spaceAround, children: [
-        IconButton(
-          tooltip: 'Menu',
-          onPressed: () {
-            showModalBottomSheet(
-                isScrollControlled: true,
-                context: context,
-                builder: (context) => _buildMenu());
-          },
-          iconSize: 30,
-          icon: Icon(Icons.menu),
-        ),
-        IconButton(
-          tooltip: 'Clock in',
-          onPressed: () async {
-            try {
-              await circleProvider.clockin();
-              // setState(() {
-              //   exp += circleProvider.CLOCK_IN_EXP;
-              //   clockInCount += 1;
-              // });
-            } on FirebaseException catch (e) {
-              showWarning(context, e.code);
-            }
-          },
-          iconSize: 30,
-          icon: Icon(Icons.lock_clock),
-        ),
-        // BottomBarItem(icon: Icon(Icons.menu), label: 'Menu'),
-        // BottomNavigationBarItem(
-        //     icon: Icon(Icons.lock_clock), label: 'Clock in'),
-        // // the clock in may use a floating action button with CircularNotchedRectangle() for better visual effect
-        // BottomNavigationBarItem(
-        //     icon: Icon(Icons.fireplace_outlined), label: 'Recommend'),
+        TextButton.icon(
+            onPressed: () {
+              showModalBottomSheet(
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (context) => _buildMenu());
+            },
+            icon: Icon(
+              Icons.menu,
+              color: Theme.of(context).primaryColorLight,
+            ),
+            label: TextH3('Menu')),
+        // IconButton(
+        //   tooltip: 'Menu',
+        //   onPressed: () {
+        //     showModalBottomSheet(
+        //         isScrollControlled: true,
+        //         context: context,
+        //         builder: (context) => _buildMenu());
+        //   },
+        //   iconSize: 30,
+        //   icon: Icon(Icons.menu),
+        // ),
+        TextButton.icon(
+            onPressed: () async {
+              try {
+                await circleProvider.clockin();
+                // setState(() {
+                //   exp += circleProvider.CLOCK_IN_EXP;
+                //   clockInCount += 1;
+                // });
+              } on FirebaseException catch (e) {
+                showWarning(context, e.code);
+              }
+            },
+            icon: Icon(
+              Icons.lock_clock,
+              color: Theme.of(context).primaryColorLight,
+            ),
+            label: TextH3('Clock in')),
+        // IconButton(
+        //   tooltip: 'Clock in',
+        //   onPressed: () async {
+        //     try {
+        //       await circleProvider.clockin();
+        //       // setState(() {
+        //       //   exp += circleProvider.CLOCK_IN_EXP;
+        //       //   clockInCount += 1;
+        //       // });
+        //     } on FirebaseException catch (e) {
+        //       showWarning(context, e.code);
+        //     }
+        //   },
+        //   iconSize: 30,
+        //   icon: Icon(Icons.lock_clock),
+        // ),
       ]),
     );
 
@@ -285,7 +308,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                                 return postDetail(context, post);
                               },
                               separatorBuilder: (c, i) => Container(
-                                height: 10,
+                                height: 5,
                                 color: Colors.blueGrey.shade100,
                               ),
                             );

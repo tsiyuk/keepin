@@ -187,7 +187,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
                 return postDetail(context, post);
               },
               separatorBuilder: (c, i) => Container(
-                height: 10,
+                height: 5,
                 color: Colors.blueGrey.shade100,
               ),
             );
@@ -223,7 +223,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
                     return postDetail(context, post);
                   },
                   separatorBuilder: (c, i) => Container(
-                    height: 10,
+                    height: 5,
                     color: Colors.blueGrey.shade100,
                   ),
                 );
