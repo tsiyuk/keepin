@@ -20,12 +20,11 @@ class PostPage extends StatefulWidget {
 
 class _PostPageState extends State<PostPage> {
   static const double safePadding = 14;
-  Widget title = Text("Post Detail");
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: title,
+        title: Text(widget.post.title),
         actions: [
           _buildDeleteButton(context, widget.post),
         ],
@@ -49,10 +48,8 @@ class _PostPageState extends State<PostPage> {
   }
 
   Widget _buildPoster(BuildContext context, Post post) {
-    UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context);
     return FutureBuilder<UserProfile>(
-      future: userProfileProvider.readUserProfile(post.posterId),
+      future: UserProfileProvider.readUserProfile(post.posterId),
       builder: (context, snapshot) {
         if (snapshot.data != null) {
           return Container(

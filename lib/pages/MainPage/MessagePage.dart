@@ -1,17 +1,21 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/Message/ChatRoomPage.dart';
+import 'package:keepin/pages/Post/PostPage.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/ChatRoom.dart';
+import 'package:keepin/src/models/Comment.dart';
 import 'package:keepin/src/models/Message.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/ChatRoomProvider.dart';
+import 'package:keepin/src/services/PostProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:provider/provider.dart';
 
 class MessagePage extends StatefulWidget {
-  const MessagePage({Key? key}) : super(key: key);
+  final String userId;
+  const MessagePage(this.userId, {Key? key}) : super(key: key);
 
   @override
   _MessagePageState createState() => _MessagePageState();
@@ -85,8 +89,6 @@ class _MessagePageState extends State<MessagePage>
 
   Widget _buildMessages(BuildContext context) {
     ChatRoomProvider chatRoomProvider = Provider.of<ChatRoomProvider>(context);
-    UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context);
 
     return Padding(
       padding: const EdgeInsets.all(12.0),
@@ -117,7 +119,7 @@ class _MessagePageState extends State<MessagePage>
                             chatRoomProvider.isUnRead(chatRooms[index]);
                         return FutureBuilder<UserProfile>(
                             future:
-                                userProfileProvider.readUserProfile(otherId),
+                                UserProfileProvider.readUserProfile(otherId),
                             builder: (context, snapshot) {
                               if (snapshot.data != null) {
                                 return GestureDetector(
@@ -165,10 +167,70 @@ class _MessagePageState extends State<MessagePage>
   }
 
   Widget _buildComments(BuildContext context) {
-    return Center(child: Text("Comments"));
+    return FutureBuilder<List<Comment>>(
+      future: PostProvider.readAllCommentsFromUser(widget.userId),
+      builder: (context, snapshot) {
+        if (snapshot.data != null && snapshot.data!.isNotEmpty) {
+          return ListView.builder(
+              physics: BouncingScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                Comment comment = snapshot.data![index];
+                return ListTile(
+                  // leading: ImageButton(
+                  //   imageLink: comment.post!.posterAvatarLink,
+                  //   size: 40,
+                  // ),
+                  title: TextH3(comment.commenterName),
+                  subtitle: Text(
+                    "commented:  " + comment.text,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  trailing: _trailing(comment.post!.title,),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => PostPage(post: comment.post!))),
+                );
+              });
+        } else {
+          return Center(child: TextH3('No Comments yet. Start making a post!'));
+        }
+      },
+    );
   }
 
   Widget _buildLikes(BuildContext context) {
-    return Center(child: Text("Likes"));
+    return FutureBuilder<List<Map<String, dynamic>>>(
+      future: PostProvider.readAllLikesFromUser(widget.userId),
+      builder: (context, snapshot) {
+        if (snapshot.data != null && snapshot.data!.isNotEmpty) {
+          return ListView.builder(
+              physics: BouncingScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: snapshot.data!.length,
+              itemBuilder: (context, index) {
+                Map<String, dynamic> likeData = snapshot.data![index];
+                return ListTile(
+                  title: TextH3(likeData["userName"]),
+                  subtitle: Text("liked your post!"),
+                  trailing: _trailing(likeData["post"].title),
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => PostPage(post: likeData["post"]))),
+                );
+              });
+        } else {
+          return Center(child: TextH3('No Likes yet. Start making a post!'));
+        }
+      },
+    );
+  }
+  
+  Widget _trailing(String text) {
+    return Container(
+        constraints: BoxConstraints(maxWidth: 100),
+        child: Text(
+          text,
+          textAlign: TextAlign.end,
+        ));
   }
 }

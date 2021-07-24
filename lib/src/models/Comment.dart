@@ -1,3 +1,4 @@
+import 'package:keepin/src/models/Post.dart';
 import 'package:keepin/src/models/Utils.dart';
 
 class Comment {
@@ -8,6 +9,7 @@ class Comment {
   String? replyToId;
   String text;
   DateTime timestamp;
+  Post? post;
 
   Comment(
       {required this.postId,
@@ -16,7 +18,8 @@ class Comment {
       required this.text,
       required this.timestamp,
       this.replyTo,
-      this.replyToId});
+      this.replyToId,
+      this.post});
 
   factory Comment.fromJson(Map<String, dynamic> json) {
     return Comment(

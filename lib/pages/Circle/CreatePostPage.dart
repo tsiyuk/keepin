@@ -32,8 +32,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
         Provider.of<PostProvider>(context, listen: false);
     CircleProvider circleProvider =
         Provider.of<CircleProvider>(context, listen: false);
-    postProvider.initPostInfo(
-        widget.user, widget.circleName, circleProvider.tags);
     return Scaffold(
       appBar: AppBar(
         title: Text("Create a post!"),
@@ -53,11 +51,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                 TextFormField(
                   maxLines: 1,
                   controller: _titleController,
-                  validator: validator("Title"),
+                  validator: titleValidator,
                   decoration: InputDecoration(labelText: 'Title'),
-                  onEditingComplete: () {
-                    postProvider.changeTitle(_titleController.text);
-                  },
                 ),
                 SizedBox(
                   height: 20,
@@ -71,9 +66,6 @@ class _CreatePostPageState extends State<CreatePostPage> {
                     filled: true,
                     fillColor: Colors.blueGrey.shade50,
                   ),
-                  onEditingComplete: () {
-                    postProvider.changeText(_textController.text);
-                  },
                 ),
                 _buildImages(context),
                 PrimaryButton(
@@ -81,6 +73,8 @@ class _CreatePostPageState extends State<CreatePostPage> {
                   onPressed: () async {
                     _formKey.currentState!.save();
                     if (_formKey.currentState!.validate()) {
+                      postProvider.initPostInfo(
+                          widget.user, widget.circleName, circleProvider.tags);
                       postProvider.changeTitle(_titleController.text);
                       postProvider.changeText(_textController.text);
                       await postProvider.uploadAssets(imageFiles);
@@ -99,9 +93,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
     );
   }
 
-  Widget _buildImages(
-    BuildContext context,
-  ) {
+  Widget _buildImages(BuildContext context) {
     double spacing = 10;
     double boxWidth = MediaQuery.of(context).size.width - safePadding * 2;
     double imageSize = (boxWidth - 8 * 2 - spacing * 2) / 3;
@@ -164,5 +156,15 @@ class _CreatePostPageState extends State<CreatePostPage> {
     return (String? value) {
       return value == null || value.isEmpty ? "$field cannot be empty" : null;
     };
+  }
+
+  String? titleValidator(String? value) {
+    if (value == null || value.isEmpty) {
+      return "Title cannot be empty";
+    } else if (value.length > 40) {
+      return "Title can only have maximum of 40 characters";
+    } else {
+      return null;
+    }
   }
 }

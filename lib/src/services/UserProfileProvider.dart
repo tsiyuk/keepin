@@ -15,7 +15,7 @@ import 'package:keepin/src/services/PostProvider.dart';
   This class provide the methods related to CURD of UserProfile
 */
 class UserProfileProvider with ChangeNotifier {
-  final firestoreService = FirestoreService();
+  static final firestoreService = FirestoreService();
   String? _avatarURL;
   String? _bio;
   User user = FirebaseAuth.instance.currentUser!;
@@ -39,7 +39,7 @@ class UserProfileProvider with ChangeNotifier {
       firestoreService.getPostHistory(userId);
 
   /// get the userProfile instance specified by the userId
-  Future<UserProfile> readUserProfile(String userId) async {
+  static Future<UserProfile> readUserProfile(String userId) async {
     return await firestoreService.getUserProfile(userId);
   }
 
@@ -151,8 +151,8 @@ class FirestoreService {
         snapshot.docs.map((doc) => UserProfile.fromJson(doc.data())).toList());
   }
 
-  Future<UserProfile> getUserProfile(String userId) async {
-    return await _firestore
+  Future<UserProfile> getUserProfile(String userId) {
+    return _firestore
         .collection('userProfiles')
         .doc(userId)
         .get()

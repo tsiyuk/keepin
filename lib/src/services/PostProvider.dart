@@ -8,8 +8,6 @@ import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/Comment.dart';
 import 'package:keepin/src/models/Post.dart';
 import 'package:keepin/src/models/UserProfile.dart';
-import 'package:keepin/src/models/Utils.dart';
-import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class PostProvider with ChangeNotifier {
   late String _postId;
@@ -51,8 +49,21 @@ class PostProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  static Future<Post> readPost(String postId) async {
+    return await FirestoreService.getPost(postId);
+  }
+
   static Stream<List<Post>> readPostsFromCircle(String circleName) {
     return FirestoreService.getPostsFromCircle(circleName);
+  }
+
+  static Future<List<Comment>> readAllCommentsFromUser(String userId) {
+    return FirestoreService.getAllComments(userId);
+  }
+
+  static Future<List<Map<String, dynamic>>> readAllLikesFromUser(
+      String userId) {
+    return FirestoreService.getAllLikes(userId);
   }
 
   static Stream<List<Post>> readPostsFromUser(String userId) {
@@ -215,6 +226,17 @@ class PostProvider with ChangeNotifier {
 class FirestoreService {
   static FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
+  static Future<Post> getPost(String postId) {
+    return _firestore.collection('post').doc(postId).get().then((value) {
+      if (value.data() != null) {
+        return Post.fromJson(value.data()!);
+      } else {
+        throw FirebaseException(
+            plugin: 'FirebaseFirestore', code: 'Post does not exist');
+      }
+    });
+  }
+
   Stream<List<Post>> getPosts() {
     return _firestore.collection('posts').snapshots().map((snapshot) =>
         snapshot.docs.map((doc) => Post.fromJson(doc.data())).toList());
@@ -283,24 +305,57 @@ class FirestoreService {
   }
 
   static Future<List<Comment>> getAllComments(String userId) async {
-    List<String> postIds = await _firestore
+    List<Post> posts = await _firestore
         .collection('posts')
         .where('posterId', isEqualTo: userId)
         .get()
-        .then((value) => value.docs.map((doc) => doc.id).toList());
+        .then((value) =>
+            value.docs.map((doc) => Post.fromJson(doc.data())).toList());
 
     List<Comment> result = [];
-    for (String postId in postIds) {
+    for (Post post in posts) {
       var r = await _firestore
           .collection('posts')
-          .doc(postId)
+          .doc(post.postId)
           .collection('comments')
           .orderBy('timestamp')
           .get()
           .then((snapshot) {
         List<Comment> result = [];
         for (QueryDocumentSnapshot item in snapshot.docs) {
-          result.add(Comment.fromJson(item.data()));
+          Comment comment = Comment.fromJson(item.data());
+          comment.post = post;
+          result.add(comment);
+        }
+        return result;
+      });
+      result.addAll(r);
+    }
+    return result;
+  }
+
+  static Future<List<Map<String, dynamic>>> getAllLikes(String userId) async {
+    List<Post> posts = await _firestore
+        .collection('posts')
+        .where('posterId', isEqualTo: userId)
+        .get()
+        .then((value) =>
+            value.docs.map((doc) => Post.fromJson(doc.data())).toList());
+
+    List<Map<String, dynamic>> result = [];
+    for (Post post in posts) {
+      var r = await _firestore
+          .collection('posts')
+          .doc(post.postId)
+          .collection('likes')
+          .orderBy('timestamp')
+          .get()
+          .then((snapshot) {
+        List<Map<String, dynamic>> result = [];
+        for (QueryDocumentSnapshot item in snapshot.docs) {
+          Map<String, dynamic> likeData = item.data();
+          likeData["post"] = post;
+          result.add(likeData);
         }
         return result;
       });
@@ -337,7 +392,12 @@ class FirestoreService {
         .doc(postId)
         .collection('likes')
         .doc(userId)
-        .set({'userId': userId, 'userName': userName, 'postId': postId});
+        .set({
+      'userId': userId,
+      'userName': userName,
+      'postId': postId,
+      'timestamp': DateTime.now(),
+    });
   }
 
   Future<void> deleteLikeList(String postId, String userId) {

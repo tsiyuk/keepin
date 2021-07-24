@@ -126,7 +126,6 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
               icon: Icons.add_rounded,
               text: " add comment",
               onPressed: () {
-                showSuccess(context, "hi");
                 _addCommentForm(context);
               }),
           StreamBuilder<List<Comment>>(

@@ -88,7 +88,7 @@ class _MainPageState extends State<MainPage> {
     List<Widget> _subPages = <Widget>[
       HomePage(),
       DiscoverPage(),
-      MessagePage(),
+      MessagePage(UserState.user!.uid),
       // assume that the user has logged in
       UserProfilePage(UserState.user!),
     ];

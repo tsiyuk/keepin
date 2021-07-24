@@ -238,7 +238,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context);
     final UserProfile userProfile =
-        await userProfileProvider.readUserProfile(userProfileProvider.userId);
+        await UserProfileProvider.readUserProfile(userProfileProvider.userId);
     userProfileProvider.load(userProfile);
   }
 }

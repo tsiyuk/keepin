@@ -39,7 +39,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   void initUser(UserProfileProvider userProfileProvider) async {
     final UserProfile userProfile =
-        await userProfileProvider.readUserProfile(widget.user.uid);
+        await UserProfileProvider.readUserProfile(widget.user.uid);
     userProfileProvider.load(userProfile);
     setState(() {
       initialUserName = userProfile.userName;
@@ -204,10 +204,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                         boxShadow: [
                                           BoxShadow(
                                             color: Colors.black12,
-                                            spreadRadius: 0,
                                             blurRadius: 4,
-                                            offset: Offset(1,
-                                                3), // changes position of shadow
+                                            offset: Offset(1, 3),
                                           ),
                                         ],
                                       ),
@@ -246,23 +244,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
             ],
           );
   }
-
-  // Widget _buildTag(BuildContext context, List<String> tempTag) {
-  //   UserProfileProvider userProfileProvider =
-  //       Provider.of<UserProfileProvider>(context);
-  //   List<String> temp = userProfileProvider.tags;
-  //   return Column(
-  //     children: [
-  //       TagSelector(texts: temp),
-  //       PrimaryButton(
-  //         child: Text('Update Tags'),
-  //         onPressed: () {
-  //           userProfileProvider.changeTags(temp);
-  //         },
-  //       )
-  //     ],
-  //   );
-  // }
 
   Future<void> _showEditForm(BuildContext context, userProfileProvider,
       String initialUserName, String initialBio) async {

@@ -257,6 +257,7 @@ class TextH5 extends StatelessWidget {
           fontWeight: FontWeight.w400,
           color: Colors.black54,
         ),
+        overflow: TextOverflow.ellipsis,
       );
 }
 
@@ -347,8 +348,7 @@ Widget postDetail(BuildContext context, Post post, {bool detail = true}) {
                     Container(
                       margin: const EdgeInsets.symmetric(vertical: 8.0),
                       constraints: new BoxConstraints(
-                        minHeight: 40.0,
-                        maxHeight: 300.0,
+                        maxHeight: 240.0,
                       ),
                       child: SingleChildScrollView(
                         physics: BouncingScrollPhysics(),

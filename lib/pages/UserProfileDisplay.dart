@@ -26,10 +26,8 @@ class UserProfileDisplay extends StatefulWidget {
 class _UserProfileDisplayState extends State<UserProfileDisplay> {
   @override
   Widget build(BuildContext context) {
-    UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context, listen: false);
     return FutureBuilder<UserProfile>(
-        future: userProfileProvider.readUserProfile(widget.userId),
+        future: UserProfileProvider.readUserProfile(widget.userId),
         builder: (context, snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
                 ? Loading(30)
