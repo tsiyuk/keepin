@@ -282,6 +282,33 @@ class FirestoreService {
             snapshot.docs.map((doc) => Comment.fromJson(doc.data())).toList());
   }
 
+  static Future<List<Comment>> getAllComments(String userId) async {
+    List<String> postIds = await _firestore
+        .collection('posts')
+        .where('posterId', isEqualTo: userId)
+        .get()
+        .then((value) => value.docs.map((doc) => doc.id).toList());
+
+    List<Comment> result = [];
+    for (String postId in postIds) {
+      var r = await _firestore
+          .collection('posts')
+          .doc(postId)
+          .collection('comments')
+          .orderBy('timestamp')
+          .get()
+          .then((snapshot) {
+        List<Comment> result = [];
+        for (QueryDocumentSnapshot item in snapshot.docs) {
+          result.add(Comment.fromJson(item.data()));
+        }
+        return result;
+      });
+      result.addAll(r);
+    }
+    return result;
+  }
+
   Future<void> addPost(Post post) {
     var docRef = _firestore.collection('posts').doc();
     post.postId = docRef.id;

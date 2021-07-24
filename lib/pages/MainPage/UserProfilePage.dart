@@ -29,7 +29,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   late Widget largeAvatar;
   bool loading = true;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late final userPosts;
+  late final Stream<List<Post>> userPosts;
 
   @override
   void initState() {
