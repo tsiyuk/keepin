@@ -40,15 +40,15 @@ class IconAndDetail extends StatelessWidget {
   final String detail;
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.all(8.0),
+  Widget build(BuildContext context) => Container(
+        width: 40,
         child: Row(
           children: [
             Icon(icon),
-            SizedBox(width: 8),
+            SizedBox(width: 4),
             Text(
               detail,
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(fontSize: 16),
             )
           ],
         ),

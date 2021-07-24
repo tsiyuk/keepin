@@ -227,7 +227,7 @@ class FirestoreService {
   static FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   static Future<Post> getPost(String postId) {
-    return _firestore.collection('post').doc(postId).get().then((value) {
+    return _firestore.collection('posts').doc(postId).get().then((value) {
       if (value.data() != null) {
         return Post.fromJson(value.data()!);
       } else {

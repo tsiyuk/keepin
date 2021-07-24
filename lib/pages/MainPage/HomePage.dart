@@ -62,8 +62,9 @@ class HomePage extends StatelessWidget {
                           padding: const EdgeInsets.all(4.0),
                           child: _buildCircleButton(
                             onPressed: () async {
-                              Circle circle = await circleProvider
-                                  .readCircleFromName(data.circleName);
+                              Circle circle =
+                                  await CircleProvider.readCircleFromName(
+                                      data.circleName);
                               circleProvider.addCircleHistory(circle);
                               Navigator.push(
                                 context,

@@ -136,7 +136,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                     CircleInfo data = snapshot.data![index];
                                     return GestureDetector(
                                       onTap: () async {
-                                        Circle circle = await circleProvider
+                                        Circle circle = await CircleProvider
                                             .readCircleFromName(
                                                 data.circleName);
                                         circleProvider.addCircleHistory(circle);
