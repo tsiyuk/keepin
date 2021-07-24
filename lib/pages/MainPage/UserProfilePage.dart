@@ -3,17 +3,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/Circle/CirclePage.dart';
-import 'package:keepin/pages/UserProfileDisplay.dart';
+import 'package:keepin/pages/Post/PostPage.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/models/Circle.dart';
-import 'package:keepin/src/models/Tag.dart';
+import 'package:keepin/src/models/Post.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/CircleProvider.dart';
+import 'package:keepin/src/services/PostProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
-
-import '../TagSelector.dart';
 
 class UserProfilePage extends StatefulWidget {
   final User user;
@@ -30,6 +29,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
   late Widget largeAvatar;
   bool loading = true;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late final userPosts;
+
+  @override
+  void initState() {
+    super.initState();
+    this.userPosts = PostProvider.readPostsFromUser(widget.user.uid);
+  }
 
   void initUser(UserProfileProvider userProfileProvider) async {
     final UserProfile userProfile =
@@ -73,10 +79,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
                 decoration: BoxDecoration(
                   color: Colors.teal.withAlpha(0x20),
-                  // image: DecorationImage(
-                  //   image: AssetImage('assets/images/blurry.jpg'),
-                  //   fit: BoxFit.cover,
-                  // ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -96,8 +98,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         title: TextH2(initialUserName),
                         subtitle: TextH4(initialBio),
                         trailing: IconButton(
-                          // visualDensity:
-                          //     VisualDensity(horizontal: -4.0, vertical: -4.0),
                           onPressed: () {
                             _showEditForm(context, userProfileProvider,
                                 initialUserName, initialBio);
@@ -157,10 +157,46 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         }
                       },
                     ),
+                    SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 6.0),
+                      child: TextH3("My Interest Tags: "),
+                    ),
+                    Wrap(
+                      children: userProfileProvider.tags.isNotEmpty ? userProfileProvider.tags.map((tag) {
+                        return Chip(label: Text(tag));
+                      }).toList() : [Text("Please add your favourite tags on the top right corner.")],
+                    ),
+                    SizedBox(height: 30),
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 6.0),
+                      child: TextH3("My Posts: "),
+                    ),
+                    StreamBuilder<List<Post>>(
+                      stream: userPosts,
+                      builder: (context, snapshot) {
+                        if (snapshot.data != null &&
+                            snapshot.data!.isNotEmpty) {
+                          return ListView.builder(
+                              shrinkWrap: true,
+                              itemCount: snapshot.data!.length,
+                              itemBuilder: (context, index) {
+                                Post post = snapshot.data![index];
+                                return ListTile(
+                                  title: TextH3(post.title),
+                                  subtitle: getTimeDisplay(post.timestamp.toString()),
+                                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                                      builder: (context) => PostPage(post: post))),
+                                );
+                              });
+                        } else {
+                          return Text('No Post');
+                        }
+                      },
+                    )
                   ],
                 ),
               ),
-              //_buildTag(context),
               SecondaryButton(
                 onPressed: () {
                   userState.signOut();
