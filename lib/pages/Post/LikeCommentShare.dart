@@ -214,6 +214,7 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
                   Form(
                     key: _formKey,
                     child: TextFormField(
+                      autofocus: true,
                       maxLines: 3,
                       controller: commentController,
                       validator: validator("Comment"),

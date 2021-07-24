@@ -34,6 +34,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
         Provider.of<CircleProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: Theme.of(context).primaryColorLight,
         title: Text("Create a post!"),
       ),
       body: Container(

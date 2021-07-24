@@ -402,7 +402,8 @@ class _DescriptionState extends State<Description> {
       children: [
         SizedBox(width: 1000),
         TextFormField(
-          maxLines: 4,
+          maxLines: 8,
+          autofocus: true,
           controller: descriptionController,
           decoration: InputDecoration(
             labelText: 'description',

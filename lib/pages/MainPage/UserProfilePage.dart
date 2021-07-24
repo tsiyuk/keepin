@@ -264,6 +264,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
+                  autofocus: true,
                   controller: userNameController,
                   validator: validator("User Name"),
                   decoration: InputDecoration(

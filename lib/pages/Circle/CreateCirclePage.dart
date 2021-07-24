@@ -56,65 +56,67 @@ class _CreateCirclePageState extends State<CreateCirclePage> {
   Widget build(BuildContext context) {
     CircleProvider circleProvider = Provider.of<CircleProvider>(context);
     return Scaffold(
-      body: SafeArea(
-        child: Container(
-          height: MediaQuery.of(context).size.height,
-          padding: const EdgeInsets.symmetric(horizontal: 44.0),
-          child: SingleChildScrollView(
-            physics: BouncingScrollPhysics(),
-            child: Column(
-              children: [
-                SizedBox(height: 30),
-                UploadImageButton(
-                  image:
-                      _avatar == null ? defaultAvatar(_avatarSize) : _avatar!,
-                  size: _avatarSize,
-                  onPressed: () {
-                    handleUpload(circleProvider);
+      appBar: AppBar(
+        title: Text("Create Circle"),
+        backgroundColor: Theme.of(context).primaryColorLight,
+      ),
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        padding: const EdgeInsets.symmetric(horizontal: 44.0),
+        child: SingleChildScrollView(
+          physics: BouncingScrollPhysics(),
+          child: Column(
+            children: [
+              SizedBox(height: 30),
+              UploadImageButton(
+                image:
+                    _avatar == null ? defaultAvatar(_avatarSize) : _avatar!,
+                size: _avatarSize,
+                onPressed: () {
+                  handleUpload(circleProvider);
+                },
+              ),
+              SizedBox(height: 12),
+              TextFormField(
+                controller: _textController,
+                decoration: InputDecoration(labelText: 'circleName'),
+              ),
+              SizedBox(height: 16),
+              TagSelector(texts: tags),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 20.0),
+                child: SwitchListTile(
+                  title: TextH3("public", size: 22),
+                  subtitle: isPublic
+                      ? TextH4("everyone can view the post")
+                      : TextH4("only invited members can view the post"),
+                  contentPadding: const EdgeInsets.all(10.0),
+                  tileColor: Colors.blueGrey.shade50,
+                  activeColor: Colors.teal.shade400,
+                  value: isPublic,
+                  onChanged: (value) {
+                    setState(() {
+                      isPublic = value;
+                    });
                   },
                 ),
-                SizedBox(height: 12),
-                TextFormField(
-                  controller: _textController,
-                  decoration: InputDecoration(labelText: 'circleName'),
-                ),
-                SizedBox(height: 16),
-                TagSelector(texts: tags),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 20.0),
-                  child: SwitchListTile(
-                    title: TextH3("public", size: 22),
-                    subtitle: isPublic
-                        ? TextH4("everyone can view the post")
-                        : TextH4("only invited members can view the post"),
-                    contentPadding: const EdgeInsets.all(10.0),
-                    tileColor: Colors.blueGrey.shade50,
-                    activeColor: Colors.teal.shade400,
-                    value: isPublic,
-                    onChanged: (value) {
-                      setState(() {
-                        isPublic = value;
-                      });
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  SecondaryButton(
+                    child: Text("Cancel"),
+                    onPressed: Navigator.of(context).pop,
+                  ),
+                  PrimaryButton(
+                    child: Text('Create Circle'),
+                    onPressed: () {
+                      handleCreateCircle(circleProvider);
                     },
                   ),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    SecondaryButton(
-                      child: Text("Cancel"),
-                      onPressed: Navigator.of(context).pop,
-                    ),
-                    PrimaryButton(
-                      child: Text('Create Circle'),
-                      onPressed: () {
-                        handleCreateCircle(circleProvider);
-                      },
-                    ),
-                  ],
-                ),
-              ],
-            ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
