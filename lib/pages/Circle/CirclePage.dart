@@ -48,7 +48,8 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
   }
 
   void initCircleInfo(CircleProvider cp) async {
-    Circle circle = await cp.readCircleFromName(widget.circle.circleName);
+    Circle circle =
+        await CircleProvider.readCircleFromName(widget.circle.circleName);
     bool temp =
         await CircleProvider.isCurrentUserMember(widget.circle.circleName);
     cp.loadAll(circle);
@@ -72,11 +73,10 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(15.0),
-            child: Image.network(
-              widget.circle.avatarURL,
-              width: 80,
-              height: 80,
-              fit: BoxFit.cover,
+            child: ImageButton(
+              imageLink: widget.circle.avatarURL,
+              size: 80,
+              oval: false,
             ),
           ),
           Expanded(

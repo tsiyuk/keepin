@@ -94,14 +94,14 @@ class ChatRoomProvider extends ChangeNotifier {
   }
 
   void createMessage(String text,
-      [String? inviteCircleName, String? invitePostId]) async {
+      {String? inviteCircleName, String? postId}) async {
     var message = Message(
         text: text,
         userId: currentUser.uid,
         receiverId: getReceiverId(),
         timestamp: DateTime.now(),
         inviteCircleName: inviteCircleName,
-        invitePostId: invitePostId);
+        postId: postId);
     _latestMessage = message;
     int index = userIds.indexOf(currentUser.uid);
     _unread[index] = false;

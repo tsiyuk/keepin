@@ -128,7 +128,7 @@ class _HelperState extends State<Helper> {
                                     CircleInfo data = snapshot.data![index];
                                     return GestureDetector(
                                       onTap: () async {
-                                        Circle circle = await circleProvider
+                                        Circle circle = await CircleProvider
                                             .readCircleFromName(
                                                 data.circleName);
                                         circleProvider.addCircleHistory(circle);

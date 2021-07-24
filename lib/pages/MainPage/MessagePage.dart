@@ -187,7 +187,9 @@ class _MessagePageState extends State<MessagePage>
                     "commented:  " + comment.text,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  trailing: _trailing(comment.post!.title,),
+                  trailing: _trailing(
+                    comment.post!.title,
+                  ),
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => PostPage(post: comment.post!))),
                 );
@@ -224,7 +226,7 @@ class _MessagePageState extends State<MessagePage>
       },
     );
   }
-  
+
   Widget _trailing(String text) {
     return Container(
         constraints: BoxConstraints(maxWidth: 100),

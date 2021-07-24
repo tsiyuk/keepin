@@ -30,7 +30,7 @@ class CircleProvider with ChangeNotifier {
   List<String>? _descriptionImageURLs = [];
   File? _avatar;
 
-  FirestoreService _firestoreService = FirestoreService();
+  static FirestoreService _firestoreService = FirestoreService();
 
   // Getters
   String get circleName => _circleName;
@@ -57,7 +57,7 @@ class CircleProvider with ChangeNotifier {
   }
 
   /// Use circle name to query the circle
-  Future<Circle> readCircleFromName(String name) async {
+  static Future<Circle> readCircleFromName(String name) async {
     if (await _firestoreService.isCircleExist(name)) {
       return _firestoreService.getCircleFromName(name);
     } else {
