@@ -318,7 +318,7 @@ class FirestoreService {
           .collection('posts')
           .doc(post.postId)
           .collection('comments')
-          .orderBy('timestamp')
+          .orderBy('timestamp', descending: true)
           .get()
           .then((snapshot) {
         List<Comment> result = [];
@@ -348,7 +348,7 @@ class FirestoreService {
           .collection('posts')
           .doc(post.postId)
           .collection('likes')
-          .orderBy('timestamp')
+          .orderBy('timestamp', descending: true)
           .get()
           .then((snapshot) {
         List<Map<String, dynamic>> result = [];

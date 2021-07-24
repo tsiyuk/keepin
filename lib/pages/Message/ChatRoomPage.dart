@@ -9,27 +9,19 @@ import 'package:keepin/src/services/ChatRoomProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:provider/provider.dart';
 
-class ChatRoomPage extends StatefulWidget {
+class ChatRoomPage extends StatelessWidget {
   final ChatRoom chatRoom;
 
-  const ChatRoomPage({Key? key, required this.chatRoom}) : super(key: key);
+  const ChatRoomPage({required this.chatRoom});
 
-  @override
-  _ChatRoomPageState createState() => _ChatRoomPageState();
-}
-
-class _ChatRoomPageState extends State<ChatRoomPage> {
-  late ChatRoomProvider chatRoomProvider;
   @override
   Widget build(BuildContext context) {
-    chatRoomProvider = Provider.of<ChatRoomProvider>(context);
-    chatRoomProvider.loadAll(widget.chatRoom);
-    String otherId = chatRoomProvider.getOtherUserId(widget.chatRoom);
+    String otherId = ChatRoomProvider.getOtherUserId(chatRoom);
     Future<UserProfile> otherUser =
         UserProfileProvider.readUserProfile(otherId);
 
-    if (chatRoomProvider.isUnRead(widget.chatRoom)) {
-      chatRoomProvider.readMessage();
+    if (ChatRoomProvider.isUnRead(chatRoom)) {
+      ChatRoomProvider.readMessage(chatRoom);
     }
 
     return Scaffold(
@@ -60,12 +52,12 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                               ),
                             ),
                             child: MessagesWidget(
-                              chatRoom: widget.chatRoom,
+                              chatRoom: chatRoom,
                               userProfile: snapshot.data!,
                             ),
                           ),
                         ),
-                        NewMessageWidget(chatRoom: widget.chatRoom),
+                        NewMessageWidget(chatRoom: chatRoom),
                       ],
                     ),
                   );
@@ -73,11 +65,5 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
             }
           }),
     );
-  }
-
-  @override
-  void dispose() {
-    chatRoomProvider.clear();
-    super.dispose();
   }
 }

@@ -219,12 +219,14 @@ class TextH2 extends StatelessWidget {
 }
 
 class TextH3 extends StatelessWidget {
-  const TextH3(this.str, {this.size = 18.0});
+  const TextH3(this.str, {this.size = 18.0, this.clip = false});
   final String str;
   final double size;
+  final bool clip;
   @override
   Widget build(BuildContext context) => Text(
         str,
+        overflow: clip ? TextOverflow.ellipsis : TextOverflow.visible,
         style: TextStyle(
             fontSize: size,
             fontWeight: FontWeight.w400,

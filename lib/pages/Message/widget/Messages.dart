@@ -4,6 +4,7 @@ import 'package:keepin/src/models/Message.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/ChatRoomProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
+import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
 
 import 'Message.dart';
@@ -20,13 +21,9 @@ class MessagesWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    ChatRoomProvider chatRoomProvider =
-        Provider.of<ChatRoomProvider>(context, listen: false);
-    UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context, listen: false);
-    var myId = chatRoomProvider.currentUser.uid;
+    var myId = UserState.user!.uid;
     return StreamBuilder<List<Message>>(
-      stream: chatRoomProvider.messages,
+      stream: ChatRoomProvider.getMessages(chatRoom.uid),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return buildText('Something Went Wrong Try later');

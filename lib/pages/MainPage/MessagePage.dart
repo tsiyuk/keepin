@@ -68,7 +68,7 @@ class _MessagePageState extends State<MessagePage>
           child: TabBarView(
             controller: _tabController,
             children: [
-              _buildMessages(context),
+              _buildChatRooms(context),
               _buildComments(context),
               _buildLikes(context),
             ],
@@ -87,13 +87,13 @@ class _MessagePageState extends State<MessagePage>
           );
   }
 
-  Widget _buildMessages(BuildContext context) {
+  Widget _buildChatRooms(BuildContext context) {
     ChatRoomProvider chatRoomProvider = Provider.of<ChatRoomProvider>(context);
 
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: StreamBuilder<List<ChatRoom>>(
-          stream: chatRoomProvider.chatRooms,
+          stream: ChatRoomProvider.getChatRooms(),
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.waiting:
@@ -102,64 +102,59 @@ class _MessagePageState extends State<MessagePage>
                 if (snapshot.hasError) {
                   showError(context, snapshot.error.toString());
                   return Center(child: Text("Error"));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text("Start a conversation"));
                 } else {
                   var chatRooms = snapshot.data!;
-                  if (chatRooms.isEmpty) {
-                    return Center(child: Text("Start a conversation"));
-                  } else {
-                    return ListView.separated(
-                      physics: BouncingScrollPhysics(),
-                      itemCount: chatRooms.length,
-                      separatorBuilder: (context, index) =>
-                          Divider(thickness: 1),
-                      itemBuilder: (context, index) {
-                        String otherId =
-                            chatRoomProvider.getOtherUserId(chatRooms[index]);
-                        bool unRead =
-                            chatRoomProvider.isUnRead(chatRooms[index]);
-                        return FutureBuilder<UserProfile>(
-                            future:
-                                UserProfileProvider.readUserProfile(otherId),
-                            builder: (context, snapshot) {
-                              if (snapshot.data != null) {
-                                return GestureDetector(
-                                  behavior: HitTestBehavior.translucent,
-                                  onTap: () => Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                          builder: (context) => ChatRoomPage(
-                                              chatRoom: chatRooms[index]))),
-                                  child: Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 2, horizontal: 12.0),
-                                        child: ImageButton(
-                                          imageLink: snapshot.data!.avatarURL!,
-                                          size: 50,
-                                        ),
+                  return ListView.separated(
+                    physics: BouncingScrollPhysics(),
+                    itemCount: chatRooms.length,
+                    separatorBuilder: (context, index) => Divider(thickness: 1),
+                    itemBuilder: (context, index) {
+                      String otherId =
+                          ChatRoomProvider.getOtherUserId(chatRooms[index]);
+                      bool unRead = ChatRoomProvider.isUnRead(chatRooms[index]);
+                      return FutureBuilder<UserProfile>(
+                          future: UserProfileProvider.readUserProfile(otherId),
+                          builder: (context, snapshot) {
+                            if (snapshot.data != null) {
+                              return GestureDetector(
+                                behavior: HitTestBehavior.translucent,
+                                onTap: () => Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                        builder: (context) => ChatRoomPage(
+                                            chatRoom: chatRooms[index]))),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.max,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 2, horizontal: 12.0),
+                                      child: ImageButton(
+                                        imageLink: snapshot.data!.avatarURL!,
+                                        size: 50,
                                       ),
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          TextH3(snapshot.data!.userName,
-                                              size: 20),
-                                          showLastMessage(
-                                              chatRooms[index].latestMessage,
-                                              unRead),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              } else {
-                                return SizedBox();
-                              }
-                            });
-                      },
-                    );
-                  }
+                                    ),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        TextH3(snapshot.data!.userName,
+                                            size: 20),
+                                        showLastMessage(
+                                            chatRooms[index].latestMessage,
+                                            unRead),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              );
+                            } else {
+                              return SizedBox();
+                            }
+                          });
+                    },
+                  );
                 }
             }
           }),
