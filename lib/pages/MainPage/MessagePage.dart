@@ -106,6 +106,7 @@ class _MessagePageState extends State<MessagePage>
                     return Center(child: Text("Start a conversation"));
                   } else {
                     return ListView.separated(
+                      physics: BouncingScrollPhysics(),
                       itemCount: chatRooms.length,
                       separatorBuilder: (context, index) =>
                           Divider(thickness: 1),

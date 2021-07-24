@@ -32,6 +32,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
                   return TextH1('No recommended circles');
                 } else {
                   return GridView.builder(
+                      physics: BouncingScrollPhysics(),
                       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2),
                       itemCount: snapshot.data!.length,
@@ -54,7 +55,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
   }
 
   Widget _buildCircleCard(BuildContext context, Circle circle) {
-    final double imageSize = MediaQuery.of(context).size.width /4;
+    final double imageSize = MediaQuery.of(context).size.width / 4;
     CircleProvider circleProvider =
         Provider.of<CircleProvider>(context, listen: false);
     return GestureDetector(
@@ -75,9 +76,15 @@ class _DiscoverPageState extends State<DiscoverPage> {
             child: Image.network(circle.avatarURL,
                 width: imageSize, height: imageSize, fit: BoxFit.cover),
           ),
-          TextH3(circle.circleName, size: 20,),
+          TextH3(
+            circle.circleName,
+            size: 20,
+          ),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Icon(Icons.people, color: Colors.blueGrey,),
+            Icon(
+              Icons.people,
+              color: Colors.blueGrey,
+            ),
             TextH4(circle.numOfMembers.toString()),
           ]),
         ],

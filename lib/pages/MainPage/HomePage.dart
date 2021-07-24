@@ -179,6 +179,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
           }
           if (snapshot.data != null) {
             return ListView.separated(
+              physics: BouncingScrollPhysics(),
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 Post post = snapshot.data![index];
@@ -214,6 +215,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
               }
               if (snapshot.data != null) {
                 return ListView.separated(
+                  physics: BouncingScrollPhysics(),
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
                     Post post = snapshot.data![index];

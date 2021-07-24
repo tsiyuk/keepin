@@ -115,8 +115,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                             builder: (context) {
                               return AlertDialog(
                                 contentPadding: const EdgeInsets.all(20.0),
-                                actionsPadding: const EdgeInsets.symmetric(
-                                    vertical: 6.0, horizontal: 16.0),
+                                insetPadding: const EdgeInsets.all(20),
                                 content: Description(
                                     initDescription:
                                         circleProvider.description),
@@ -244,30 +243,33 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                     Container(
                       padding: const EdgeInsets.symmetric(
                           vertical: 30, horizontal: 20),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            margin: EdgeInsets.only(bottom: 12),
-                            child: Text(
-                              circleProvider.description ?? "No Description",
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.black87,
+                      child: SingleChildScrollView(
+                        physics: BouncingScrollPhysics(),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(bottom: 12),
+                              child: Text(
+                                circleProvider.description ?? "No Description",
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black87,
+                                ),
                               ),
                             ),
-                          ),
-                          Divider(
-                            height: 40,
-                          ),
-                          TextH3("Tags:"),
-                          Wrap(
-                            children: circleProvider.tags.map((tag) {
-                              return Chip(label: Text(tag));
-                            }).toList(),
-                          ),
-                        ],
+                            Divider(
+                              height: 40,
+                            ),
+                            TextH3("Tags:"),
+                            Wrap(
+                              children: circleProvider.tags.map((tag) {
+                                return Chip(label: Text(tag));
+                              }).toList(),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     StreamBuilder<List<Post>>(
@@ -276,6 +278,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                         builder: (context, snapshot) {
                           if (snapshot.data != null) {
                             return ListView.separated(
+                              physics: BouncingScrollPhysics(),
                               itemCount: snapshot.data!.length,
                               itemBuilder: (context, index) {
                                 Post post = snapshot.data![index];
@@ -290,8 +293,11 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                             return Text('null');
                           }
                         }),
-                    Rank(
-                      circleName: circleProvider.circleName,
+                    SingleChildScrollView(
+                      physics: BouncingScrollPhysics(),
+                      child: Rank(
+                        circleName: circleProvider.circleName,
+                      ),
                     ),
                   ]),
                 ),
@@ -362,9 +368,15 @@ class _DescriptionState extends State<Description> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
+        SizedBox(width: 1000),
         TextFormField(
+          maxLines: 4,
           controller: descriptionController,
-          decoration: InputDecoration(labelText: 'description'),
+          decoration: InputDecoration(
+            labelText: 'description',
+            filled: true,
+            fillColor: Colors.blueGrey.shade50,
+          ),
           validator: validator("description"),
         ),
         SecondaryButton(
