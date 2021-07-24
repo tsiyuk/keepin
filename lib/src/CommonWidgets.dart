@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/Post/LikeCommentShare.dart';
 import 'package:keepin/pages/Post/PostPage.dart';
@@ -107,7 +108,13 @@ class ImageButton extends StatelessWidget {
                 ? defaultAvatar(size)
                 : this.image!
             : Image.file(imageFile!, fit: fit)
-        : Image.network(imageLink!, fit: fit);
+        : CachedNetworkImage(
+            fit: fit,
+            imageUrl: imageLink!,
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                CircularProgressIndicator(value: downloadProgress.progress),
+            errorWidget: (context, url, error) => Icon(Icons.error),
+          );
     return GestureDetector(
       onTap: onPressed == null ? _showImage(context, image) : onPressed,
       child: Container(

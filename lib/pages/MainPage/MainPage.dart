@@ -95,6 +95,7 @@ class _MainPageState extends State<MainPage> {
 
     return Scaffold(
       appBar: AppBar(
+        toolbarHeight: 56,
         title: const Text(' Keepin'),
         actions: [
           IconButton(

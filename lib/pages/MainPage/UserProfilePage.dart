@@ -75,6 +75,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Container(
+                height: 130,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
                 decoration: BoxDecoration(
@@ -109,101 +110,138 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextH3("Circles Joined: "),
-                    StreamBuilder<List<CircleInfo>>(
-                      stream: userProfileProvider.circlesJoined,
-                      builder: (context, snapshot) {
-                        if (snapshot.data != null &&
-                            snapshot.data!.isNotEmpty) {
-                          return Container(
-                            height: 60,
-                            child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: snapshot.data!.length,
-                              itemBuilder: (context, index) {
-                                CircleInfo data = snapshot.data![index];
-                                return GestureDetector(
-                                  onTap: () async {
-                                    Circle circle = await circleProvider
-                                        .readCircleFromName(data.circleName);
-                                    circleProvider.addCircleHistory(circle);
-                                    Navigator.of(context).push(
-                                        (MaterialPageRoute(
-                                            builder: (context) => CirclePage(
-                                                circle: circle,
-                                                circleInfo: data))));
+              Container(
+                // 130 profile height, 556 app bar, 92 bottom bar
+                height: MediaQuery.of(context).size.height - 280,
+                child: SingleChildScrollView(
+                  physics: BouncingScrollPhysics(),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextH3("Circles Joined: "),
+                        StreamBuilder<List<CircleInfo>>(
+                          stream: userProfileProvider.circlesJoined,
+                          builder: (context, snapshot) {
+                            if (snapshot.data != null &&
+                                snapshot.data!.isNotEmpty) {
+                              return Container(
+                                height: 60,
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: snapshot.data!.length,
+                                  itemBuilder: (context, index) {
+                                    CircleInfo data = snapshot.data![index];
+                                    return GestureDetector(
+                                      onTap: () async {
+                                        Circle circle = await circleProvider
+                                            .readCircleFromName(
+                                                data.circleName);
+                                        circleProvider.addCircleHistory(circle);
+                                        Navigator.of(context).push(
+                                            (MaterialPageRoute(
+                                                builder: (context) =>
+                                                    CirclePage(
+                                                        circle: circle,
+                                                        circleInfo: data))));
+                                      },
+                                      child: CircleInfoBuilder.buildCircleInfo(
+                                          data.avatarURL,
+                                          data.circleName,
+                                          data.clockinCount),
+                                    );
                                   },
-                                  child: CircleInfoBuilder.buildCircleInfo(
-                                      data.avatarURL,
-                                      data.circleName,
-                                      data.clockinCount),
-                                );
-                              },
-                              separatorBuilder: (c, i) => VerticalDivider(
-                                indent: 10,
-                                endIndent: 10,
-                                thickness: 1,
-                              ),
-                            ),
-                          );
-                        } else {
-                          return Text('No circles joined');
-                        }
-                      },
+                                  separatorBuilder: (c, i) => VerticalDivider(
+                                    indent: 10,
+                                    endIndent: 10,
+                                    thickness: 1,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Text('No circles joined');
+                            }
+                          },
+                        ),
+                        SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6.0),
+                          child: TextH3("My Interest Tags: "),
+                        ),
+                        Wrap(
+                          children: userProfileProvider.tags.isNotEmpty
+                              ? userProfileProvider.tags.map((tag) {
+                                  return Chip(label: Text(tag));
+                                }).toList()
+                              : [
+                                  Text(
+                                      "Please add your favourite tags on the top right corner.")
+                                ],
+                        ),
+                        SizedBox(height: 24),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6.0),
+                          child: TextH3("My Posts: "),
+                        ),
+                        StreamBuilder<List<Post>>(
+                          stream: userPosts,
+                          builder: (context, snapshot) {
+                            if (snapshot.data != null &&
+                                snapshot.data!.isNotEmpty) {
+                              return ListView.builder(
+                                  physics: BouncingScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: snapshot.data!.length,
+                                  itemBuilder: (context, index) {
+                                    Post post = snapshot.data![index];
+                                    return Container(
+                                      margin: const EdgeInsets.only(bottom: 10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(6),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            spreadRadius: 0,
+                                            blurRadius: 4,
+                                            offset: Offset(1,
+                                                3), // changes position of shadow
+                                          ),
+                                        ],
+                                      ),
+                                      child: ListTile(
+                                        title: TextH3(post.title),
+                                        subtitle: getTimeDisplay(
+                                            post.timestamp.toString()),
+                                        trailing: Text(post.circleName),
+                                        onTap: () => Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    PostPage(post: post))),
+                                      ),
+                                    );
+                                  });
+                            } else {
+                              return Text('No Post');
+                            }
+                          },
+                        ),
+                        Center(
+                          child: SecondaryButton(
+                            onPressed: () {
+                              userState.signOut();
+                              userProfileProvider.clear();
+                              dispose();
+                            },
+                            child: Text("Sign out"),
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 6.0),
-                      child: TextH3("My Interest Tags: "),
-                    ),
-                    Wrap(
-                      children: userProfileProvider.tags.isNotEmpty ? userProfileProvider.tags.map((tag) {
-                        return Chip(label: Text(tag));
-                      }).toList() : [Text("Please add your favourite tags on the top right corner.")],
-                    ),
-                    SizedBox(height: 30),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 6.0),
-                      child: TextH3("My Posts: "),
-                    ),
-                    StreamBuilder<List<Post>>(
-                      stream: userPosts,
-                      builder: (context, snapshot) {
-                        if (snapshot.data != null &&
-                            snapshot.data!.isNotEmpty) {
-                          return ListView.builder(
-                              shrinkWrap: true,
-                              itemCount: snapshot.data!.length,
-                              itemBuilder: (context, index) {
-                                Post post = snapshot.data![index];
-                                return ListTile(
-                                  title: TextH3(post.title),
-                                  subtitle: getTimeDisplay(post.timestamp.toString()),
-                                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => PostPage(post: post))),
-                                );
-                              });
-                        } else {
-                          return Text('No Post');
-                        }
-                      },
-                    )
-                  ],
+                  ),
                 ),
-              ),
-              SecondaryButton(
-                onPressed: () {
-                  userState.signOut();
-                  userProfileProvider.clear();
-                  dispose();
-                },
-                child: Text("Sign out"),
               ),
             ],
           );

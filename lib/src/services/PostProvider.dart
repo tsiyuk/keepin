@@ -381,7 +381,19 @@ class FirestoreService {
     });
   }
 
-  static Future<void> removePost(String postId) {
+  static Future<void> removePost(String postId) async {
+    await _firestore
+        .collection('posts')
+        .doc(postId)
+        .collection("comments")
+        .doc()
+        .delete();
+    await _firestore
+        .collection('posts')
+        .doc(postId)
+        .collection("likes")
+        .doc()
+        .delete();
     return _firestore.collection('posts').doc(postId).delete();
   }
 }
