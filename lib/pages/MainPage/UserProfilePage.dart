@@ -29,7 +29,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   late Widget largeAvatar;
   bool loading = true;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late final userPosts;
+  late final Stream<List<Post>> userPosts;
 
   @override
   void initState() {
@@ -163,9 +163,14 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       child: TextH3("My Interest Tags: "),
                     ),
                     Wrap(
-                      children: userProfileProvider.tags.isNotEmpty ? userProfileProvider.tags.map((tag) {
-                        return Chip(label: Text(tag));
-                      }).toList() : [Text("Please add your favourite tags on the top right corner.")],
+                      children: userProfileProvider.tags.isNotEmpty
+                          ? userProfileProvider.tags.map((tag) {
+                              return Chip(label: Text(tag));
+                            }).toList()
+                          : [
+                              Text(
+                                  "Please add your favourite tags on the top right corner.")
+                            ],
                     ),
                     SizedBox(height: 30),
                     Padding(
@@ -184,9 +189,12 @@ class _UserProfilePageState extends State<UserProfilePage> {
                                 Post post = snapshot.data![index];
                                 return ListTile(
                                   title: TextH3(post.title),
-                                  subtitle: getTimeDisplay(post.timestamp.toString()),
-                                  onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                                      builder: (context) => PostPage(post: post))),
+                                  subtitle:
+                                      getTimeDisplay(post.timestamp.toString()),
+                                  onTap: () => Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              PostPage(post: post))),
                                 );
                               });
                         } else {
