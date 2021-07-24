@@ -5,12 +5,14 @@ class Message {
   String userId;
   String receiverId;
   String? inviteCircleName;
+  String? invitePostId;
   DateTime timestamp;
 
   Message({
     required this.text,
     required this.userId,
     this.inviteCircleName,
+    this.invitePostId,
     required this.timestamp,
     required this.receiverId,
   });
@@ -21,7 +23,8 @@ class Message {
         userId: json['userId'],
         receiverId: json['receiverId'],
         timestamp: Utils.toDateTime(json['timestamp']),
-        inviteCircleName: json['inviteCircleName']);
+        inviteCircleName: json['inviteCircleName'],
+        invitePostId: json['invitePostId']);
   }
 
   Map<String, dynamic> toMap() {
@@ -30,6 +33,7 @@ class Message {
       'userId': userId,
       'receiverId': receiverId,
       'inviteCircleName': inviteCircleName,
+      'invitePostId': invitePostId,
       'timestamp': timestamp.toUtc(),
     };
   }

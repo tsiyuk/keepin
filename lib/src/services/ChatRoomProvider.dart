@@ -93,13 +93,15 @@ class ChatRoomProvider extends ChangeNotifier {
     return FirestoreService.isNotExist(userIds);
   }
 
-  void createMessage(String text, [String? inviteCircleName]) async {
+  void createMessage(String text,
+      [String? inviteCircleName, String? invitePostId]) async {
     var message = Message(
         text: text,
         userId: currentUser.uid,
         receiverId: getReceiverId(),
         timestamp: DateTime.now(),
-        inviteCircleName: inviteCircleName);
+        inviteCircleName: inviteCircleName,
+        invitePostId: invitePostId);
     _latestMessage = message;
     int index = userIds.indexOf(currentUser.uid);
     _unread[index] = false;
