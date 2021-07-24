@@ -21,7 +21,10 @@ class _DiscoverPageState extends State<DiscoverPage> {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context, listen: false);
     return userProfileProvider.tags.length == 0
-        ? TextH2('Please go to add your favourite tags on the top right corner')
+        ? Padding(
+          padding: const EdgeInsets.all(28.0),
+          child: TextH2('Please go to add your favourite tags on the top right corner.'),
+        )
         : StreamBuilder<List<Circle>>(
             stream: userProfileProvider.recommandCircles,
             builder: (context, snapshot) {

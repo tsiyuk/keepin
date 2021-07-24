@@ -39,7 +39,8 @@ class HomePage extends StatelessWidget {
               Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => CreateCirclePage()));
             },
-            child: Icon(Icons.add_box, size: 50, color: Colors.teal),
+            child: Icon(Icons.add_box,
+                size: 50, color: Theme.of(context).primaryColorLight),
           ),
           VerticalDivider(
             thickness: 1,
