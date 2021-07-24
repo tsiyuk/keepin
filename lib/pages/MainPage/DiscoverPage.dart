@@ -21,7 +21,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context, listen: false);
     return userProfileProvider.tags.length == 0
-        ? TextH2('Please go to add your favourite tags')
+        ? TextH2('Please go to add your favourite tags on the top right corner')
         : StreamBuilder<List<Circle>>(
             stream: userProfileProvider.recommandCircles,
             builder: (context, snapshot) {
@@ -37,8 +37,9 @@ class _DiscoverPageState extends State<DiscoverPage> {
                       itemCount: snapshot.data!.length,
                       itemBuilder: (context, index) {
                         return Card(
+                          margin: const EdgeInsets.all(10),
                           color: Colors.white,
-                          elevation: 10,
+                          elevation: 6,
                           shape: RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(10))),
@@ -53,6 +54,7 @@ class _DiscoverPageState extends State<DiscoverPage> {
   }
 
   Widget _buildCircleCard(BuildContext context, Circle circle) {
+    final double imageSize = MediaQuery.of(context).size.width /4;
     CircleProvider circleProvider =
         Provider.of<CircleProvider>(context, listen: false);
     return GestureDetector(
@@ -69,13 +71,13 @@ class _DiscoverPageState extends State<DiscoverPage> {
             height: 10,
           ),
           ClipRRect(
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             child: Image.network(circle.avatarURL,
-                width: 110, height: 110, fit: BoxFit.cover),
+                width: imageSize, height: imageSize, fit: BoxFit.cover),
           ),
-          TextH2(circle.circleName),
+          TextH3(circle.circleName, size: 20,),
           Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Icon(Icons.people),
+            Icon(Icons.people, color: Colors.blueGrey,),
             TextH4(circle.numOfMembers.toString()),
           ]),
         ],
