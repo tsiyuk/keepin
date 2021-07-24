@@ -241,21 +241,34 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                 ),
                 Expanded(
                   child: TabBarView(controller: _tabController, children: [
-                    Column(
-                      children: [
-                        Center(
-                            child: circleProvider.description != null
-                                ? Text(circleProvider.description!)
-                                : Text("No Description")),
-                        circleProvider.isAdmin(user.uid)
-                            ? _buildTags(context, circleProvider.tags)
-                            : Container(),
-                        circleProvider.isAdmin(user.uid)
-                            ? Description(
-                                initDescription: circleProvider.description,
-                              )
-                            : Container(),
-                      ],
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 30, horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(bottom: 12),
+                            child: Text(
+                              circleProvider.description ?? "No Description",
+                              style: TextStyle(
+                                fontSize: 18.0,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ),
+                          Divider(
+                            height: 40,
+                          ),
+                          TextH3("Tags:"),
+                          Wrap(
+                            children: circleProvider.tags.map((tag) {
+                              return Chip(label: Text(tag));
+                            }).toList(),
+                          ),
+                        ],
+                      ),
                     ),
                     StreamBuilder<List<Post>>(
                         stream: PostProvider.readPostsFromCircle(
@@ -410,51 +423,45 @@ class _RankState extends State<Rank> {
                 ),
               );
             } else {
-              return Expanded(
-                child: SizedBox(
-                  height: 300,
-                  child: ListView.builder(
-                      shrinkWrap: true,
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          onTap: () {
-                            Navigator.of(context).push(MaterialPageRoute(
-                                builder: (context) => UserProfileDisplay(
-                                    snapshot.data![index].userId)));
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    child: TextH2((index + 1).toString()),
-                                  ),
-                                  snapshot.data![index].avatarURL != null
-                                      ? ClipOval(
-                                          child: Image.network(
-                                            snapshot.data![index].avatarURL!,
-                                            width: 40,
-                                            height: 40,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        )
-                                      : defaultAvatar(40),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    child:
-                                        TextH3(snapshot.data![index].userName),
-                                  ),
-                                ]),
-                          ),
-                        );
-                      }),
-                ),
-              );
+              return ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => UserProfileDisplay(
+                                snapshot.data![index].userId)));
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: TextH2((index + 1).toString()),
+                              ),
+                              snapshot.data![index].avatarURL != null
+                                  ? ClipOval(
+                                      child: Image.network(
+                                        snapshot.data![index].avatarURL!,
+                                        width: 40,
+                                        height: 40,
+                                        fit: BoxFit.cover,
+                                      ),
+                                    )
+                                  : defaultAvatar(40),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 10),
+                                child: TextH3(snapshot.data![index].userName),
+                              ),
+                            ]),
+                      ),
+                    );
+                  });
             }
         }
       },

@@ -199,39 +199,32 @@ class _UserProfilePageState extends State<UserProfilePage> {
         final bioController = TextEditingController();
         userNameController.text = initialUserName;
         bioController.text = initialBio;
-        List<String> tempTags = userProfileProvider.tags;
         return AlertDialog(
           contentPadding: const EdgeInsets.all(20.0),
           actionsPadding:
               const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
-          content: Column(children: [
-            Form(
-              key: _formKey,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: userNameController,
-                    validator: validator("User Name"),
-                    decoration: InputDecoration(
-                      labelText: 'User Name',
-                    ),
+          content: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: userNameController,
+                  validator: validator("User Name"),
+                  decoration: InputDecoration(
+                    labelText: 'User Name',
                   ),
-                  TextFormField(
-                    controller: bioController,
-                    validator: validator("Bio"),
-                    decoration: InputDecoration(
-                      labelText: 'Bio',
-                    ),
+                ),
+                TextFormField(
+                  controller: bioController,
+                  validator: validator("Bio"),
+                  decoration: InputDecoration(
+                    labelText: 'Bio',
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            SizedBox(
-              height: 20,
-            ),
-            TagSelector(texts: tempTags),
-          ]),
+          ),
           actions: [
             SecondaryButton(
                 child: Text("cancel"), onPressed: Navigator.of(context).pop),
@@ -242,7 +235,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   if (_formKey.currentState!.validate()) {
                     userProfileProvider.changeUserName(userNameController.text);
                     userProfileProvider.changeBio(bioController.text);
-                    userProfileProvider.changeTags(tempTags);
                     userProfileProvider.saveChanges();
                     Navigator.of(context).pop();
                   }

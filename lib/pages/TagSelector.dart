@@ -13,7 +13,7 @@ class TagSelector extends StatefulWidget {
 
 class _TagSelectorState extends State<TagSelector> {
   List<Tag> _items = [];
-  double _fontSize = 16;
+  double _fontSize = 18;
 
   @override
   void initState() {
@@ -55,6 +55,7 @@ class _TagSelectorState extends State<TagSelector> {
           index: index, // required
           title: item.tag,
           active: !widget.texts.contains(item.tag),
+          activeColor: Colors.blueGrey.shade100,
           textStyle: TextStyle(
             fontSize: _fontSize,
           ),
