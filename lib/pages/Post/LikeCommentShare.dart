@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/Loading.dart';
+import 'package:keepin/src/Share.dart';
+import 'package:keepin/src/models/ChatRoom.dart';
 import 'package:keepin/src/models/Comment.dart';
 import 'package:keepin/src/models/Post.dart';
+import 'package:keepin/src/models/UserProfile.dart';
+import 'package:keepin/src/services/ChatRoomProvider.dart';
 import 'package:keepin/src/services/PostProvider.dart';
+import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:provider/provider.dart';
 
 class LikeCommentShare extends StatefulWidget {
@@ -87,7 +92,11 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
                   });
                 }),
             StyledButton(
-                icon: Icons.share_outlined, text: " share", onPressed: () {})
+                icon: Icons.share_outlined,
+                text: " share",
+                onPressed: () {
+                  share(context, postId: widget.post.postId);
+                })
           ],
         ),
         AnimatedSwitcher(
@@ -187,8 +196,7 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
     );
   }
 
-  Future<void> _addCommentForm(BuildContext context,
-      [replyTo, replyToId]) async {
+  void _addCommentForm(BuildContext context, [replyTo, replyToId]) async {
     return await showDialog(
       context: context,
       builder: (context) {
@@ -206,6 +214,7 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
                   Form(
                     key: _formKey,
                     child: TextFormField(
+                      autofocus: true,
                       maxLines: 3,
                       controller: commentController,
                       validator: validator("Comment"),

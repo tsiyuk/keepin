@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:keepin/pages/Circle/CreatePostPage.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/Loading.dart';
+import 'package:keepin/src/Share.dart';
 import 'package:keepin/src/models/Circle.dart';
 import 'package:keepin/src/models/Post.dart';
 import 'package:keepin/src/models/UserProfile.dart';
@@ -240,7 +241,15 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
     ];
 
     return Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        actions: [
+          IconButton(
+              onPressed: () {
+                share(context, circleName: widget.circle.circleName);
+              },
+              icon: Icon(Icons.share_outlined))
+        ],
+      ),
       body: loading
           ? Loading(50)
           : Column(
@@ -393,7 +402,8 @@ class _DescriptionState extends State<Description> {
       children: [
         SizedBox(width: 1000),
         TextFormField(
-          maxLines: 4,
+          maxLines: 8,
+          autofocus: true,
           controller: descriptionController,
           decoration: InputDecoration(
             labelText: 'description',

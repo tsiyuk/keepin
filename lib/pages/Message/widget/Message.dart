@@ -84,7 +84,7 @@ class MessageWidget extends StatelessWidget {
                       ],
                     ),
                     child: ListTile(
-                      title: TextH3(post.title),
+                      title: TextH3(post.title, clip: true),
                       subtitle: TextH5(post.posterName),
                       trailing: TextH5(post.circleName),
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(
