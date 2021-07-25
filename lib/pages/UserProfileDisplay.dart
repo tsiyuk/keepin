@@ -243,12 +243,6 @@ class _HelperState extends State<Helper> {
                           chatRoomProvider.setUserIds(
                               FirebaseAuth.instance.currentUser!.uid,
                               widget.userProfile.userId);
-                          // var temp = await chatRoomProvider.specifiedChatRoom;
-                          // if (temp.isEmpty) {
-                          //   chatRoom = await chatRoomProvider.createChatRoom();
-                          // } else {
-                          //   chatRoom = temp[0];
-                          // }
                           ChatRoom chatRoom =
                               await ChatRoomProvider.getOrCreateChatRoom(
                                   FirebaseAuth.instance.currentUser!.uid,
