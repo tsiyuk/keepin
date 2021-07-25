@@ -175,26 +175,29 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
         future: PostProvider.readFollowPosts(
             FirebaseAuth.instance.currentUser!.uid),
         builder: (context, snapshot) {
-          if (snapshot.data == [] ||
-              snapshot.connectionState == ConnectionState.waiting) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return Loading(40);
-          }
-          if (snapshot.data != null) {
-            return ListView.separated(
-              physics: BouncingScrollPhysics(),
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                Post post = snapshot.data![index];
-                userProfileProvider.updatePosterInfo(post);
-                return postDetail(context, post);
-              },
-              separatorBuilder: (c, i) => Container(
-                height: 5,
-                color: Colors.blueGrey.shade100,
-              ),
-            );
           } else {
-            return Center(child: Text('No posts'));
+            if (snapshot.data == null || snapshot.data == []) {
+              return TextH3("Join a new circle");
+            }
+            if (snapshot.data!.length > 0) {
+              return ListView.separated(
+                physics: BouncingScrollPhysics(),
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  Post post = snapshot.data![index];
+                  userProfileProvider.updatePosterInfo(post);
+                  return postDetail(context, post);
+                },
+                separatorBuilder: (c, i) => Container(
+                  height: 5,
+                  color: Colors.blueGrey.shade100,
+                ),
+              );
+            } else {
+              return Center(child: Text('No posts'));
+            }
           }
         });
   }
