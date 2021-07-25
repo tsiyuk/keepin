@@ -199,8 +199,8 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
   }
 
   Widget _buildRecommendation(BuildContext context) {
-    return FutureBuilder<UserProfile>(
-        future: UserProfileProvider.readUserProfile(
+    return StreamBuilder<UserProfile>(
+        stream: UserProfileProvider.readUserProfile(
             FirebaseAuth.instance.currentUser!.uid),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

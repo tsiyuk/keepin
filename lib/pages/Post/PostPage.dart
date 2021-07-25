@@ -47,8 +47,8 @@ class _PostPageState extends State<PostPage> {
   }
 
   Widget _buildPoster(BuildContext context, Post post) {
-    return FutureBuilder<UserProfile>(
-      future: UserProfileProvider.readUserProfile(post.posterId),
+    return StreamBuilder<UserProfile>(
+      stream: UserProfileProvider.readUserProfile(post.posterId),
       builder: (context, snapshot) {
         if (snapshot.data != null) {
           return Container(

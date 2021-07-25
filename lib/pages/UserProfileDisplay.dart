@@ -30,7 +30,7 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<UserProfile>(
-        future: UserProfileProvider.readUserProfile(widget.userId),
+        future: UserProfileProvider.readUserProfileOnce(widget.userId),
         builder: (context, snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
                 ? Loading(30)

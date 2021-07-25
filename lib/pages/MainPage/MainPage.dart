@@ -87,9 +87,9 @@ class _MainPageState extends State<MainPage> {
       UserProfileProvider.updateToken(token!);
     }
 
-    FutureBuilder<UserProfile> userProfilePageHelper =
-        FutureBuilder<UserProfile>(
-      future: UserProfileProvider.readUserProfile(UserState.user!.uid),
+    StreamBuilder<UserProfile> userProfilePageHelper =
+        StreamBuilder<UserProfile>(
+      stream: UserProfileProvider.readUserProfile(UserState.user!.uid),
       builder: (context, snapshot) =>
           snapshot.connectionState == ConnectionState.waiting
               ? Loading(30)
@@ -182,8 +182,8 @@ class _MainPageState extends State<MainPage> {
     return await showDialog(
       context: context,
       builder: (context) {
-        return FutureBuilder<UserProfile>(
-            future: UserProfileProvider.readUserProfile(userId),
+        return StreamBuilder<UserProfile>(
+            stream: UserProfileProvider.readUserProfile(userId),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Loading(10);
@@ -192,7 +192,7 @@ class _MainPageState extends State<MainPage> {
                   return TextH5('Error: no sign in');
                 } else {
                   UserProfile userProfile = snapshot.data!;
-                  List<String> tempTags = userProfile.tags;
+                  // List<String> tempTags = userProfile.tags;
                   return AlertDialog(
                     contentPadding: const EdgeInsets.all(20.0),
                     actionsPadding: const EdgeInsets.symmetric(
@@ -204,7 +204,7 @@ class _MainPageState extends State<MainPage> {
                           margin: const EdgeInsets.only(bottom: 12.0),
                           child: TextH2("Edit My Tags"),
                         ),
-                        TagSelector(texts: tempTags),
+                        TagSelector(texts: userProfile.tags),
                       ],
                     ),
                     actions: [
@@ -214,7 +214,7 @@ class _MainPageState extends State<MainPage> {
                       PrimaryButton(
                           child: Text("Save"),
                           onPressed: () {
-                            UserProfileProvider.changeTags(tempTags);
+                            UserProfileProvider.changeTags(userProfile.tags);
                             Navigator.of(context).pop();
                           })
                     ],

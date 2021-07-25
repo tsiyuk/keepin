@@ -19,8 +19,8 @@ class DiscoverPage extends StatefulWidget {
 class _DiscoverPageState extends State<DiscoverPage> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<UserProfile>(
-        future: UserProfileProvider.readUserProfile(
+    return StreamBuilder<UserProfile>(
+        stream: UserProfileProvider.readUserProfile(
             FirebaseAuth.instance.currentUser!.uid),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {

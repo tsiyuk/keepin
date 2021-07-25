@@ -115,7 +115,8 @@ class _MessagePageState extends State<MessagePage>
                           ChatRoomAPI.getOtherUserId(chatRooms[index]);
                       bool unRead = ChatRoomAPI.isUnRead(chatRooms[index]);
                       return FutureBuilder<UserProfile>(
-                          future: UserProfileProvider.readUserProfile(otherId),
+                          future:
+                              UserProfileProvider.readUserProfileOnce(otherId),
                           builder: (context, snapshot) {
                             if (snapshot.data != null) {
                               UserProfile userProfile = snapshot.data!;

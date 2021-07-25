@@ -17,7 +17,7 @@ class ChatRoomPage extends StatelessWidget {
   Widget build(BuildContext context) {
     String otherId = ChatRoomAPI.getOtherUserId(chatRoom);
     Future<UserProfile> otherUser =
-        UserProfileProvider.readUserProfile(otherId);
+        UserProfileProvider.readUserProfileOnce(otherId);
 
     if (ChatRoomAPI.isUnRead(chatRoom)) {
       ChatRoomAPI.readMessage(chatRoom);

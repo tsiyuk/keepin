@@ -33,8 +33,12 @@ class UserProfileProvider with ChangeNotifier {
       firestoreService.getPostHistory(userId);
 
   /// get the userProfile instance specified by the userId
-  static Future<UserProfile> readUserProfile(String userId) async {
-    return await firestoreService.getUserProfile(userId);
+  static Stream<UserProfile> readUserProfile(String userId) {
+    return firestoreService.getUserProfileStream(userId);
+  }
+
+  static Future<UserProfile> readUserProfileOnce(String userId) {
+    return firestoreService.getUserProfileFuture(userId);
   }
 
   static Stream<List<Circle>> getRecommandCircles(List<String> tags) =>
@@ -98,7 +102,7 @@ class UserProfileProvider with ChangeNotifier {
   /// Check if the posterName and posterAvatar have been updated
   /// If so, update it in the post
   static void updatePosterInfo(Post post) async {
-    UserProfile userProfile = await readUserProfile(post.posterId);
+    UserProfile userProfile = await readUserProfileOnce(post.posterId);
     bool dirty = false;
     if (userProfile.userName != post.posterName) {
       post.posterName = userProfile.userName;
@@ -131,7 +135,23 @@ class FirestoreService {
         snapshot.docs.map((doc) => UserProfile.fromJson(doc.data())).toList());
   }
 
-  Future<UserProfile> getUserProfile(String userId) {
+  Stream<UserProfile> getUserProfile(String userId) {
+    return _firestore
+        .collection('userProfiles')
+        .doc(userId)
+        .get()
+        .then((value) {
+      if (value.data() != null) {
+        return UserProfile.fromJson(value.data()!);
+      } else {
+        User user = FirebaseAuth.instance.currentUser!;
+        return UserProfile(user.uid, user.displayName!, [],
+            avatarURL: user.photoURL);
+      }
+    }).asStream();
+  }
+
+  Future<UserProfile> getUserProfileFuture(String userId) {
     return _firestore
         .collection('userProfiles')
         .doc(userId)
@@ -145,6 +165,14 @@ class FirestoreService {
             avatarURL: user.photoURL);
       }
     });
+  }
+
+  Stream<UserProfile> getUserProfileStream(String userId) {
+    return _firestore
+        .collection('userProfiles')
+        .where('userId', isEqualTo: userId)
+        .snapshots()
+        .map((event) => UserProfile.fromJson(event.docs[0].data()));
   }
 
   Future<bool> isExist(String userId) {
