@@ -111,7 +111,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 ),
               ),
               Container(
-                // 130 profile height, 556 app bar, 92 bottom bar
+                // 130 profile height, 56 app bar, 92 bottom bar
                 height: MediaQuery.of(context).size.height - 280,
                 child: SingleChildScrollView(
                   physics: BouncingScrollPhysics(),

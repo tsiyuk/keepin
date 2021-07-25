@@ -10,6 +10,8 @@ import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:keepin/src/services/PostProvider.dart';
 
+import '../../UserProfileDisplay.dart';
+
 class MessageWidget extends StatelessWidget {
   static Map<String, Image> map = Map<String, Image>();
   final Message message;
@@ -24,21 +26,36 @@ class MessageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final radius = Radius.circular(12);
+    final radius = Radius.circular(10);
     final borderRadius = BorderRadius.all(radius);
+    final String? avatarLink = isMe ? FirebaseAuth.instance.currentUser!.photoURL : userProfile.avatarURL;
+    final String userId = isMe ? FirebaseAuth.instance.currentUser!.uid : userProfile.userId;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
       textDirection: isMe ? TextDirection.rtl : TextDirection.ltr,
       mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        isMe
-            ? buildAvatar(FirebaseAuth.instance.currentUser!.photoURL)
-            : buildAvatar(userProfile.avatarURL),
+      Container(
+      width: 56,
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: ImageButton(
+          imageLink: avatarLink,
+          size: 40,
+          onPressed: () {
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) =>
+                    UserProfileDisplay(userId)));}
+            ),
+            ),
+        // isMe
+        //     ? buildAvatar(FirebaseAuth.instance.currentUser!.photoURL)
+        //     : buildAvatar(userProfile.avatarURL),
         Container(
-          padding: EdgeInsets.all(12),
-          margin: EdgeInsets.symmetric(vertical: 6),
-          constraints: BoxConstraints(maxWidth: 200),
+          padding: EdgeInsets.all(10),
+          margin: EdgeInsets.symmetric(vertical: 4),
+          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
           decoration: BoxDecoration(
             color:
                 isMe ? Colors.grey[100] : Theme.of(context).primaryColorLight,
@@ -148,28 +165,32 @@ class MessageWidget extends StatelessWidget {
         ],
       );
 
-  Widget buildAvatar(String? url) {
-    if (url == null) {
-      return defaultAvatar(40);
-    } else {
-      if (!map.containsKey(url)) {
-        map.addEntries([
-          MapEntry(
-              url,
-              Image.network(
-                url,
-                fit: BoxFit.cover,
-              ))
-        ]);
-      }
-      return Container(
-        width: 60,
-        padding: const EdgeInsets.symmetric(horizontal: 10),
-        child: ImageButton(
-          image: map[url]!,
-          size: 40,
-        ),
-      );
-    }
-  }
+  // Widget buildAvatar(String? url) {
+  //   if (url == null) {
+  //     return defaultAvatar(40);
+  //   } else {
+  //     if (!map.containsKey(url)) {
+  //       map.addEntries([
+  //         MapEntry(
+  //             url,
+  //             Image.network(
+  //               url,
+  //               fit: BoxFit.cover,
+  //             ))
+  //       ]);
+  //     }
+  //     return Container(
+  //       width: 60,
+  //       padding: const EdgeInsets.symmetric(horizontal: 10),
+  //       child: ImageButton(
+  //         image: map[url]!,
+  //         size: 40,
+  //   // onPressed: () {
+  //   // Navigator.of(context).push(MaterialPageRoute(
+  //   // builder: (context) =>
+  //   // UserProfileDisplay(post.posterId)));
+  //   //     ),
+  //     ));
+  //   }
+  // }
 }
