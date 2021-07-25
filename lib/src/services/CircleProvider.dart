@@ -282,8 +282,13 @@ class CircleProvider with ChangeNotifier {
     } else {
       _exp = 0;
       _clockinCount = 0;
+      --_numOfMembers;
       notifyListeners();
-      await _firestoreService.removeUser(circleName, user.uid);
+      var futures = <Future>[];
+      futures.add(_firestoreService.removeUser(circleName, user.uid));
+      futures
+          .add(_firestoreService.updateNumOfMember(circleName, numOfMembers));
+      await Future.wait(futures);
     }
   }
 }

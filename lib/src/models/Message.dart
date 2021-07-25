@@ -30,7 +30,7 @@ class Message {
         receiverId: json['receiverId'],
         timestamp: Utils.toDateTime(json['timestamp']),
         inviteCircleName: json['inviteCircleName'],
-        postId: json['invitePostId']);
+        postId: json['postId']);
   }
 
   Map<String, dynamic> toMap() {
