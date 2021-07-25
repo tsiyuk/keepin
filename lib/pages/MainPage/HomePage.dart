@@ -24,8 +24,6 @@ class HomePage extends StatelessWidget {
   // https://flutter.dev/docs/cookbook/navigation/navigation-basics
   // refer to this link for navigating to circle page and back
   Widget _buildCircleList(BuildContext context) {
-    UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context);
     CircleProvider circleProvider =
         Provider.of<CircleProvider>(context, listen: false);
     return Container(
@@ -48,7 +46,7 @@ class HomePage extends StatelessWidget {
           Container(
             width: MediaQuery.of(context).size.width - 100,
             child: StreamBuilder<List<CircleInfo>>(
-              stream: userProfileProvider.circlesJoined,
+              stream: UserProfileProvider.circlesJoined,
               builder: (context, snapshot) {
                 if (snapshot.data != null && snapshot.data!.isNotEmpty) {
                   return Container(
@@ -168,8 +166,6 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
   }
 
   Widget _buildFollowFeed(BuildContext context) {
-    UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context, listen: false);
     return FutureBuilder<List<Post>>(
         initialData: [],
         future: PostProvider.readFollowPosts(
@@ -187,7 +183,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
                 itemCount: snapshot.data!.length,
                 itemBuilder: (context, index) {
                   Post post = snapshot.data![index];
-                  userProfileProvider.updatePosterInfo(post);
+                  UserProfileProvider.updatePosterInfo(post);
                   return postDetail(context, post);
                 },
                 separatorBuilder: (c, i) => Container(
@@ -203,46 +199,49 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
   }
 
   Widget _buildRecommendation(BuildContext context) {
-    UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context, listen: false);
-    initUser(context);
-    return userProfileProvider.tags.isEmpty
-        ? Container(
-            child: Text('Please add your favourite tags in Discover'),
-          )
-        : StreamBuilder<List<Post>>(
-            initialData: [],
-            stream: userProfileProvider.recommandPost,
-            builder: (context, snapshot) {
-              if (snapshot.data == [] ||
-                  snapshot.connectionState == ConnectionState.waiting) {
-                return Loading(40);
-              }
-              if (snapshot.data != null) {
-                return ListView.separated(
-                  physics: BouncingScrollPhysics(),
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: (context, index) {
-                    Post post = snapshot.data![index];
-                    userProfileProvider.updatePosterInfo(post);
-                    return postDetail(context, post);
-                  },
-                  separatorBuilder: (c, i) => Container(
-                    height: 5,
-                    color: Colors.blueGrey.shade100,
-                  ),
-                );
-              } else {
-                return Center(child: Text('No recommand posts'));
-              }
-            });
-  }
-
-  void initUser(BuildContext context) async {
-    UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context);
-    final UserProfile userProfile =
-        await UserProfileProvider.readUserProfile(userProfileProvider.userId);
-    userProfileProvider.load(userProfile);
+    return FutureBuilder<UserProfile>(
+        future: UserProfileProvider.readUserProfile(
+            FirebaseAuth.instance.currentUser!.uid),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Loading(30);
+          }
+          if (snapshot.data != null) {
+            UserProfile userProfile = snapshot.data!;
+            return userProfile.tags.isEmpty
+                ? Container(
+                    child: Text('Please add your favourite tags in Discover'),
+                  )
+                : StreamBuilder<List<Post>>(
+                    initialData: [],
+                    stream:
+                        UserProfileProvider.getRecommandPost(userProfile.tags),
+                    builder: (context, snapshot) {
+                      if (snapshot.data == [] ||
+                          snapshot.connectionState == ConnectionState.waiting) {
+                        return Loading(40);
+                      }
+                      if (snapshot.data != null) {
+                        return ListView.separated(
+                          physics: BouncingScrollPhysics(),
+                          itemCount: snapshot.data!.length,
+                          itemBuilder: (context, index) {
+                            Post post = snapshot.data![index];
+                            UserProfileProvider.updatePosterInfo(post);
+                            return postDetail(context, post);
+                          },
+                          separatorBuilder: (c, i) => Container(
+                            height: 5,
+                            color: Colors.blueGrey.shade100,
+                          ),
+                        );
+                      } else {
+                        return Center(child: Text('No recommand posts'));
+                      }
+                    });
+          } else {
+            return TextH3("Error: No user signed in");
+          }
+        });
   }
 }

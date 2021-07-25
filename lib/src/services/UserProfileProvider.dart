@@ -16,26 +16,20 @@ import 'package:keepin/src/services/PostProvider.dart';
 */
 class UserProfileProvider with ChangeNotifier {
   static final firestoreService = FirestoreService();
-  String? _avatarURL;
-  String? _bio;
-  User user = FirebaseAuth.instance.currentUser!;
-  String _userId = FirebaseAuth.instance.currentUser!.uid;
+  static User user = FirebaseAuth.instance.currentUser!;
+  static String _userId = FirebaseAuth.instance.currentUser!.uid;
   String _userName = FirebaseAuth.instance.currentUser!.displayName!;
-  List<String> _tags = [];
 
   // Getters
-  String get userId => _userId;
+  static String get userId => _userId;
   String get userName => _userName;
-  String? get avatarURL => _avatarURL;
-  String? get bio => _bio;
-  List<String> get tags => _tags;
-  Stream<List<UserProfile>> get userProfiles =>
+  static Stream<List<UserProfile>> get userProfiles =>
       firestoreService.getUserProfiles();
-  Stream<List<CircleInfo>> get circlesJoined =>
+  static Stream<List<CircleInfo>> get circlesJoined =>
       firestoreService.getCirclesJoined(userId);
-  Future<List<Circle>> get circleHistory =>
+  static Future<List<Circle>> get circleHistory =>
       firestoreService.getCircleHistory(userId);
-  Future<List<Post?>> get postHistory =>
+  static Future<List<Post?>> get postHistory =>
       firestoreService.getPostHistory(userId);
 
   /// get the userProfile instance specified by the userId
@@ -43,54 +37,37 @@ class UserProfileProvider with ChangeNotifier {
     return await firestoreService.getUserProfile(userId);
   }
 
-  Stream<List<Circle>> get recommandCircles =>
+  static Stream<List<Circle>> getRecommandCircles(List<String> tags) =>
       firestoreService.getRecommandCircle(tags);
-  Stream<List<Post>> get recommandPost =>
+  static Stream<List<Post>> getRecommandPost(List<String> tags) =>
       firestoreService.getRecommandPost(tags);
 
-  Stream<List<CircleInfo>> readCircleJoined(String id) =>
+  static Stream<List<CircleInfo>> readCircleJoined(String id) =>
       firestoreService.getCirclesJoined(id);
 
-  // Setters
-  void changeUserName(String userName) {
-    _userName = userName;
-    notifyListeners();
-  }
-
-  void changeBio(String newBio) {
-    _bio = newBio;
-    notifyListeners();
-  }
-
-  // load all the information from the userProfile instance
-  void load(UserProfile userProfile) {
-    _userId = userProfile.userId;
-    _userName = userProfile.userName;
-    _avatarURL = userProfile.avatarURL;
-    _bio = userProfile.bio;
-    _tags = userProfile.tags;
-  }
-
-  void clear() {
-    _userId = '';
-    _userName = '';
-    _avatarURL = '';
-    _bio = '';
-    _tags = [];
-  }
-
   // save all the changes
-  void saveChanges() {
+  static Future<void> saveChanges(String userName, List<String> tags,
+      String? avatarURL, String? bio) async {
     UserProfile userProfile =
         UserProfile(userId, userName, tags, avatarURL: avatarURL, bio: bio);
     user.updateDisplayName(userName);
     user.updatePhotoURL(avatarURL);
-    firestoreService.setUserProfile(userProfile);
+    await firestoreService.setUserProfile(userProfile);
+  }
+
+  static Future<void> createProfile(
+      String userId, String userName, String? avatarURL) {
+    return firestoreService.setUserProfile(
+        UserProfile(userId, userName, [], avatarURL: avatarURL));
+  }
+
+  static Future<bool> isProfileExist() {
+    return firestoreService.isExist(userId);
   }
 
   // upload avatar from the user's local gallery
   // maybe need to restrict the size of the uploaded image
-  Future uploadPic(BuildContext context) async {
+  static Future<String> uploadPic(BuildContext context) async {
     ImagePicker imagePicker = ImagePicker();
     final pickedFile = await imagePicker.getImage(source: ImageSource.gallery);
     if (pickedFile != null) {
@@ -104,18 +81,23 @@ class UserProfileProvider with ChangeNotifier {
             .child(userId)
             .child(fileName);
         await firebaseStorageRef.putFile(image);
-        _avatarURL = await firebaseStorageRef.getDownloadURL();
-        notifyListeners();
+        return await firebaseStorageRef.getDownloadURL();
       } else {
         throw FirebaseException(
             plugin: 'Firebase upload', code: 'Upload failed');
       }
+    } else {
+      throw FirebaseException(plugin: 'Firebase upload', code: 'Upload failed');
     }
+  }
+
+  static void updateAvatarURL(String url) async {
+    await firestoreService.updateAvatarLink(userId, url);
   }
 
   /// Check if the posterName and posterAvatar have been updated
   /// If so, update it in the post
-  void updatePosterInfo(Post post) async {
+  static void updatePosterInfo(Post post) async {
     UserProfile userProfile = await readUserProfile(post.posterId);
     bool dirty = false;
     if (userProfile.userName != post.posterName) {
@@ -131,14 +113,12 @@ class UserProfileProvider with ChangeNotifier {
     }
   }
 
-  void updateToken(String token) async {
+  static void updateToken(String token) async {
     await firestoreService.updateNotificationToken(userId, token);
   }
 
-  void changeTags(List<String> tags) async {
-    _tags = tags;
+  static void changeTags(List<String> tags) async {
     await firestoreService.updateTags(userId, tags);
-    notifyListeners();
   }
 }
 
@@ -167,6 +147,14 @@ class FirestoreService {
     });
   }
 
+  Future<bool> isExist(String userId) {
+    return _firestore
+        .collection('userProfiles')
+        .doc(userId)
+        .get()
+        .then((value) => value.data() != null);
+  }
+
   Stream<List<CircleInfo>> getCirclesJoined(String userId) {
     return _firestore
         .collection('userProfiles')
@@ -193,6 +181,13 @@ class FirestoreService {
         .collection('userProfiles')
         .doc(userId)
         .update({'notificationToken': token});
+  }
+
+  Future<void> updateAvatarLink(String userId, String avatarURL) {
+    return _firestore
+        .collection('userProfiles')
+        .doc(userId)
+        .update({'avatarURL': avatarURL});
   }
 
   /// Circle history

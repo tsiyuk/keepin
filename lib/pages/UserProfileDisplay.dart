@@ -126,8 +126,8 @@ class _HelperState extends State<Helper> {
                           SizedBox(width: MediaQuery.of(context).size.width),
                           TextH3("Circles Joined: "),
                           StreamBuilder<List<CircleInfo>>(
-                            stream: userProfileProvider
-                                .readCircleJoined(widget.userProfile.userId),
+                            stream: UserProfileProvider.readCircleJoined(
+                                widget.userProfile.userId),
                             builder: (context, snapshot) {
                               if (snapshot.data != null &&
                                   snapshot.data!.isNotEmpty) {

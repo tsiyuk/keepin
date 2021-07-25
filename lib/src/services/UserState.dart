@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:keepin/src/services/UserProfileProvider.dart';
 
 enum LoginState {
   loggedOut,
@@ -90,7 +91,11 @@ class UserState extends ChangeNotifier {
         await user.reload();
         if (user.emailVerified) {
           timer.cancel();
-          await user.updateDisplayName(displayName);
+          var futures = <Future>[];
+          futures.add(user.updateDisplayName(displayName));
+          futures.add(UserProfileProvider.createProfile(
+              user.uid, user.displayName!, user.photoURL));
+          Future.wait(futures);
           _loginState = LoginState.loggedIn;
           _user = user;
           notifyListeners();
@@ -114,6 +119,12 @@ class UserState extends ChangeNotifier {
       var temp = await FirebaseAuth.instance.signInWithCredential(credential);
       _user = temp.user;
       _loginState = LoginState.loggedIn;
+      if (user != null) {
+        if (!await UserProfileProvider.isProfileExist()) {
+          UserProfileProvider.createProfile(
+              user!.uid, user!.displayName!, user!.photoURL);
+        }
+      }
       notifyListeners();
     } on PlatformException catch (e) {
       throw e;
