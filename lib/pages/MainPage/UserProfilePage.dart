@@ -88,8 +88,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         subtitle: TextH4(initialBio),
                         trailing: IconButton(
                           onPressed: () {
-                            _showEditForm(context, widget.userProfile,
-                                initialUserName, initialBio);
+                            _showEditForm(context, widget.userProfile);
                           },
                           icon: Icon(Icons.edit),
                         ),
@@ -232,8 +231,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
           );
   }
 
-  Future<void> _showEditForm(BuildContext context, UserProfile userProfile,
-      String initialUserName, String initialBio) async {
+  Future<void> _showEditForm(
+      BuildContext context, UserProfile userProfile) async {
     return await showDialog(
       context: context,
       builder: (context) {
