@@ -69,13 +69,11 @@ class _CreateCirclePageState extends State<CreateCirclePage> {
   @override
   Widget build(BuildContext context) {
     CircleProvider circleProvider = Provider.of<CircleProvider>(context);
-    // Color fill = Theme.of(context).primaryColorLight.withOpacity(0.1);
     Color fill = Colors.white;
     return Scaffold(
-      backgroundColor: Colors.blueGrey.shade50,
+      backgroundColor: Colors.teal.shade50,
       appBar: AppBar(
         title: Text("Create Circle", style: TextStyle(color: Colors.white)),
-        backgroundColor: Theme.of(context).primaryColorLight,
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,
