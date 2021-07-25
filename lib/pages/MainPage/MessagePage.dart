@@ -13,6 +13,8 @@ import 'package:keepin/src/services/PostProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:provider/provider.dart';
 
+import '../UserProfileDisplay.dart';
+
 class MessagePage extends StatefulWidget {
   final String userId;
   const MessagePage(this.userId, {Key? key}) : super(key: key);
@@ -118,6 +120,7 @@ class _MessagePageState extends State<MessagePage>
                           future: UserProfileProvider.readUserProfile(otherId),
                           builder: (context, snapshot) {
                             if (snapshot.data != null) {
+                              UserProfile userProfile = snapshot.data!;
                               return GestureDetector(
                                 behavior: HitTestBehavior.translucent,
                                 onTap: () => Navigator.of(context).push(
@@ -131,15 +134,19 @@ class _MessagePageState extends State<MessagePage>
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 2, horizontal: 12.0),
                                       child: ImageButton(
-                                        imageLink: snapshot.data!.avatarURL!,
+                                        imageLink: userProfile.avatarURL!,
                                         size: 50,
+                                          onPressed: () {
+                                            Navigator.of(context).push(MaterialPageRoute(
+                                                builder: (context) =>
+                                                    UserProfileDisplay(userProfile.userId)));}
                                       ),
                                     ),
                                     Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        TextH3(snapshot.data!.userName,
+                                        TextH3(userProfile.userName,
                                             size: 20),
                                         showLastMessage(
                                             chatRooms[index].latestMessage,

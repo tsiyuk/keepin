@@ -202,6 +202,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
             onPressed: () async {
               try {
                 await circleProvider.clockin();
+                showSuccess(context, "Clock in successfully!");
                 // setState(() {
                 //   exp += circleProvider.CLOCK_IN_EXP;
                 //   clockInCount += 1;
@@ -273,13 +274,13 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                 Expanded(
                   child: TabBarView(controller: _tabController, children: [
                     Container(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 30, horizontal: 20),
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: SingleChildScrollView(
                         physics: BouncingScrollPhysics(),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            SizedBox(height: 20),
                             Container(
                               margin: EdgeInsets.only(bottom: 12),
                               child: Text(
@@ -300,6 +301,7 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                                 return Chip(label: Text(tag));
                               }).toList(),
                             ),
+                            SizedBox(height: 50),
                           ],
                         ),
                       ),

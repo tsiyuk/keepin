@@ -151,6 +151,7 @@ class _LikeCommentShareState extends State<LikeCommentShare> {
                   } else {
                     return ListView.builder(
                         scrollDirection: Axis.vertical,
+                        physics: BouncingScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
