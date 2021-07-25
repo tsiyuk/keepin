@@ -116,8 +116,7 @@ class _HelperState extends State<Helper> {
                   Container(
                     // 140 profile height, 56 app bar, 32 margin, 70 button
                     constraints: BoxConstraints(
-                      maxHeight: MediaQuery.of(context).size.height - 340
-                    ),
+                        maxHeight: MediaQuery.of(context).size.height - 340),
                     margin: const EdgeInsets.symmetric(vertical: 16),
                     child: SingleChildScrollView(
                       physics: BouncingScrollPhysics(),
@@ -145,7 +144,8 @@ class _HelperState extends State<Helper> {
                                           Circle circle = await CircleProvider
                                               .readCircleFromName(
                                                   data.circleName);
-                                          circleProvider.addCircleHistory(circle);
+                                          circleProvider
+                                              .addCircleHistory(circle);
                                           Navigator.of(context).push(
                                               (MaterialPageRoute(
                                                   builder: (context) =>
@@ -153,10 +153,11 @@ class _HelperState extends State<Helper> {
                                                           circle: circle,
                                                           circleInfo: data))));
                                         },
-                                        child: CircleInfoBuilder.buildCircleInfo(
-                                            data.avatarURL,
-                                            data.circleName,
-                                            data.clockinCount),
+                                        child:
+                                            CircleInfoBuilder.buildCircleInfo(
+                                                data.avatarURL,
+                                                data.circleName,
+                                                data.clockinCount),
                                       );
                                     },
                                     separatorBuilder: (c, i) => VerticalDivider(
@@ -178,12 +179,9 @@ class _HelperState extends State<Helper> {
                           Wrap(
                             children: widget.userProfile.tags.isNotEmpty
                                 ? widget.userProfile.tags.map((tag) {
-                              return Chip(label: Text(tag));
-                            }).toList()
-                                : [
-                              Text(
-                                  "No interest tags")
-                            ],
+                                    return Chip(label: Text(tag));
+                                  }).toList()
+                                : [Text("No interest tags")],
                           ),
                           SizedBox(height: 24),
                           Padding(
@@ -202,10 +200,12 @@ class _HelperState extends State<Helper> {
                                     itemBuilder: (context, index) {
                                       Post post = snapshot.data![index];
                                       return Container(
-                                        margin: const EdgeInsets.only(bottom: 10),
+                                        margin:
+                                            const EdgeInsets.only(bottom: 10),
                                         decoration: BoxDecoration(
                                           color: Colors.white,
-                                          borderRadius: BorderRadius.circular(6),
+                                          borderRadius:
+                                              BorderRadius.circular(6),
                                           boxShadow: [
                                             BoxShadow(
                                               color: Colors.black12,
@@ -219,8 +219,8 @@ class _HelperState extends State<Helper> {
                                           subtitle: getTimeDisplay(
                                               post.timestamp.toString()),
                                           trailing: Text(post.circleName),
-                                          onTap: () => Navigator.of(context).push(
-                                              MaterialPageRoute(
+                                          onTap: () => Navigator.of(context)
+                                              .push(MaterialPageRoute(
                                                   builder: (context) =>
                                                       PostPage(post: post))),
                                         ),
@@ -240,15 +240,19 @@ class _HelperState extends State<Helper> {
                     PrimaryButton(
                         child: Text('Contact'),
                         onPressed: () async {
-                          ChatRoom chatRoom;
-                          chatRoomProvider
-                              .setNewUser(widget.userProfile.userId);
-                          var temp = await chatRoomProvider.specifiedChatRoom;
-                          if (temp.isEmpty) {
-                            chatRoom = await chatRoomProvider.createChatRoom();
-                          } else {
-                            chatRoom = temp[0];
-                          }
+                          chatRoomProvider.setUserIds(
+                              FirebaseAuth.instance.currentUser!.uid,
+                              widget.userProfile.userId);
+                          // var temp = await chatRoomProvider.specifiedChatRoom;
+                          // if (temp.isEmpty) {
+                          //   chatRoom = await chatRoomProvider.createChatRoom();
+                          // } else {
+                          //   chatRoom = temp[0];
+                          // }
+                          ChatRoom chatRoom =
+                              await ChatRoomProvider.getOrCreateChatRoom(
+                                  FirebaseAuth.instance.currentUser!.uid,
+                                  widget.userProfile.userId);
                           Navigator.of(context).push(MaterialPageRoute(
                               builder: (context) =>
                                   ChatRoomPage(chatRoom: chatRoom)));
@@ -266,5 +270,11 @@ class _HelperState extends State<Helper> {
     if (mounted) {
       super.setState(fn);
     }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
   }
 }

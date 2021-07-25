@@ -26,8 +26,12 @@ class ChatRoomProvider extends ChangeNotifier {
       FirestoreService.getMessages(chatRoomId);
 
   /// Return a chat room where two given users are in
-  Future<List<ChatRoom>> get specifiedChatRoom =>
+  Future<ChatRoom?> get specifiedChatRoom =>
       FirestoreService.getChatRoom(_userIds);
+
+  static Future<ChatRoom?> getSpecifiedChatRoom(List<String> uids) {
+    return FirestoreService.getChatRoom(uids);
+  }
 
   /// Check if the given user is in the chat
   bool isInChat(String userId) {
@@ -59,9 +63,8 @@ class ChatRoomProvider extends ChangeNotifier {
   }
 
   // Setters
-  void setNewUser(String userId) {
-    _userIds.insert(0, currentUser.uid);
-    _userIds.insert(1, userId);
+  void setUserIds(String userId1, String userId2) {
+    _userIds = [userId1, userId2];
     _userIds.sort();
     notifyListeners();
   }
@@ -87,6 +90,22 @@ class ChatRoomProvider extends ChangeNotifier {
     await FirestoreService.addChatRoom(chatRoom);
     notifyListeners();
     return chatRoom;
+  }
+
+  static Future<ChatRoom> getOrCreateChatRoom(
+      String userId1, String userId2) async {
+    List<String> userIds = [userId1, userId2];
+    userIds.sort();
+    ChatRoom? result = await getSpecifiedChatRoom(userIds);
+    if (result == null) {
+      String uid = FirestoreService.firestore.doc().id;
+      ChatRoom chatRoom =
+          ChatRoom(uid: uid, userIds: userIds, unread: [false, false]);
+      await FirestoreService.addChatRoom(chatRoom);
+      return chatRoom;
+    } else {
+      return result;
+    }
   }
 
   Future<bool> isNotExist() {
@@ -166,12 +185,15 @@ class FirestoreService {
   }
 
   static Future<bool> isNotExist(List<String> ids) {
-    return firestore.where('userIds', isEqualTo: ids).snapshots().isEmpty;
+    return firestore
+        .where('userIds', isEqualTo: ids)
+        .get()
+        .then((value) => value.docs.isEmpty);
   }
 
-  static Future<List<ChatRoom>> getChatRoom(List<String> ids) {
-    return firestore.where('userIds', isEqualTo: ids).get().then(
-        (value) => value.docs.map((e) => ChatRoom.fromJson(e.data())).toList());
+  static Future<ChatRoom?> getChatRoom(List<String> ids) {
+    return firestore.where('userIds', isEqualTo: ids).get().then((value) =>
+        value.docs.isNotEmpty ? ChatRoom.fromJson(value.docs[0].data()) : null);
   }
 
   static Future<void> deleteChatRoom(String chatRoomId) {
