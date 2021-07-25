@@ -16,12 +16,12 @@ class ChatRoomPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String otherId = ChatRoomProvider.getOtherUserId(chatRoom);
+    String otherId = ChatRoomAPI.getOtherUserId(chatRoom);
     Future<UserProfile> otherUser =
         UserProfileProvider.readUserProfile(otherId);
 
-    if (ChatRoomProvider.isUnRead(chatRoom)) {
-      ChatRoomProvider.readMessage(chatRoom);
+    if (ChatRoomAPI.isUnRead(chatRoom)) {
+      ChatRoomAPI.readMessage(chatRoom);
     }
 
     return Scaffold(

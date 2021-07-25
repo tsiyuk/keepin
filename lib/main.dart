@@ -20,7 +20,6 @@ void main() {
         create: (context) => PostProvider(),
       ),
       ChangeNotifierProvider(create: (context) => CircleProvider()),
-      ChangeNotifierProvider(create: (context) => ChatRoomProvider()),
     ],
     builder: (context, child) => MyApp(),
   ));

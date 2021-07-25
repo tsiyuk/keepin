@@ -80,7 +80,6 @@ class _HelperState extends State<Helper> {
         Provider.of<UserProfileProvider>(context, listen: false);
     CircleProvider circleProvider =
         Provider.of<CircleProvider>(context, listen: false);
-    ChatRoomProvider chatRoomProvider = Provider.of<ChatRoomProvider>(context);
     return Scaffold(
       appBar: AppBar(),
       body: loading
@@ -240,11 +239,8 @@ class _HelperState extends State<Helper> {
                     PrimaryButton(
                         child: Text('Contact'),
                         onPressed: () async {
-                          chatRoomProvider.setUserIds(
-                              FirebaseAuth.instance.currentUser!.uid,
-                              widget.userProfile.userId);
                           ChatRoom chatRoom =
-                              await ChatRoomProvider.getOrCreateChatRoom(
+                              await ChatRoomAPI.getOrCreateChatRoom(
                                   FirebaseAuth.instance.currentUser!.uid,
                                   widget.userProfile.userId);
                           Navigator.of(context).push(MaterialPageRoute(

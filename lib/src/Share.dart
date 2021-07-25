@@ -27,7 +27,7 @@ Future<void> share(BuildContext context,
                 child: TextH2("Share To:"),
               ),
               StreamBuilder<List<ChatRoom>>(
-                stream: ChatRoomProvider.getChatRooms(),
+                stream: ChatRoomAPI.getChatRooms(),
                 builder: (sContext, snapshot) {
                   switch (snapshot.connectionState) {
                     case ConnectionState.waiting:
@@ -51,7 +51,7 @@ Future<void> share(BuildContext context,
                                 Divider(thickness: 1),
                             itemBuilder: (lContext, index) {
                               ChatRoom chatRoom = chatRooms[index];
-                              String otherId = ChatRoomProvider.getOtherUserId(
+                              String otherId = ChatRoomAPI.getOtherUserId(
                                   chatRooms[index]);
                               return FutureBuilder<UserProfile>(
                                 future: UserProfileProvider.readUserProfile(
@@ -61,7 +61,7 @@ Future<void> share(BuildContext context,
                                     return GestureDetector(
                                       behavior: HitTestBehavior.translucent,
                                       onTap: () {
-                                        ChatRoomProvider.createMessage(
+                                        ChatRoomAPI.createMessage(
                                             chatRoom, "check out this $shared!",
                                             postId: postId,
                                             inviteCircleName: circleName);

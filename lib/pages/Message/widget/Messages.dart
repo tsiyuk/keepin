@@ -23,7 +23,7 @@ class MessagesWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var myId = UserState.user!.uid;
     return StreamBuilder<List<Message>>(
-      stream: ChatRoomProvider.getMessages(chatRoom.uid),
+      stream: ChatRoomAPI.getMessages(chatRoom.uid),
       builder: (context, snapshot) {
         if (snapshot.hasError) {
           return buildText('Something Went Wrong Try later');

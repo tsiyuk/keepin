@@ -90,12 +90,10 @@ class _MessagePageState extends State<MessagePage>
   }
 
   Widget _buildChatRooms(BuildContext context) {
-    ChatRoomProvider chatRoomProvider = Provider.of<ChatRoomProvider>(context);
-
     return Padding(
       padding: const EdgeInsets.all(12.0),
       child: StreamBuilder<List<ChatRoom>>(
-          stream: ChatRoomProvider.getChatRooms(),
+          stream: ChatRoomAPI.getChatRooms(),
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.waiting:
@@ -114,8 +112,8 @@ class _MessagePageState extends State<MessagePage>
                     separatorBuilder: (context, index) => Divider(thickness: 1),
                     itemBuilder: (context, index) {
                       String otherId =
-                          ChatRoomProvider.getOtherUserId(chatRooms[index]);
-                      bool unRead = ChatRoomProvider.isUnRead(chatRooms[index]);
+                      ChatRoomAPI.getOtherUserId(chatRooms[index]);
+                      bool unRead = ChatRoomAPI.isUnRead(chatRooms[index]);
                       return FutureBuilder<UserProfile>(
                           future: UserProfileProvider.readUserProfile(otherId),
                           builder: (context, snapshot) {

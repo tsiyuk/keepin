@@ -6,18 +6,8 @@ import 'package:keepin/src/models/Message.dart';
 import 'package:keepin/src/services/UserState.dart';
 
 /// Only support two people in one chat room
-class ChatRoomProvider extends ChangeNotifier {
-  List<String> _userIds = [];
-  String _chatRoomId = '';
-  List<bool> _unread = [];
-  Message? _latestMessage;
+class ChatRoomAPI {
   static User currentUser = UserState.user!;
-
-  // Getters
-  List<String> get userIds => _userIds;
-  Message? get latestMessage => _latestMessage;
-  String get chatRoomId => _chatRoomId;
-  List<bool> get unread => _unread;
 
   /// Return a stream of all the chat room the user belonged to
   static Stream<List<ChatRoom>> getChatRooms() =>
@@ -25,17 +15,8 @@ class ChatRoomProvider extends ChangeNotifier {
   static Stream<List<Message>> getMessages(String chatRoomId) =>
       FirestoreService.getMessages(chatRoomId);
 
-  /// Return a chat room where two given users are in
-  Future<ChatRoom?> get specifiedChatRoom =>
-      FirestoreService.getChatRoom(_userIds);
-
   static Future<ChatRoom?> getSpecifiedChatRoom(List<String> uids) {
     return FirestoreService.getChatRoom(uids);
-  }
-
-  /// Check if the given user is in the chat
-  bool isInChat(String userId) {
-    return userIds.contains(userId);
   }
 
   /// Check if the chat room has been read by the current user
@@ -62,35 +43,6 @@ class ChatRoomProvider extends ChangeNotifier {
     }
   }
 
-  // Setters
-  void setUserIds(String userId1, String userId2) {
-    _userIds = [userId1, userId2];
-    _userIds.sort();
-    notifyListeners();
-  }
-
-  void loadAll(ChatRoom chatRoom) {
-    _userIds = chatRoom.userIds;
-    _chatRoomId = chatRoom.uid;
-    _latestMessage = chatRoom.latestMessage;
-    _unread = chatRoom.unread;
-    notifyListeners();
-  }
-
-  void clear() {
-    _userIds = [];
-    _chatRoomId = '';
-    _unread = [];
-  }
-
-  Future<ChatRoom> createChatRoom() async {
-    String uid = FirestoreService.firestore.doc().id;
-    ChatRoom chatRoom =
-        ChatRoom(uid: uid, userIds: userIds, unread: [false, false]);
-    await FirestoreService.addChatRoom(chatRoom);
-    notifyListeners();
-    return chatRoom;
-  }
 
   static Future<ChatRoom> getOrCreateChatRoom(
       String userId1, String userId2) async {
@@ -106,10 +58,6 @@ class ChatRoomProvider extends ChangeNotifier {
     } else {
       return result;
     }
-  }
-
-  Future<bool> isNotExist() {
-    return FirestoreService.isNotExist(userIds);
   }
 
   static void createMessage(ChatRoom chatRoom, String text,
@@ -182,13 +130,6 @@ class FirestoreService {
         .snapshots()
         .map((snapshot) =>
             snapshot.docs.map((doc) => Message.fromJson(doc.data())).toList());
-  }
-
-  static Future<bool> isNotExist(List<String> ids) {
-    return firestore
-        .where('userIds', isEqualTo: ids)
-        .get()
-        .then((value) => value.docs.isEmpty);
   }
 
   static Future<ChatRoom?> getChatRoom(List<String> ids) {

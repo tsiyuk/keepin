@@ -22,7 +22,6 @@ class _NewMessageWidgetState extends State<NewMessageWidget> {
 
   @override
   Widget build(BuildContext context) {
-    ChatRoomProvider chatRoomProvider = Provider.of<ChatRoomProvider>(context);
     return Container(
       color: Colors.white,
       padding: EdgeInsets.all(12),
@@ -56,7 +55,7 @@ class _NewMessageWidgetState extends State<NewMessageWidget> {
                 ? null
                 : () {
                     FocusScope.of(context).unfocus();
-                    ChatRoomProvider.createMessage(widget.chatRoom, message);
+                    ChatRoomAPI.createMessage(widget.chatRoom, message);
                     _controller.clear();
                   },
             child: Container(
