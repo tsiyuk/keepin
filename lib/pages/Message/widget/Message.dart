@@ -65,7 +65,12 @@ class MessageWidget extends StatelessWidget {
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
                   print(snapshot.error);
-                  return Divider();
+                  return Column(
+                    children: [
+                      Divider(),
+                      TextH5('The post may have been deleted'),
+                    ],
+                  );
                 } else if (snapshot.hasData) {
                   Post post = snapshot.data!;
                   return Container(

@@ -8,7 +8,6 @@ class Message {
   String userId;
   String receiverId;
   String? inviteCircleName;
-  String? invitePostId;
   DateTime timestamp;
   String? postId;
   Circle? circle;
