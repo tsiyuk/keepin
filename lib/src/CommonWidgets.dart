@@ -1,4 +1,9 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:keepin/pages/Post/LikeCommentShare.dart';
+import 'package:keepin/pages/Post/PostPage.dart';
 import 'package:keepin/pages/UserProfileDisplay.dart';
 import 'package:keepin/src/models/Post.dart';
 
@@ -35,15 +40,15 @@ class IconAndDetail extends StatelessWidget {
   final String detail;
 
   @override
-  Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.all(8.0),
+  Widget build(BuildContext context) => Container(
+        width: 40,
         child: Row(
           children: [
             Icon(icon),
-            SizedBox(width: 8),
+            SizedBox(width: 4),
             Text(
               detail,
-              style: TextStyle(fontSize: 18),
+              style: TextStyle(fontSize: 16),
             )
           ],
         ),
@@ -79,26 +84,46 @@ class SecondaryButton extends StatelessWidget {
 
 class ImageButton extends StatelessWidget {
   const ImageButton(
-      {required this.image,
+      {this.imageLink,
+      this.imageFile,
+      this.image,
       this.oval = true,
+      this.fit = BoxFit.cover,
       this.onPressed,
       required this.size});
 
-  final Widget image;
+  final Widget? image;
+  final String? imageLink;
+  final File? imageFile;
   final void Function()? onPressed;
   final bool oval;
+  final BoxFit fit;
   final double size;
 
   @override
-  Widget build(BuildContext context) => MaterialButton(
-      onPressed: onPressed == null ? _showImage(context, image) : onPressed,
+  Widget build(BuildContext context) {
+    Widget image = imageLink == null
+        ? this.imageFile == null
+            ? this.image == null
+                ? defaultAvatar(size)
+                : this.image!
+            : Image.file(imageFile!, fit: fit)
+        : CachedNetworkImage(
+            fit: fit,
+            imageUrl: imageLink!,
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                CircularProgressIndicator(value: downloadProgress.progress),
+            errorWidget: (context, url, error) => Icon(Icons.error),
+          );
+    return GestureDetector(
+      onTap: onPressed == null ? _showImage(context, image) : onPressed,
       child: Container(
         width: size,
         height: size,
         child: oval ? ClipOval(child: image) : image,
       ),
-      padding: const EdgeInsets.all(0.0),
-      shape: CircleBorder());
+    );
+  }
 
   static Null Function() _showImage(BuildContext context, Widget image) {
     return () {
@@ -106,17 +131,14 @@ class ImageButton extends StatelessWidget {
         context: context,
         builder: (context) {
           return AlertDialog(
-            insetPadding: const EdgeInsets.all(0),
-            contentPadding: const EdgeInsets.all(0),
-            content: ImageButton(
-              image: image,
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              oval: false,
-              size: MediaQuery.of(context).size.width,
-            ),
-          );
+              insetPadding: const EdgeInsets.all(0),
+              contentPadding: const EdgeInsets.all(0),
+              content: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pop();
+                },
+                child: image,
+              ));
         },
       );
     };
@@ -197,12 +219,14 @@ class TextH2 extends StatelessWidget {
 }
 
 class TextH3 extends StatelessWidget {
-  const TextH3(this.str, {this.size = 18.0});
+  const TextH3(this.str, {this.size = 18.0, this.clip = false});
   final String str;
   final double size;
+  final bool clip;
   @override
   Widget build(BuildContext context) => Text(
         str,
+        overflow: clip ? TextOverflow.ellipsis : TextOverflow.visible,
         style: TextStyle(
             fontSize: size,
             fontWeight: FontWeight.w400,
@@ -235,6 +259,7 @@ class TextH5 extends StatelessWidget {
           fontWeight: FontWeight.w400,
           color: Colors.black54,
         ),
+        overflow: TextOverflow.ellipsis,
       );
 }
 
@@ -279,8 +304,9 @@ TextH5 getTimeDisplay(String str) {
   return TextH5(str.substring(0, 16));
 }
 
-Widget postDetail(BuildContext context, Post post) {
+Widget postDetail(BuildContext context, Post post, {bool detail = true}) {
   return Row(
+    mainAxisSize: MainAxisSize.max,
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
       Container(
@@ -295,47 +321,120 @@ Widget postDetail(BuildContext context, Post post) {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => UserProfileDisplay(post.posterId)));
               },
-              image: Image.network(
-                post.posterAvatarLink!,
-                fit: BoxFit.cover,
-              ),
+              imageLink: post.posterAvatarLink!,
               size: 46,
             ),
-            SizedBox(
-              height: 10,
-            ),
-            TextH5(post.posterName)
+            SizedBox(height: 10),
+            TextH4(post.posterName)
           ],
         ),
       ),
       SizedBox(width: 10),
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(height: 10),
-          TextH2(post.title),
-          ConstrainedBox(
-            constraints: new BoxConstraints(
-              minHeight: 60.0,
-              maxWidth: MediaQuery.of(context).size.width - 100,
-              maxHeight: 200.0,
+      Container(
+        width: MediaQuery.of(context).size.width - 100,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => PostPage(post: post))),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 10),
+                    TextH2(post.title),
+                    detail
+                        ? getTimeDisplay(post.timestamp.toString())
+                        : SizedBox(),
+                    Container(
+                      margin: const EdgeInsets.symmetric(vertical: 8.0),
+                      constraints: new BoxConstraints(
+                        maxHeight: 240.0,
+                      ),
+                      child: SingleChildScrollView(
+                        physics: BouncingScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              post.text,
+                              style: TextStyle(
+                                fontSize: 16.0,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            detail && post.imageLinks.isNotEmpty
+                                ? Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: Text(
+                                      "click to view " +
+                                          post.imageLinks.length.toString() +
+                                          " images",
+                                      style: TextStyle(
+                                        fontSize: 14.0,
+                                        fontWeight: FontWeight.w400,
+                                        fontStyle: FontStyle.italic,
+                                        decoration: TextDecoration.underline,
+                                        color: Colors.blue.shade800,
+                                      ),
+                                    ),
+                                  )
+                                : SizedBox()
+                          ],
+                        ),
+                      ),
+                    ),
+                  ]),
             ),
-            child: Container(
-              child: SingleChildScrollView(
-                physics: BouncingScrollPhysics(),
-                scrollDirection: Axis.vertical,
-                child: Text(
-                  post.text,
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0),
-            child: getTimeDisplay(post.timestamp.toString()),
-          ),
-        ],
+            detail ? LikeCommentShare(post: post) : SizedBox()
+          ],
+        ),
       )
     ],
   );
+}
+
+class CircleInfoBuilder {
+  static Widget buildCircleInfo(String url, String name, num count) {
+    return Container(
+      width: 130,
+      height: 50,
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: Image.network(
+              url,
+              width: 40,
+              height: 40,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(width: 4),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 80,
+                child: Text(
+                  name,
+                  style: TextStyle(fontSize: 18),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              Text(
+                'keepin for: $count',
+                style: TextStyle(fontSize: 12),
+              ),
+            ],
+          )
+        ],
+      ),
+    );
+  }
 }

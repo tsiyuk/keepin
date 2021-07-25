@@ -11,7 +11,7 @@ class ChatRoomProvider extends ChangeNotifier {
   String _chatRoomId = '';
   List<bool> _unread = [];
   Message? _latestMessage;
-  User currentUser = UserState.user!;
+  static User currentUser = UserState.user!;
 
   // Getters
   List<String> get userIds => _userIds;
@@ -20,14 +20,18 @@ class ChatRoomProvider extends ChangeNotifier {
   List<bool> get unread => _unread;
 
   /// Return a stream of all the chat room the user belonged to
-  Stream<List<ChatRoom>> get chatRooms =>
+  static Stream<List<ChatRoom>> getChatRooms() =>
       FirestoreService.getChatRoomsByUser(currentUser.uid);
-  Stream<List<Message>> get messages =>
+  static Stream<List<Message>> getMessages(String chatRoomId) =>
       FirestoreService.getMessages(chatRoomId);
 
   /// Return a chat room where two given users are in
-  Future<List<ChatRoom>> get specifiedChatRoom =>
+  Future<ChatRoom?> get specifiedChatRoom =>
       FirestoreService.getChatRoom(_userIds);
+
+  static Future<ChatRoom?> getSpecifiedChatRoom(List<String> uids) {
+    return FirestoreService.getChatRoom(uids);
+  }
 
   /// Check if the given user is in the chat
   bool isInChat(String userId) {
@@ -35,14 +39,14 @@ class ChatRoomProvider extends ChangeNotifier {
   }
 
   /// Check if the chat room has been read by the current user
-  bool isUnRead(ChatRoom chatRoom) {
+  static bool isUnRead(ChatRoom chatRoom) {
     List<String> ids = chatRoom.userIds;
     int index = ids.indexOf(currentUser.uid);
     return chatRoom.unread[index];
   }
 
   /// Get the userId of the other user in the chat room
-  String getOtherUserId(ChatRoom chatRoom) {
+  static String getOtherUserId(ChatRoom chatRoom) {
     if (currentUser.uid == chatRoom.userIds[0]) {
       return chatRoom.userIds[1];
     } else {
@@ -50,18 +54,17 @@ class ChatRoomProvider extends ChangeNotifier {
     }
   }
 
-  String getReceiverId() {
-    if (currentUser.uid == userIds[0]) {
-      return userIds[1];
+  static String getReceiverId(ChatRoom chatRoom) {
+    if (currentUser.uid == chatRoom.userIds[0]) {
+      return chatRoom.userIds[1];
     } else {
-      return userIds[0];
+      return chatRoom.userIds[0];
     }
   }
 
   // Setters
-  void setNewUser(String userId) {
-    _userIds.insert(0, currentUser.uid);
-    _userIds.insert(1, userId);
+  void setUserIds(String userId1, String userId2) {
+    _userIds = [userId1, userId2];
     _userIds.sort();
     notifyListeners();
   }
@@ -89,31 +92,49 @@ class ChatRoomProvider extends ChangeNotifier {
     return chatRoom;
   }
 
+  static Future<ChatRoom> getOrCreateChatRoom(
+      String userId1, String userId2) async {
+    List<String> userIds = [userId1, userId2];
+    userIds.sort();
+    ChatRoom? result = await getSpecifiedChatRoom(userIds);
+    if (result == null) {
+      String uid = FirestoreService.firestore.doc().id;
+      ChatRoom chatRoom =
+          ChatRoom(uid: uid, userIds: userIds, unread: [false, false]);
+      await FirestoreService.addChatRoom(chatRoom);
+      return chatRoom;
+    } else {
+      return result;
+    }
+  }
+
   Future<bool> isNotExist() {
     return FirestoreService.isNotExist(userIds);
   }
 
-  void createMessage(String text, [String? inviteCircleName]) async {
+  static void createMessage(ChatRoom chatRoom, String text,
+      {String? inviteCircleName, String? postId}) async {
     var message = Message(
         text: text,
         userId: currentUser.uid,
-        receiverId: getReceiverId(),
+        receiverId: getReceiverId(chatRoom),
         timestamp: DateTime.now(),
-        inviteCircleName: inviteCircleName);
-    _latestMessage = message;
-    int index = userIds.indexOf(currentUser.uid);
-    _unread[index] = false;
-    _unread[1 - index] = true;
-    notifyListeners();
-    return FirestoreService.addMessage(chatRoomId, message, _unread);
+        inviteCircleName: inviteCircleName,
+        postId: postId);
+    chatRoom.latestMessage = message;
+    int index = chatRoom.userIds.indexOf(currentUser.uid);
+    chatRoom.unread[index] = false;
+    chatRoom.unread[1 - index] = true;
+    // notifyListeners();
+    return FirestoreService.addMessage(chatRoom.uid, message, chatRoom.unread);
   }
 
   /// Read the unread message,
   /// use it after check if the current user has read the message or not
-  void readMessage() async {
-    int index = userIds.indexOf(currentUser.uid);
-    _unread[index] = false;
-    FirestoreService.updateRead(chatRoomId, _unread);
+  static void readMessage(ChatRoom chatRoom) async {
+    int index = chatRoom.userIds.indexOf(currentUser.uid);
+    chatRoom.unread[index] = false;
+    FirestoreService.updateRead(chatRoom.uid, chatRoom.unread);
   }
 }
 
@@ -164,12 +185,15 @@ class FirestoreService {
   }
 
   static Future<bool> isNotExist(List<String> ids) {
-    return firestore.where('userIds', isEqualTo: ids).snapshots().isEmpty;
+    return firestore
+        .where('userIds', isEqualTo: ids)
+        .get()
+        .then((value) => value.docs.isEmpty);
   }
 
-  static Future<List<ChatRoom>> getChatRoom(List<String> ids) {
-    return firestore.where('userIds', isEqualTo: ids).get().then(
-        (value) => value.docs.map((e) => ChatRoom.fromJson(e.data())).toList());
+  static Future<ChatRoom?> getChatRoom(List<String> ids) {
+    return firestore.where('userIds', isEqualTo: ids).get().then((value) =>
+        value.docs.isNotEmpty ? ChatRoom.fromJson(value.docs[0].data()) : null);
   }
 
   static Future<void> deleteChatRoom(String chatRoomId) {

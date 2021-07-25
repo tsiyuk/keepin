@@ -11,7 +11,7 @@ class ProfileHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        height: 70,
+        height: 60,
         padding: EdgeInsets.all(16).copyWith(left: 0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,

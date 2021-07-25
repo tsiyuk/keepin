@@ -9,29 +9,19 @@ import 'package:keepin/src/services/ChatRoomProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:provider/provider.dart';
 
-class ChatRoomPage extends StatefulWidget {
+class ChatRoomPage extends StatelessWidget {
   final ChatRoom chatRoom;
 
-  const ChatRoomPage({Key? key, required this.chatRoom}) : super(key: key);
+  const ChatRoomPage({required this.chatRoom});
 
-  @override
-  _ChatRoomPageState createState() => _ChatRoomPageState();
-}
-
-class _ChatRoomPageState extends State<ChatRoomPage> {
-  late ChatRoomProvider chatRoomProvider;
   @override
   Widget build(BuildContext context) {
-    UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context, listen: false);
-    chatRoomProvider = Provider.of<ChatRoomProvider>(context);
-    chatRoomProvider.loadAll(widget.chatRoom);
-    String otherId = chatRoomProvider.getOtherUserId(widget.chatRoom);
+    String otherId = ChatRoomProvider.getOtherUserId(chatRoom);
     Future<UserProfile> otherUser =
-        userProfileProvider.readUserProfile(otherId);
+        UserProfileProvider.readUserProfile(otherId);
 
-    if (chatRoomProvider.isUnRead(widget.chatRoom)) {
-      chatRoomProvider.readMessage();
+    if (ChatRoomProvider.isUnRead(chatRoom)) {
+      ChatRoomProvider.readMessage(chatRoom);
     }
 
     return Scaffold(
@@ -42,7 +32,7 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.waiting:
-                return Text("yo");
+                return Loading(50);
               default:
                 if (snapshot.hasError) {
                   return Text('Something Went Wrong Try later');
@@ -57,17 +47,17 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(20),
-                                topRight: Radius.circular(20),
+                                topLeft: Radius.circular(16),
+                                topRight: Radius.circular(16),
                               ),
                             ),
                             child: MessagesWidget(
-                              chatRoom: widget.chatRoom,
+                              chatRoom: chatRoom,
                               userProfile: snapshot.data!,
                             ),
                           ),
                         ),
-                        NewMessageWidget(chatRoom: widget.chatRoom),
+                        NewMessageWidget(chatRoom: chatRoom),
                       ],
                     ),
                   );
@@ -75,11 +65,5 @@ class _ChatRoomPageState extends State<ChatRoomPage> {
             }
           }),
     );
-  }
-
-  @override
-  void dispose() {
-    chatRoomProvider.clear();
-    super.dispose();
   }
 }

@@ -32,7 +32,7 @@ class Circle {
         isPublic: json['isPublic'],
         adminUserId: json['adminUserId'],
         numOfMembers: json['numOfMembers'],
-        description: json['descritpyion'],
+        description: json['description'],
         descriptionImageURLs: json['descriptionImageURLs']);
   }
 
@@ -79,5 +79,17 @@ class CircleInfo {
       'lastClockinTime': lastClockinTime.toUtc(),
       'exp': exp,
     };
+  }
+}
+
+class RankingInfo {
+  bool isAdmin;
+  String userId;
+  num exp;
+
+  RankingInfo(this.isAdmin, this.userId, this.exp);
+
+  factory RankingInfo.fromJson(Map<String, dynamic> json) {
+    return RankingInfo(json['isAdmin'], json['userId'], json['exp']);
   }
 }

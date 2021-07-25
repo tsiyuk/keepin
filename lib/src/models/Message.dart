@@ -1,3 +1,6 @@
+import 'package:keepin/src/models/Circle.dart';
+import 'package:keepin/src/models/Post.dart';
+
 import 'Utils.dart';
 
 class Message {
@@ -6,11 +9,15 @@ class Message {
   String receiverId;
   String? inviteCircleName;
   DateTime timestamp;
+  String? postId;
+  Circle? circle;
+  Post? post;
 
   Message({
     required this.text,
     required this.userId,
     this.inviteCircleName,
+    this.postId,
     required this.timestamp,
     required this.receiverId,
   });
@@ -21,7 +28,8 @@ class Message {
         userId: json['userId'],
         receiverId: json['receiverId'],
         timestamp: Utils.toDateTime(json['timestamp']),
-        inviteCircleName: json['inviteCircleName']);
+        inviteCircleName: json['inviteCircleName'],
+        postId: json['postId']);
   }
 
   Map<String, dynamic> toMap() {
@@ -30,6 +38,7 @@ class Message {
       'userId': userId,
       'receiverId': receiverId,
       'inviteCircleName': inviteCircleName,
+      'postId': postId,
       'timestamp': timestamp.toUtc(),
     };
   }

@@ -17,7 +17,9 @@ class ChatRoom {
     return ChatRoom(
         uid: json['uid'],
         userIds: List.castFrom(json['userIds']),
-        latestMessage: Message.fromJson(json['latestMessage']),
+        latestMessage: json['latestMessage'] != null
+            ? Message.fromJson(json['latestMessage'])
+            : null,
         unread: List.castFrom(json['unread']));
   }
 
@@ -25,7 +27,7 @@ class ChatRoom {
     return {
       'uid': uid,
       'userIds': userIds,
-      'latestMessage': latestMessage?.toMap(),
+      'latestMessage': latestMessage != null ? latestMessage?.toMap() : null,
       'unread': unread,
     };
   }

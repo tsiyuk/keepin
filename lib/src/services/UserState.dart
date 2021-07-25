@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 enum LoginState {
@@ -98,18 +99,22 @@ class UserState extends ChangeNotifier {
     }
   }
 
-  void signInWithGoogle() async {
-    final GoogleSignInAccount googleUser = (await GoogleSignIn().signIn())!;
-    final GoogleSignInAuthentication googleAuth =
-        await googleUser.authentication;
-    final credential = GoogleAuthProvider.credential(
-      accessToken: googleAuth.accessToken,
-      idToken: googleAuth.idToken,
-    );
-    var temp = await FirebaseAuth.instance.signInWithCredential(credential);
-    _user = temp.user;
-    _loginState = LoginState.loggedIn;
-    notifyListeners();
+  Future<void> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount googleUser = (await GoogleSignIn().signIn())!;
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      var temp = await FirebaseAuth.instance.signInWithCredential(credential);
+      _user = temp.user;
+      _loginState = LoginState.loggedIn;
+      notifyListeners();
+    } on PlatformException catch (e) {
+      throw e;
+    }
   }
 
   void resetPassword(String email) async {

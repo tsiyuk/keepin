@@ -3,11 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/Circle/CirclePage.dart';
-import 'package:keepin/pages/UserProfileDisplay.dart';
+import 'package:keepin/pages/Post/PostPage.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/models/Circle.dart';
+import 'package:keepin/src/models/Post.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/CircleProvider.dart';
+import 'package:keepin/src/services/PostProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
@@ -27,10 +29,17 @@ class _UserProfilePageState extends State<UserProfilePage> {
   late Widget largeAvatar;
   bool loading = true;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  late final Stream<List<Post>> userPosts;
+
+  @override
+  void initState() {
+    super.initState();
+    this.userPosts = PostProvider.readPostsFromUser(widget.user.uid);
+  }
 
   void initUser(UserProfileProvider userProfileProvider) async {
     final UserProfile userProfile =
-        await userProfileProvider.readUserProfile(widget.user.uid);
+        await UserProfileProvider.readUserProfile(widget.user.uid);
     userProfileProvider.load(userProfile);
     setState(() {
       initialUserName = userProfile.userName;
@@ -54,7 +63,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   Widget build(BuildContext context) {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context);
-    UserState userState = Provider.of<UserState>(context, listen: false);
+    UserState userState = Provider.of<UserState>(context);
     CircleProvider circleProvider =
         Provider.of<CircleProvider>(context, listen: false);
     initUser(userProfileProvider);
@@ -66,14 +75,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
             mainAxisSize: MainAxisSize.max,
             children: [
               Container(
+                height: 130,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 8.0, vertical: 16),
                 decoration: BoxDecoration(
                   color: Colors.teal.withAlpha(0x20),
-                  // image: DecorationImage(
-                  //   image: AssetImage('assets/images/blurry.jpg'),
-                  //   fit: BoxFit.cover,
-                  // ),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -93,8 +99,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         title: TextH2(initialUserName),
                         subtitle: TextH4(initialBio),
                         trailing: IconButton(
-                          visualDensity:
-                              VisualDensity(horizontal: -4.0, vertical: -4.0),
                           onPressed: () {
                             _showEditForm(context, userProfileProvider,
                                 initialUserName, initialBio);
@@ -106,61 +110,136 @@ class _UserProfilePageState extends State<UserProfilePage> {
                   ],
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    TextH3("Circles Joined: "),
-                    StreamBuilder<List<CircleInfo>>(
-                      stream: userProfileProvider.circlesJoined,
-                      //stream: postProvider.posts,
-                      builder: (context, snapshot) {
-                        if (snapshot.data != null &&
-                            snapshot.data!.isNotEmpty) {
-                          return Container(
-                            height: 60,
-                            child: ListView.separated(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: snapshot.data!.length,
-                              itemBuilder: (context, index) {
-                                CircleInfo data = snapshot.data![index];
-                                return GestureDetector(
-                                  onTap: () async {
-                                    Circle circle = await circleProvider
-                                        .readCircleFromName(data.circleName);
-                                    circleProvider.addCircleHistory(circle);
-                                    Navigator.of(context).push(
-                                        (MaterialPageRoute(
-                                            builder: (context) => CirclePage(
-                                                circle: circle,
-                                                circleInfo: data))));
+              Container(
+                // 130 profile height, 56 app bar, 92 bottom bar
+                height: MediaQuery.of(context).size.height - 280,
+                child: SingleChildScrollView(
+                  physics: BouncingScrollPhysics(),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        TextH3("Circles Joined: "),
+                        StreamBuilder<List<CircleInfo>>(
+                          stream: userProfileProvider.circlesJoined,
+                          builder: (context, snapshot) {
+                            if (snapshot.data != null &&
+                                snapshot.data!.isNotEmpty) {
+                              return Container(
+                                height: 60,
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: snapshot.data!.length,
+                                  itemBuilder: (context, index) {
+                                    CircleInfo data = snapshot.data![index];
+                                    return GestureDetector(
+                                      onTap: () async {
+                                        Circle circle = await CircleProvider
+                                            .readCircleFromName(
+                                                data.circleName);
+                                        circleProvider.addCircleHistory(circle);
+                                        Navigator.of(context).push(
+                                            (MaterialPageRoute(
+                                                builder: (context) =>
+                                                    CirclePage(
+                                                        circle: circle,
+                                                        circleInfo: data))));
+                                      },
+                                      child: CircleInfoBuilder.buildCircleInfo(
+                                          data.avatarURL,
+                                          data.circleName,
+                                          data.clockinCount),
+                                    );
                                   },
-                                  child: CircleInfoBuilder.buildCircleInfo(
-                                      data.avatarURL,
-                                      data.circleName,
-                                      data.clockinCount),
-                                );
-                              },
-                              separatorBuilder: (c, i) => VerticalDivider(
-                                indent: 10,
-                                endIndent: 10,
-                                thickness: 1,
-                              ),
-                            ),
-                          );
-                        } else {
-                          return Text('No circles joined');
-                        }
-                      },
+                                  separatorBuilder: (c, i) => VerticalDivider(
+                                    indent: 10,
+                                    endIndent: 10,
+                                    thickness: 1,
+                                  ),
+                                ),
+                              );
+                            } else {
+                              return Text('No circles joined');
+                            }
+                          },
+                        ),
+                        SizedBox(height: 20),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6.0),
+                          child: TextH3("My Interest Tags: "),
+                        ),
+                        Wrap(
+                          children: userProfileProvider.tags.isNotEmpty
+                              ? userProfileProvider.tags.map((tag) {
+                                  return Chip(label: Text(tag));
+                                }).toList()
+                              : [
+                                  Text(
+                                      "Please add your favourite tags on the top right corner.")
+                                ],
+                        ),
+                        SizedBox(height: 24),
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 6.0),
+                          child: TextH3("My Posts: "),
+                        ),
+                        StreamBuilder<List<Post>>(
+                          stream: userPosts,
+                          builder: (context, snapshot) {
+                            if (snapshot.data != null &&
+                                snapshot.data!.isNotEmpty) {
+                              return ListView.builder(
+                                  physics: BouncingScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: snapshot.data!.length,
+                                  itemBuilder: (context, index) {
+                                    Post post = snapshot.data![index];
+                                    return Container(
+                                      margin: const EdgeInsets.only(bottom: 10),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius: BorderRadius.circular(6),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.black12,
+                                            blurRadius: 4,
+                                            offset: Offset(1, 3),
+                                          ),
+                                        ],
+                                      ),
+                                      child: ListTile(
+                                        title: TextH3(post.title),
+                                        subtitle: getTimeDisplay(
+                                            post.timestamp.toString()),
+                                        trailing: Text(post.circleName),
+                                        onTap: () => Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    PostPage(post: post))),
+                                      ),
+                                    );
+                                  });
+                            } else {
+                              return Text('No Post');
+                            }
+                          },
+                        ),
+                        Center(
+                          child: SecondaryButton(
+                            onPressed: () {
+                              userState.signOut();
+                              userProfileProvider.clear();
+                              dispose();
+                            },
+                            child: Text("Sign out"),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
-              SecondaryButton(
-                onPressed: userState.signOut,
-                child: Text("Sign out"),
               ),
             ],
           );
@@ -185,6 +264,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextFormField(
+                  autofocus: true,
                   controller: userNameController,
                   validator: validator("User Name"),
                   decoration: InputDecoration(

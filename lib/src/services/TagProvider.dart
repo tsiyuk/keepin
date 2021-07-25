@@ -4,9 +4,15 @@ import 'package:keepin/src/models/Tag.dart';
 class TagProvider {
   static FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  static Stream<List<Tag>> readTags() {
-    return _db.collection('tags').snapshots().map((snapshot) =>
-        snapshot.docs.map((doc) => Tag.fromJson(doc.data())).toList());
+  static Future<List<Tag>> readTags() {
+    return _db.collection('tags').get().then((value) {
+      List<Tag> result = [];
+      value.docs.forEach((element) {
+        result.add(Tag.fromJson(element.data()));
+      });
+      print(result);
+      return result;
+    });
   }
 
   static Future<void> addTag(String name) {

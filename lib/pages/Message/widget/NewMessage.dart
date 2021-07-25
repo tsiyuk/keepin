@@ -56,7 +56,7 @@ class _NewMessageWidgetState extends State<NewMessageWidget> {
                 ? null
                 : () {
                     FocusScope.of(context).unfocus();
-                    chatRoomProvider.createMessage(message);
+                    ChatRoomProvider.createMessage(widget.chatRoom, message);
                     _controller.clear();
                   },
             child: Container(

@@ -182,10 +182,10 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
               itemCount: snapshot.data!.length,
               itemBuilder: (context, index) {
                 Post post = snapshot.data![index];
-                return postDetail(context, post);
+                return postDetail(context, post, detail: false);
               },
               separatorBuilder: (c, i) => Container(
-                height: 10,
+                height: 5,
                 color: Colors.blueGrey.shade100,
               ),
             );

@@ -15,7 +15,7 @@ import 'package:keepin/src/services/PostProvider.dart';
   This class provide the methods related to CURD of UserProfile
 */
 class UserProfileProvider with ChangeNotifier {
-  final firestoreService = FirestoreService();
+  static final firestoreService = FirestoreService();
   String? _avatarURL;
   String? _bio;
   User user = FirebaseAuth.instance.currentUser!;
@@ -39,7 +39,7 @@ class UserProfileProvider with ChangeNotifier {
       firestoreService.getPostHistory(userId);
 
   /// get the userProfile instance specified by the userId
-  Future<UserProfile> readUserProfile(String userId) async {
+  static Future<UserProfile> readUserProfile(String userId) async {
     return await firestoreService.getUserProfile(userId);
   }
 
@@ -47,6 +47,9 @@ class UserProfileProvider with ChangeNotifier {
       firestoreService.getRecommandCircle(tags);
   Stream<List<Post>> get recommandPost =>
       firestoreService.getRecommandPost(tags);
+
+  Stream<List<CircleInfo>> readCircleJoined(String id) =>
+      firestoreService.getCirclesJoined(id);
 
   // Setters
   void changeUserName(String userName) {
@@ -66,6 +69,14 @@ class UserProfileProvider with ChangeNotifier {
     _avatarURL = userProfile.avatarURL;
     _bio = userProfile.bio;
     _tags = userProfile.tags;
+  }
+
+  void clear() {
+    _userId = '';
+    _userName = '';
+    _avatarURL = '';
+    _bio = '';
+    _tags = [];
   }
 
   // save all the changes
@@ -92,7 +103,7 @@ class UserProfileProvider with ChangeNotifier {
             .child('userAvatars')
             .child(userId)
             .child(fileName);
-        TaskSnapshot task = await firebaseStorageRef.putFile(image);
+        await firebaseStorageRef.putFile(image);
         _avatarURL = await firebaseStorageRef.getDownloadURL();
         notifyListeners();
       } else {
@@ -123,6 +134,12 @@ class UserProfileProvider with ChangeNotifier {
   void updateToken(String token) async {
     await firestoreService.updateNotificationToken(userId, token);
   }
+
+  void changeTags(List<String> tags) async {
+    _tags = tags;
+    await firestoreService.updateTags(userId, tags);
+    notifyListeners();
+  }
 }
 
 class FirestoreService {
@@ -134,8 +151,8 @@ class FirestoreService {
         snapshot.docs.map((doc) => UserProfile.fromJson(doc.data())).toList());
   }
 
-  Future<UserProfile> getUserProfile(String userId) async {
-    return await _firestore
+  Future<UserProfile> getUserProfile(String userId) {
+    return _firestore
         .collection('userProfiles')
         .doc(userId)
         .get()
@@ -244,9 +261,17 @@ class FirestoreService {
     return _firestore
         .collection('posts')
         .where('tags', arrayContainsAny: tags)
+        //.orderBy('timestamp', descending: true)
         .snapshots()
         .map((snapshot) =>
             snapshot.docs.map((doc) => Post.fromJson(doc.data())).toList());
+  }
+
+  Future<void> updateTags(String userId, List<String> tags) {
+    return _firestore
+        .collection('userProfiles')
+        .doc(userId)
+        .update({'tags': tags});
   }
 
   // Delete

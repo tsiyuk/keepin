@@ -39,7 +39,8 @@ class HomePage extends StatelessWidget {
               Navigator.of(context).push(
                   MaterialPageRoute(builder: (context) => CreateCirclePage()));
             },
-            child: Icon(Icons.add_box, size: 50, color: Colors.teal),
+            child: Icon(Icons.add_box,
+                size: 50, color: Theme.of(context).primaryColorLight),
           ),
           VerticalDivider(
             thickness: 1,
@@ -61,8 +62,9 @@ class HomePage extends StatelessWidget {
                           padding: const EdgeInsets.all(4.0),
                           child: _buildCircleButton(
                             onPressed: () async {
-                              Circle circle = await circleProvider
-                                  .readCircleFromName(data.circleName);
+                              Circle circle =
+                                  await CircleProvider.readCircleFromName(
+                                      data.circleName);
                               circleProvider.addCircleHistory(circle);
                               Navigator.push(
                                 context,
@@ -89,24 +91,6 @@ class HomePage extends StatelessWidget {
               },
             ),
           ),
-          // MaterialButton(
-          //   onPressed: () {
-          //     Navigator.push(
-          //       context,
-          //       MaterialPageRoute(builder: (context) => CirclePage()),
-          //     );
-          //   },
-          //   color: Colors.white,
-          //   child: ClipRRect(
-          //     borderRadius: BorderRadius.circular(8),
-          //     child: Image.asset('assets/images/nus.png',
-          //         width: 50, height: 50, fit: BoxFit.cover),
-          //   ),
-          //   padding: EdgeInsets.all(6),
-          //   shape: ContinuousRectangleBorder(
-          //       borderRadius: BorderRadius.circular(16)),
-          //   minWidth: 50,
-          // ),
         ],
       ),
     );
@@ -138,7 +122,6 @@ class HomePage extends StatelessWidget {
     return Column(
       children: [
         _buildCircleList(context),
-        Divider(),
         Expanded(child: Feed()),
       ],
     );
@@ -167,7 +150,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
         TabBar(
           labelColor: Theme.of(context).primaryColorDark,
           indicatorColor: Theme.of(context).primaryColor,
-          labelPadding: EdgeInsets.all(12.0),
+          labelPadding: EdgeInsets.all(8.0),
           controller: _tabController,
           tabs: <Widget>[Text("Follow"), Text("Recommendation")],
         ),
@@ -185,34 +168,36 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
   }
 
   Widget _buildFollowFeed(BuildContext context) {
-    // return Center(child: Text("follow feed"));
-    PostProvider postProvider =
-        Provider.of<PostProvider>(context, listen: false);
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context, listen: false);
     return FutureBuilder<List<Post>>(
         initialData: [],
-        future: postProvider
-            .readFollowPosts(FirebaseAuth.instance.currentUser!.uid),
+        future: PostProvider.readFollowPosts(
+            FirebaseAuth.instance.currentUser!.uid),
         builder: (context, snapshot) {
-          if (snapshot.data == []) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return Loading(40);
-          }
-          if (snapshot.data != null) {
-            return ListView.separated(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                Post post = snapshot.data![index];
-                userProfileProvider.updatePosterInfo(post);
-                return postDetail(context, post);
-              },
-              separatorBuilder: (c, i) => Container(
-                height: 10,
-                color: Colors.blueGrey.shade100,
-              ),
-            );
           } else {
-            return Center(child: Text('No posts'));
+            if (snapshot.data == null || snapshot.data == []) {
+              return TextH3("Join a new circle");
+            }
+            if (snapshot.data!.length > 0) {
+              return ListView.separated(
+                physics: BouncingScrollPhysics(),
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  Post post = snapshot.data![index];
+                  userProfileProvider.updatePosterInfo(post);
+                  return postDetail(context, post);
+                },
+                separatorBuilder: (c, i) => Container(
+                  height: 5,
+                  color: Colors.blueGrey.shade100,
+                ),
+              );
+            } else {
+              return Center(child: Text('No posts'));
+            }
           }
         });
   }
@@ -223,17 +208,19 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
     initUser(context);
     return userProfileProvider.tags.isEmpty
         ? Container(
-            child: Text('No recommand posts'),
+            child: Text('Please add your favourite tags in Discover'),
           )
         : StreamBuilder<List<Post>>(
             initialData: [],
             stream: userProfileProvider.recommandPost,
             builder: (context, snapshot) {
-              if (snapshot.data == []) {
+              if (snapshot.data == [] ||
+                  snapshot.connectionState == ConnectionState.waiting) {
                 return Loading(40);
               }
               if (snapshot.data != null) {
                 return ListView.separated(
+                  physics: BouncingScrollPhysics(),
                   itemCount: snapshot.data!.length,
                   itemBuilder: (context, index) {
                     Post post = snapshot.data![index];
@@ -241,7 +228,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
                     return postDetail(context, post);
                   },
                   separatorBuilder: (c, i) => Container(
-                    height: 10,
+                    height: 5,
                     color: Colors.blueGrey.shade100,
                   ),
                 );
@@ -254,8 +241,8 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
   void initUser(BuildContext context) async {
     UserProfileProvider userProfileProvider =
         Provider.of<UserProfileProvider>(context);
-    final UserProfile userProfile = await userProfileProvider
-        .readUserProfile(FirebaseAuth.instance.currentUser!.uid);
+    final UserProfile userProfile =
+        await UserProfileProvider.readUserProfile(userProfileProvider.userId);
     userProfileProvider.load(userProfile);
   }
 }
