@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:keepin/pages/StartPage.dart';
-import 'package:keepin/src/services/ChatRoomProvider.dart';
+import 'package:keepin/src/Authentication.dart';
 import 'package:keepin/src/services/CircleProvider.dart';
 import 'package:keepin/src/services/PostProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
@@ -36,7 +35,7 @@ class MyApp extends StatelessWidget {
         primaryColorLight: Color(0xff66b088),
         // primaryColorLight: Color(0xffE4EFE7),
       ),
-      home: StartPage(),
+      home: Scaffold(body: Authentication()),
     );
   }
 }

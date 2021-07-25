@@ -112,7 +112,7 @@ class _MessagePageState extends State<MessagePage>
                     separatorBuilder: (context, index) => Divider(thickness: 1),
                     itemBuilder: (context, index) {
                       String otherId =
-                      ChatRoomAPI.getOtherUserId(chatRooms[index]);
+                          ChatRoomAPI.getOtherUserId(chatRooms[index]);
                       bool unRead = ChatRoomAPI.isUnRead(chatRooms[index]);
                       return FutureBuilder<UserProfile>(
                           future: UserProfileProvider.readUserProfile(otherId),
@@ -132,20 +132,22 @@ class _MessagePageState extends State<MessagePage>
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 2, horizontal: 12.0),
                                       child: ImageButton(
-                                        imageLink: userProfile.avatarURL!,
-                                        size: 50,
+                                          imageLink: userProfile.avatarURL!,
+                                          size: 50,
                                           onPressed: () {
-                                            Navigator.of(context).push(MaterialPageRoute(
-                                                builder: (context) =>
-                                                    UserProfileDisplay(userProfile.userId)));}
-                                      ),
+                                            Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        UserProfileDisplay(
+                                                            userProfile
+                                                                .userId)));
+                                          }),
                                     ),
                                     Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        TextH3(userProfile.userName,
-                                            size: 20),
+                                        TextH3(userProfile.userName, size: 20),
                                         showLastMessage(
                                             chatRooms[index].latestMessage,
                                             unRead),

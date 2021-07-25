@@ -43,7 +43,6 @@ class ChatRoomAPI {
     }
   }
 
-
   static Future<ChatRoom> getOrCreateChatRoom(
       String userId1, String userId2) async {
     List<String> userIds = [userId1, userId2];

@@ -51,8 +51,8 @@ Future<void> share(BuildContext context,
                                 Divider(thickness: 1),
                             itemBuilder: (lContext, index) {
                               ChatRoom chatRoom = chatRooms[index];
-                              String otherId = ChatRoomAPI.getOtherUserId(
-                                  chatRooms[index]);
+                              String otherId =
+                                  ChatRoomAPI.getOtherUserId(chatRooms[index]);
                               return FutureBuilder<UserProfile>(
                                 future: UserProfileProvider.readUserProfile(
                                     otherId),

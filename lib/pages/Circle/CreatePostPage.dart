@@ -35,7 +35,7 @@ class _CreatePostPageState extends State<CreatePostPage> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).primaryColorLight,
-        title: Text("Create a post!"),
+        title: Text("Create a post!", style: TextStyle(color: Colors.white)),
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,

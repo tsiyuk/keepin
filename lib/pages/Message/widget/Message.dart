@@ -28,8 +28,11 @@ class MessageWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final radius = Radius.circular(10);
     final borderRadius = BorderRadius.all(radius);
-    final String? avatarLink = isMe ? FirebaseAuth.instance.currentUser!.photoURL : userProfile.avatarURL;
-    final String userId = isMe ? FirebaseAuth.instance.currentUser!.uid : userProfile.userId;
+    final String? avatarLink = isMe
+        ? FirebaseAuth.instance.currentUser!.photoURL
+        : userProfile.avatarURL;
+    final String userId =
+        isMe ? FirebaseAuth.instance.currentUser!.uid : userProfile.userId;
 
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -37,25 +40,25 @@ class MessageWidget extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-      Container(
-      width: 56,
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: ImageButton(
-          imageLink: avatarLink,
-          size: 40,
-          onPressed: () {
-            Navigator.of(context).push(MaterialPageRoute(
-                builder: (context) =>
-                    UserProfileDisplay(userId)));}
-            ),
-            ),
+        Container(
+          width: 56,
+          padding: const EdgeInsets.symmetric(horizontal: 8),
+          child: ImageButton(
+              imageLink: avatarLink,
+              size: 40,
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => UserProfileDisplay(userId)));
+              }),
+        ),
         // isMe
         //     ? buildAvatar(FirebaseAuth.instance.currentUser!.photoURL)
         //     : buildAvatar(userProfile.avatarURL),
         Container(
           padding: EdgeInsets.all(10),
           margin: EdgeInsets.symmetric(vertical: 4),
-          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
+          constraints:
+              BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.6),
           decoration: BoxDecoration(
             color:
                 isMe ? Colors.grey[100] : Theme.of(context).primaryColorLight,

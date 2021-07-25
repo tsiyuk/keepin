@@ -131,8 +131,8 @@ class CircleProvider with ChangeNotifier {
     }
   }
 
-  Future<void> createCircle(
-      String circleName, List<String> tags, bool isPublic) async {
+  Future<Circle> createCircle(String circleName, List<String> tags,
+      String description, bool isPublic) async {
     if (await _firestoreService.isCircleExist(circleName)) {
       throw Exception('The circle $circleName has already existed');
     }
@@ -159,6 +159,7 @@ class CircleProvider with ChangeNotifier {
           circleName: circleName,
           avatarURL: _circleAvatarURL,
           tags: _tags,
+          description: description,
           adminUserId: _adminUserId,
           numOfMembers: _numOfMembers,
           isPublic: isPublic);
@@ -171,6 +172,7 @@ class CircleProvider with ChangeNotifier {
       futures.add(_firestoreService.updateUserProfile(
           _circleName, _circleAvatarURL, _adminUserId));
       await Future.wait(futures);
+      return circle;
     }
   }
 

@@ -84,8 +84,14 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
             child: ListTile(
               title: TextH2(widget.circle.circleName),
               subtitle: !isMember
-                  ? TextH4(
-                      'Join the ${widget.circle.circleName} and clock in every day')
+                  ? PrimaryButton(
+                      child: Text("Join Circle"),
+                      onPressed: () {
+                        circleProvider.joinCircle();
+                        setState(() {
+                          isMember = true;
+                        });
+                      })
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -141,31 +147,33 @@ class _CirclePageState extends State<CirclePage> with TickerProviderStateMixin {
                       },
                     )
                   : SizedBox(),
-              !isMember
-                  ? ListTile(
-                      leading: Icon(Icons.add),
-                      title: TextH3('Join Circle'),
-                      onTap: () {
-                        circleProvider.joinCircle();
-                        setState(() {
-                          isMember = true;
-                        });
-                      },
-                    )
-                  : ListTile(
-                      leading: Icon(Icons.exit_to_app),
-                      title: TextH3('Quit Circle'),
-                      onTap: () async {
-                        try {
-                          await circleProvider.quitCircle();
-                        } on FirebaseException catch (e) {
-                          showError(context, e.code);
-                        }
-                        setState(() {
-                          isMember = false;
-                        });
-                      },
-                    )
+              if (isMember)
+                ListTile(
+                  leading: Icon(Icons.exit_to_app),
+                  title: TextH3('Quit Circle'),
+                  onTap: () async {
+                    try {
+                      await circleProvider.quitCircle();
+                    } on FirebaseException catch (e) {
+                      showError(context, e.code);
+                    }
+                    setState(() {
+                      isMember = false;
+                    });
+                  },
+                )
+
+              // ? ListTile(
+              //     leading: Icon(Icons.add),
+              //     title: TextH3('Join Circle'),
+              //     onTap: () {
+              //       circleProvider.joinCircle();
+              //       setState(() {
+              //         isMember = true;
+              //       });
+              //     },
+              //   )
+              // :
             ],
           ),
         ),

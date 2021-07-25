@@ -17,15 +17,18 @@ enum LoginState {
   The UserState class handles the backend log in and register workflow with firebase
 */
 class UserState extends ChangeNotifier {
+  LoginState _loginState = LoginState.loggedOut;
+
   UserState() {
     init();
   }
 
   Future<void> init() async {
     await Firebase.initializeApp();
+    _user = FirebaseAuth.instance.currentUser;
+    _loginState = _user == null ? LoginState.loggedOut : LoginState.loggedIn;
   }
 
-  LoginState _loginState = LoginState.loggedOut;
   LoginState get loginState => _loginState;
 
   static User? _user;
