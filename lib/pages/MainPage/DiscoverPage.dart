@@ -16,9 +16,78 @@ class DiscoverPage extends StatefulWidget {
   _DiscoverPageState createState() => _DiscoverPageState();
 }
 
-class _DiscoverPageState extends State<DiscoverPage> {
+class _DiscoverPageState extends State<DiscoverPage>
+    with TickerProviderStateMixin {
+  late TabController _tabController;
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
   @override
   Widget build(BuildContext context) {
+    return Column(
+      children: [
+        TabBar(
+          labelColor: Theme.of(context).primaryColorDark,
+          indicatorColor: Theme.of(context).primaryColor,
+          labelPadding: EdgeInsets.all(8.0),
+          controller: _tabController,
+          tabs: <Widget>[
+            Text("Recommendation"),
+            Text("All"),
+          ],
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [_buildRecommendation(context), _buildAll(context)],
+          ),
+        )
+      ],
+    );
+  }
+
+  Widget _buildCircleCard(BuildContext context, Circle circle) {
+    final double imageSize = MediaQuery.of(context).size.width / 4;
+    CircleProvider circleProvider =
+        Provider.of<CircleProvider>(context, listen: false);
+    return GestureDetector(
+      onTap: () async {
+        circleProvider.addCircleHistory(circle);
+        Navigator.of(context).push((MaterialPageRoute(
+            builder: (context) => CirclePage(
+                  circle: circle,
+                ))));
+      },
+      child: Column(
+        children: [
+          SizedBox(
+            height: 10,
+          ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Image.network(circle.avatarURL,
+                width: imageSize, height: imageSize, fit: BoxFit.cover),
+          ),
+          TextH3(
+            circle.circleName,
+            size: 20,
+          ),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Icon(
+              Icons.people,
+              color: Colors.blueGrey,
+            ),
+            TextH4(circle.numOfMembers.toString()),
+          ]),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecommendation(BuildContext context) {
     return StreamBuilder<UserProfile>(
         stream: UserProfileProvider.readUserProfile(
             FirebaseAuth.instance.currentUser!.uid),
@@ -74,41 +143,34 @@ class _DiscoverPageState extends State<DiscoverPage> {
         });
   }
 
-  Widget _buildCircleCard(BuildContext context, Circle circle) {
-    final double imageSize = MediaQuery.of(context).size.width / 4;
-    CircleProvider circleProvider =
-        Provider.of<CircleProvider>(context, listen: false);
-    return GestureDetector(
-      onTap: () async {
-        circleProvider.addCircleHistory(circle);
-        Navigator.of(context).push((MaterialPageRoute(
-            builder: (context) => CirclePage(
-                  circle: circle,
-                ))));
-      },
-      child: Column(
-        children: [
-          SizedBox(
-            height: 10,
-          ),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(16),
-            child: Image.network(circle.avatarURL,
-                width: imageSize, height: imageSize, fit: BoxFit.cover),
-          ),
-          TextH3(
-            circle.circleName,
-            size: 20,
-          ),
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Icon(
-              Icons.people,
-              color: Colors.blueGrey,
-            ),
-            TextH4(circle.numOfMembers.toString()),
-          ]),
-        ],
-      ),
-    );
+  Widget _buildAll(BuildContext context) {
+    return StreamBuilder<List<Circle>>(
+        stream: CircleProvider.publicCircles,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Loading(30);
+          } else {
+            if (!snapshot.hasData || snapshot.data!.length == 0) {
+              return TextH1('No circles');
+            } else {
+              return GridView.builder(
+                  physics: BouncingScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2),
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      margin: const EdgeInsets.all(10),
+                      color: Colors.white,
+                      elevation: 6,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      clipBehavior: Clip.antiAlias,
+                      child: _buildCircleCard(context, snapshot.data![index]),
+                    );
+                  });
+            }
+          }
+        });
   }
 }
