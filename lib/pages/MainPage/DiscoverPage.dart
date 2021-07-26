@@ -102,8 +102,11 @@ class _DiscoverPageState extends State<DiscoverPage>
               return userProfile.tags.length == 0
                   ? Padding(
                       padding: const EdgeInsets.all(28.0),
-                      child: TextH2(
-                          'Please go to add your favourite tags on the top right corner.'),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextH3(
+                            'Please go to add your favourite tags on the top right corner.'),
+                      ),
                     )
                   : StreamBuilder<List<Circle>>(
                       stream: UserProfileProvider.getRecommandCircles(
@@ -114,7 +117,10 @@ class _DiscoverPageState extends State<DiscoverPage>
                           return Loading(30);
                         } else {
                           if (!snapshot.hasData || snapshot.data!.length == 0) {
-                            return TextH1('No recommended circles');
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TextH3('No recommended circles'),
+                            );
                           } else {
                             return GridView.builder(
                                 physics: BouncingScrollPhysics(),

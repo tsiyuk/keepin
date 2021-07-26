@@ -209,7 +209,7 @@ class _FeedState extends State<Feed> with TickerProviderStateMixin {
           if (snapshot.data != null) {
             UserProfile userProfile = snapshot.data!;
             return userProfile.tags.isEmpty
-                ? Container(
+                ? Center(
                     child: Text('Please add your favourite tags in Discover'),
                   )
                 : StreamBuilder<List<Post>>(
