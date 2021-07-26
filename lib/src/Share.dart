@@ -18,7 +18,7 @@ Future<void> share(BuildContext context,
         contentPadding: const EdgeInsets.all(16.0),
         content: Container(
           width: MediaQuery.of(context).size.width - 20,
-          constraints: BoxConstraints(maxHeight: 400),
+          constraints: BoxConstraints(maxHeight: 500),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
