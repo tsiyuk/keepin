@@ -10,7 +10,6 @@ import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:keepin/src/services/UserState.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import '../TagSelector.dart';
@@ -80,8 +79,6 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context);
     if (token != null) {
       // this is to avoid the error ! used on null value
       UserProfileProvider.updateToken(token!);
@@ -202,7 +199,7 @@ class _MainPageState extends State<MainPage> {
                       children: [
                         Container(
                           margin: const EdgeInsets.only(bottom: 12.0),
-                          child: TextH2("Edit My Tags"),
+                          child: TextH2("Pick My Interest Tags"),
                         ),
                         TagSelector(texts: userProfile.tags),
                       ],

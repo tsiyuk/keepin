@@ -54,7 +54,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     UserState userState = Provider.of<UserState>(context);
     CircleProvider circleProvider =
         Provider.of<CircleProvider>(context, listen: false);
-
     return loading
         ? Container()
         : Column(

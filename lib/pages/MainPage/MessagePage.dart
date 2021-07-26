@@ -11,7 +11,6 @@ import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/ChatRoomProvider.dart';
 import 'package:keepin/src/services/PostProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
-import 'package:provider/provider.dart';
 
 import '../UserProfileDisplay.dart';
 

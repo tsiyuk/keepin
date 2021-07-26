@@ -35,6 +35,7 @@ class _TagSelectorState extends State<TagSelector> {
       textField: TagsTextField(
         lowerCase: true,
         textStyle: TextStyle(fontSize: _fontSize),
+        hintText: 'Or add a new tag',
         autofocus: false,
         onSubmitted: (String str) {
           // Add item to the data source.

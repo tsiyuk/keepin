@@ -76,8 +76,6 @@ class _HelperState extends State<Helper> {
 
   @override
   Widget build(BuildContext context) {
-    UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context, listen: false);
     CircleProvider circleProvider =
         Provider.of<CircleProvider>(context, listen: false);
     return Scaffold(
@@ -260,11 +258,5 @@ class _HelperState extends State<Helper> {
     if (mounted) {
       super.setState(fn);
     }
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
   }
 }
