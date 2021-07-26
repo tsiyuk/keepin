@@ -7,7 +7,6 @@ import 'package:keepin/src/models/Post.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/PostProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
-import 'package:provider/provider.dart';
 
 import '../UserProfileDisplay.dart';
 
@@ -48,8 +47,8 @@ class _PostPageState extends State<PostPage> {
   }
 
   Widget _buildPoster(BuildContext context, Post post) {
-    return FutureBuilder<UserProfile>(
-      future: UserProfileProvider.readUserProfile(post.posterId),
+    return StreamBuilder<UserProfile>(
+      stream: UserProfileProvider.readUserProfile(post.posterId),
       builder: (context, snapshot) {
         if (snapshot.data != null) {
           return Container(

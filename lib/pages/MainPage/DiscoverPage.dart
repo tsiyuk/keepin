@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/Circle/CirclePage.dart';
 import 'package:keepin/src/CommonWidgets.dart';
@@ -15,47 +16,37 @@ class DiscoverPage extends StatefulWidget {
   _DiscoverPageState createState() => _DiscoverPageState();
 }
 
-class _DiscoverPageState extends State<DiscoverPage> {
+class _DiscoverPageState extends State<DiscoverPage>
+    with TickerProviderStateMixin {
+  late TabController _tabController;
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+  }
+
   @override
   Widget build(BuildContext context) {
-    UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context, listen: false);
-    return userProfileProvider.tags.length == 0
-        ? Padding(
-            padding: const EdgeInsets.all(28.0),
-            child: TextH2(
-                'Please go to add your favourite tags on the top right corner.'),
-          )
-        : StreamBuilder<List<Circle>>(
-            stream: userProfileProvider.recommandCircles,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Loading(30);
-              } else {
-                if (!snapshot.hasData || snapshot.data!.length == 0) {
-                  return TextH1('No recommended circles');
-                } else {
-                  return GridView.builder(
-                      physics: BouncingScrollPhysics(),
-                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2),
-                      itemCount: snapshot.data!.length,
-                      itemBuilder: (context, index) {
-                        return Card(
-                          margin: const EdgeInsets.all(10),
-                          color: Colors.white,
-                          elevation: 6,
-                          shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(10))),
-                          clipBehavior: Clip.antiAlias,
-                          child:
-                              _buildCircleCard(context, snapshot.data![index]),
-                        );
-                      });
-                }
-              }
-            });
+    return Column(
+      children: [
+        TabBar(
+          labelColor: Theme.of(context).primaryColorDark,
+          indicatorColor: Theme.of(context).primaryColor,
+          labelPadding: EdgeInsets.all(8.0),
+          controller: _tabController,
+          tabs: <Widget>[
+            Text("Recommendation"),
+            Text("All"),
+          ],
+        ),
+        Expanded(
+          child: TabBarView(
+            controller: _tabController,
+            children: [_buildRecommendation(context), _buildAll(context)],
+          ),
+        )
+      ],
+    );
   }
 
   Widget _buildCircleCard(BuildContext context, Circle circle) {
@@ -94,5 +85,98 @@ class _DiscoverPageState extends State<DiscoverPage> {
         ],
       ),
     );
+  }
+
+  Widget _buildRecommendation(BuildContext context) {
+    return StreamBuilder<UserProfile>(
+        stream: UserProfileProvider.readUserProfile(
+            FirebaseAuth.instance.currentUser!.uid),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Loading(30);
+          } else {
+            if (snapshot.data == null) {
+              return TextH2('Error');
+            } else {
+              UserProfile userProfile = snapshot.data!;
+              return userProfile.tags.length == 0
+                  ? Padding(
+                      padding: const EdgeInsets.all(28.0),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: TextH3(
+                            'Please go to add your favourite tags on the top right corner.'),
+                      ),
+                    )
+                  : StreamBuilder<List<Circle>>(
+                      stream: UserProfileProvider.getRecommandCircles(
+                          userProfile.tags),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Loading(30);
+                        } else {
+                          if (!snapshot.hasData || snapshot.data!.length == 0) {
+                            return Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: TextH3('No recommended circles'),
+                            );
+                          } else {
+                            return GridView.builder(
+                                physics: BouncingScrollPhysics(),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                        crossAxisCount: 2),
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  return Card(
+                                    margin: const EdgeInsets.all(10),
+                                    color: Colors.white,
+                                    elevation: 6,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(10))),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: _buildCircleCard(
+                                        context, snapshot.data![index]),
+                                  );
+                                });
+                          }
+                        }
+                      });
+            }
+          }
+        });
+  }
+
+  Widget _buildAll(BuildContext context) {
+    return StreamBuilder<List<Circle>>(
+        stream: CircleProvider.publicCircles,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Loading(30);
+          } else {
+            if (!snapshot.hasData || snapshot.data!.length == 0) {
+              return TextH1('No circles');
+            } else {
+              return GridView.builder(
+                  physics: BouncingScrollPhysics(),
+                  gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2),
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    return Card(
+                      margin: const EdgeInsets.all(10),
+                      color: Colors.white,
+                      elevation: 6,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(10))),
+                      clipBehavior: Clip.antiAlias,
+                      child: _buildCircleCard(context, snapshot.data![index]),
+                    );
+                  });
+            }
+          }
+        });
   }
 }

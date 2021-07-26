@@ -10,7 +10,7 @@ class Circle {
   String adminUserId;
   num numOfMembers;
   String? description;
-  List<String>? descriptionImageURLs = [];
+  List<String>? descriptionImageURLs;
 
   Circle({
     required this.circleName,
@@ -26,14 +26,17 @@ class Circle {
   // factory method to retrive data from firestore
   factory Circle.fromJson(Map<String, dynamic> json) {
     return Circle(
-        circleName: json['circleName'],
-        avatarURL: json['avatarURL'],
-        tags: List.castFrom(json['tags']),
-        isPublic: json['isPublic'],
-        adminUserId: json['adminUserId'],
-        numOfMembers: json['numOfMembers'],
-        description: json['description'],
-        descriptionImageURLs: json['descriptionImageURLs']);
+      circleName: json['circleName'],
+      avatarURL: json['avatarURL'],
+      tags: List.castFrom(json['tags']),
+      isPublic: json['isPublic'],
+      adminUserId: json['adminUserId'],
+      numOfMembers: json['numOfMembers'],
+      description: json['description'],
+      descriptionImageURLs: json['descriptionImageURLs'] != null
+          ? List.castFrom(json['descriptionImageURLs'])
+          : null,
+    );
   }
 
   // transform the Circle into the json form

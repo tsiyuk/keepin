@@ -6,9 +6,10 @@ import 'package:keepin/pages/MainPage/HomePage.dart';
 import 'package:keepin/pages/MainPage/MessagePage.dart';
 import 'package:keepin/pages/SearchDelegate.dart';
 import 'package:keepin/src/CommonWidgets.dart';
+import 'package:keepin/src/Loading.dart';
+import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:keepin/src/services/UserState.dart';
-import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 import '../TagSelector.dart';
@@ -78,19 +79,26 @@ class _MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
-    UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context);
     if (token != null) {
       // this is to avoid the error ! used on null value
-      userProfileProvider.updateToken(token!);
+      UserProfileProvider.updateToken(token!);
     }
+
+    StreamBuilder<UserProfile> userProfilePageHelper =
+        StreamBuilder<UserProfile>(
+      stream: UserProfileProvider.readUserProfile(UserState.user!.uid),
+      builder: (context, snapshot) =>
+          snapshot.connectionState == ConnectionState.waiting
+              ? Loading(30)
+              : UserProfilePage(snapshot.data!),
+    );
 
     List<Widget> _subPages = <Widget>[
       HomePage(),
       DiscoverPage(),
       MessagePage(UserState.user!.uid),
       // assume that the user has logged in
-      UserProfilePage(UserState.user!),
+      userProfilePageHelper,
     ];
 
     return Scaffold(
@@ -105,7 +113,7 @@ class _MainPageState extends State<MainPage> {
               icon: Icon(Icons.search)),
           IconButton(
               onPressed: () {
-                _editTags(context, userProfileProvider);
+                _editTags(context, UserState.user!.uid);
               },
               icon: Icon(Icons.more_vert))
         ],
@@ -167,37 +175,50 @@ class _MainPageState extends State<MainPage> {
     print(token);
   }
 
-  Future<void> _editTags(BuildContext context, userProfileProvider) async {
+  Future<void> _editTags(BuildContext context, String userId) async {
     return await showDialog(
       context: context,
       builder: (context) {
-        List<String> tempTags = userProfileProvider.tags;
-        return AlertDialog(
-          contentPadding: const EdgeInsets.all(20.0),
-          actionsPadding:
-              const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                margin: const EdgeInsets.only(bottom: 12.0),
-                child: TextH2("Edit My Tags"),
-              ),
-              TagSelector(texts: tempTags),
-            ],
-          ),
-          actions: [
-            SecondaryButton(
-                child: Text("cancel"), onPressed: Navigator.of(context).pop),
-            PrimaryButton(
-                child: Text("Save"),
-                onPressed: () {
-                  userProfileProvider.changeTags(tempTags);
-                  userProfileProvider.saveChanges();
-                  Navigator.of(context).pop();
-                })
-          ],
-        );
+        return StreamBuilder<UserProfile>(
+            stream: UserProfileProvider.readUserProfile(userId),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Loading(10);
+              } else {
+                if (snapshot.data == null) {
+                  return TextH5('Error: no sign in');
+                } else {
+                  UserProfile userProfile = snapshot.data!;
+                  // List<String> tempTags = userProfile.tags;
+                  return AlertDialog(
+                    contentPadding: const EdgeInsets.all(20.0),
+                    actionsPadding: const EdgeInsets.symmetric(
+                        vertical: 6.0, horizontal: 16.0),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.only(bottom: 12.0),
+                          child: TextH2("Pick My Interest Tags"),
+                        ),
+                        TagSelector(texts: userProfile.tags),
+                      ],
+                    ),
+                    actions: [
+                      SecondaryButton(
+                          child: Text("cancel"),
+                          onPressed: Navigator.of(context).pop),
+                      PrimaryButton(
+                          child: Text("Save"),
+                          onPressed: () {
+                            UserProfileProvider.changeTags(userProfile.tags);
+                            Navigator.of(context).pop();
+                          })
+                    ],
+                  );
+                }
+              }
+            });
       },
     );
   }

@@ -2,13 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:keepin/src/CommonWidgets.dart';
 import 'package:keepin/src/Loading.dart';
 import 'package:keepin/src/Share.dart';
-import 'package:keepin/src/models/ChatRoom.dart';
 import 'package:keepin/src/models/Comment.dart';
 import 'package:keepin/src/models/Post.dart';
-import 'package:keepin/src/models/UserProfile.dart';
-import 'package:keepin/src/services/ChatRoomProvider.dart';
 import 'package:keepin/src/services/PostProvider.dart';
-import 'package:keepin/src/services/UserProfileProvider.dart';
 import 'package:provider/provider.dart';
 
 class LikeCommentShare extends StatefulWidget {

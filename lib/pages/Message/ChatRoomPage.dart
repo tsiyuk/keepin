@@ -7,7 +7,6 @@ import 'package:keepin/src/models/ChatRoom.dart';
 import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/ChatRoomProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
-import 'package:provider/provider.dart';
 
 class ChatRoomPage extends StatelessWidget {
   final ChatRoom chatRoom;
@@ -18,7 +17,7 @@ class ChatRoomPage extends StatelessWidget {
   Widget build(BuildContext context) {
     String otherId = ChatRoomAPI.getOtherUserId(chatRoom);
     Future<UserProfile> otherUser =
-        UserProfileProvider.readUserProfile(otherId);
+        UserProfileProvider.readUserProfileOnce(otherId);
 
     if (ChatRoomAPI.isUnRead(chatRoom)) {
       ChatRoomAPI.readMessage(chatRoom);

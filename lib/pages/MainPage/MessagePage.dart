@@ -11,7 +11,6 @@ import 'package:keepin/src/models/UserProfile.dart';
 import 'package:keepin/src/services/ChatRoomProvider.dart';
 import 'package:keepin/src/services/PostProvider.dart';
 import 'package:keepin/src/services/UserProfileProvider.dart';
-import 'package:provider/provider.dart';
 
 import '../UserProfileDisplay.dart';
 
@@ -103,7 +102,7 @@ class _MessagePageState extends State<MessagePage>
                   showError(context, snapshot.error.toString());
                   return Center(child: Text("Error"));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text("Start a conversation"));
+                  return Center(child: Text("Start a conversation by finding other users in circles, posts or search!"));
                 } else {
                   var chatRooms = snapshot.data!;
                   return ListView.separated(
@@ -115,7 +114,8 @@ class _MessagePageState extends State<MessagePage>
                           ChatRoomAPI.getOtherUserId(chatRooms[index]);
                       bool unRead = ChatRoomAPI.isUnRead(chatRooms[index]);
                       return FutureBuilder<UserProfile>(
-                          future: UserProfileProvider.readUserProfile(otherId),
+                          future:
+                              UserProfileProvider.readUserProfileOnce(otherId),
                           builder: (context, snapshot) {
                             if (snapshot.data != null) {
                               UserProfile userProfile = snapshot.data!;

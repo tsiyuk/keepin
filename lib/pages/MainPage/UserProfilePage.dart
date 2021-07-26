@@ -1,5 +1,4 @@
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:keepin/pages/Circle/CirclePage.dart';
@@ -15,8 +14,8 @@ import 'package:keepin/src/services/UserState.dart';
 import 'package:provider/provider.dart';
 
 class UserProfilePage extends StatefulWidget {
-  final User user;
-  UserProfilePage(this.user);
+  final UserProfile userProfile;
+  UserProfilePage(this.userProfile);
   @override
   _UserProfilePageState createState() => _UserProfilePageState();
 }
@@ -27,47 +26,34 @@ class _UserProfilePageState extends State<UserProfilePage> {
   String initialBio = "";
   late Widget avatar;
   late Widget largeAvatar;
-  bool loading = true;
+  bool loading = false;
   GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late final Stream<List<Post>> userPosts;
 
   @override
   void initState() {
     super.initState();
-    this.userPosts = PostProvider.readPostsFromUser(widget.user.uid);
-  }
-
-  void initUser(UserProfileProvider userProfileProvider) async {
-    final UserProfile userProfile =
-        await UserProfileProvider.readUserProfile(widget.user.uid);
-    userProfileProvider.load(userProfile);
-    setState(() {
-      initialUserName = userProfile.userName;
-      initialBio = userProfile.bio == null
-          ? "Please tell us more about you!"
-          : userProfile.bio!;
-      avatar = userProfileProvider.avatarURL == null
-          ? defaultAvatar(avatarSize)
-          : CachedNetworkImage(
-              fit: BoxFit.cover,
-              imageUrl: userProfileProvider.avatarURL!,
-              progressIndicatorBuilder: (context, url, downloadProgress) =>
-                  CircularProgressIndicator(value: downloadProgress.progress),
-              errorWidget: (context, url, error) => Icon(Icons.error),
-            );
-      loading = false;
-    });
+    userPosts = PostProvider.readPostsFromUser(widget.userProfile.userId);
+    initialUserName = widget.userProfile.userName;
+    initialBio = widget.userProfile.bio == null
+        ? "Please tell us more about you!"
+        : widget.userProfile.bio!;
+    avatar = widget.userProfile.avatarURL == null
+        ? defaultAvatar(avatarSize)
+        : CachedNetworkImage(
+            fit: BoxFit.cover,
+            imageUrl: widget.userProfile.avatarURL!,
+            progressIndicatorBuilder: (context, url, downloadProgress) =>
+                CircularProgressIndicator(value: downloadProgress.progress),
+            errorWidget: (context, url, error) => Icon(Icons.error),
+          );
   }
 
   @override
   Widget build(BuildContext context) {
-    UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context);
     UserState userState = Provider.of<UserState>(context);
     CircleProvider circleProvider =
         Provider.of<CircleProvider>(context, listen: false);
-    initUser(userProfileProvider);
-
     return loading
         ? Container()
         : Column(
@@ -88,8 +74,9 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       image: avatar,
                       size: avatarSize,
                       onPressed: () async {
-                        await userProfileProvider.uploadPic(context);
-                        userProfileProvider.saveChanges();
+                        String avatarURL =
+                            await UserProfileProvider.uploadPic(context);
+                        UserProfileProvider.updateAvatarURL(avatarURL);
                       },
                     ),
                     SizedBox(width: 14),
@@ -100,8 +87,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                         subtitle: TextH4(initialBio),
                         trailing: IconButton(
                           onPressed: () {
-                            _showEditForm(context, userProfileProvider,
-                                initialUserName, initialBio);
+                            _showEditForm(context, widget.userProfile);
                           },
                           icon: Icon(Icons.edit),
                         ),
@@ -123,7 +109,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       children: [
                         TextH3("Circles Joined: "),
                         StreamBuilder<List<CircleInfo>>(
-                          stream: userProfileProvider.circlesJoined,
+                          stream: UserProfileProvider.circlesJoined,
                           builder: (context, snapshot) {
                             if (snapshot.data != null &&
                                 snapshot.data!.isNotEmpty) {
@@ -171,8 +157,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           child: TextH3("My Interest Tags: "),
                         ),
                         Wrap(
-                          children: userProfileProvider.tags.isNotEmpty
-                              ? userProfileProvider.tags.map((tag) {
+                          children: widget.userProfile.tags.isNotEmpty
+                              ? widget.userProfile.tags.map((tag) {
                                   return Chip(label: Text(tag));
                                 }).toList()
                               : [
@@ -230,7 +216,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
                           child: SecondaryButton(
                             onPressed: () {
                               userState.signOut();
-                              userProfileProvider.clear();
                               dispose();
                             },
                             child: Text("Sign out"),
@@ -245,8 +230,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
           );
   }
 
-  Future<void> _showEditForm(BuildContext context, userProfileProvider,
-      String initialUserName, String initialBio) async {
+  Future<void> _showEditForm(
+      BuildContext context, UserProfile userProfile) async {
     return await showDialog(
       context: context,
       builder: (context) {
@@ -289,9 +274,15 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 onPressed: () {
                   _formKey.currentState!.save();
                   if (_formKey.currentState!.validate()) {
-                    userProfileProvider.changeUserName(userNameController.text);
-                    userProfileProvider.changeBio(bioController.text);
-                    userProfileProvider.saveChanges();
+                    UserProfileProvider.saveChanges(
+                        userNameController.text,
+                        userProfile.tags,
+                        userProfile.avatarURL,
+                        bioController.text);
+                    setState(() {
+                      initialUserName = userNameController.text;
+                      initialBio = bioController.text;
+                    });
                     Navigator.of(context).pop();
                   }
                 })
@@ -305,12 +296,5 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return (String? value) {
       return value == null || value.isEmpty ? "$field cannot be empty" : null;
     };
-  }
-
-  @override
-  void setState(fn) {
-    if (mounted) {
-      super.setState(fn);
-    }
   }
 }

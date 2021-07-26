@@ -45,10 +45,10 @@ class CircleProvider with ChangeNotifier {
   String? get description => _description;
   List<String>? get descriptionImageURLs => _descriptionImageURLs;
 
-  Stream<List<Circle>> get allCircles => _firestoreService.getCircles();
+  static Stream<List<Circle>> get allCircles => _firestoreService.getCircles();
 
   /// Query all the public circles
-  Stream<List<Circle>> get publicCircles =>
+  static Stream<List<Circle>> get publicCircles =>
       _firestoreService.getPublicCircles();
 
   /// Query circle inforamtion to demonstrate the circle feed

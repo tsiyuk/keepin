@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:keepin/src/models/ChatRoom.dart';
 import 'package:keepin/src/services/ChatRoomProvider.dart';
-import 'package:provider/provider.dart';
 
 class NewMessageWidget extends StatefulWidget {
   final ChatRoom chatRoom;

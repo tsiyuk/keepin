@@ -30,7 +30,7 @@ class _UserProfileDisplayState extends State<UserProfileDisplay> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<UserProfile>(
-        future: UserProfileProvider.readUserProfile(widget.userId),
+        future: UserProfileProvider.readUserProfileOnce(widget.userId),
         builder: (context, snapshot) =>
             snapshot.connectionState == ConnectionState.waiting
                 ? Loading(30)
@@ -76,8 +76,6 @@ class _HelperState extends State<Helper> {
 
   @override
   Widget build(BuildContext context) {
-    UserProfileProvider userProfileProvider =
-        Provider.of<UserProfileProvider>(context, listen: false);
     CircleProvider circleProvider =
         Provider.of<CircleProvider>(context, listen: false);
     return Scaffold(
@@ -126,8 +124,8 @@ class _HelperState extends State<Helper> {
                           SizedBox(width: MediaQuery.of(context).size.width),
                           TextH3("Circles Joined: "),
                           StreamBuilder<List<CircleInfo>>(
-                            stream: userProfileProvider
-                                .readCircleJoined(widget.userProfile.userId),
+                            stream: UserProfileProvider.readCircleJoined(
+                                widget.userProfile.userId),
                             builder: (context, snapshot) {
                               if (snapshot.data != null &&
                                   snapshot.data!.isNotEmpty) {
@@ -260,11 +258,5 @@ class _HelperState extends State<Helper> {
     if (mounted) {
       super.setState(fn);
     }
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
   }
 }

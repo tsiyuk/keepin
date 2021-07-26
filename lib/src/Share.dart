@@ -53,8 +53,8 @@ Future<void> share(BuildContext context,
                               ChatRoom chatRoom = chatRooms[index];
                               String otherId =
                                   ChatRoomAPI.getOtherUserId(chatRooms[index]);
-                              return FutureBuilder<UserProfile>(
-                                future: UserProfileProvider.readUserProfile(
+                              return StreamBuilder<UserProfile>(
+                                stream: UserProfileProvider.readUserProfile(
                                     otherId),
                                 builder: (fContext, snapshot) {
                                   if (snapshot.data != null) {
