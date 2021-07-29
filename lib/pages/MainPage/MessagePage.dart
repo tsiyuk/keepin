@@ -102,7 +102,7 @@ class _MessagePageState extends State<MessagePage>
                   showError(context, snapshot.error.toString());
                   return Center(child: Text("Error"));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text("Start a conversation"));
+                  return Center(child: Text("Start a conversation by finding other users in circles, posts or search!"));
                 } else {
                   var chatRooms = snapshot.data!;
                   return ListView.separated(
