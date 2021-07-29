@@ -94,7 +94,7 @@ class UserState extends ChangeNotifier {
           var futures = <Future>[];
           futures.add(user.updateDisplayName(displayName));
           futures.add(UserProfileProvider.createProfile(
-              user.uid, user.displayName!, user.photoURL));
+              user.uid, displayName, user.photoURL));
           await Future.wait(futures);
           _loginState = LoginState.loggedIn;
           _user = user;
