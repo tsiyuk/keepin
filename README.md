@@ -1,16 +1,13 @@
 # keepin
 
-A new Flutter project.
+A mobile platform for people to clock in in their interest circle whenever they join an event, have done their practice or have something interesting to share.
+
+<img src="2461.png" width="500" />
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+Download the apk file [here](https://github.com/tsiyuk/keepin/releases/tag/v1.0) and install it on your mobile phone.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
-
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Document
+You can check our document [here](https://docs.google.com/document/d/182Fx9l9qHtbZgNM7j6ezTNkhG4Ne_1fg7Fsdnqadfc0/edit?usp=sharing)
+You can check our demo video [here](https://drive.google.com/file/d/1I1xui7DXc8iEAuBNOdlKJBXN6DnLhPzN/view?usp=sharing)
